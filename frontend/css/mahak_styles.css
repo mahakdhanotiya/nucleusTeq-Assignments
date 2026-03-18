@@ -64,3 +64,13 @@ nav ul li a {
 nav ul li a:hover {
     color: #ffa500;
 }
+
+/*---Section Styling---*/
+
+section {
+    margin-bottom: 20px;
+    padding: 20px;
+    background-color: white;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
