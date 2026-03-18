@@ -112,3 +112,42 @@ td {
 tr:nth-child(even) {
     background-color: #f9f9f9;
 }
+
+/* ===== Projects Section Styling ===== */
+
+/* ===== Projects Section Styling ===== */
+
+#projects ol {
+    padding-left: 20px;
+}
+
+#projects li {
+    margin-bottom: 20px;
+}
+
+/* Project Title */
+#projects strong {
+    font-size: 16px;
+}
+
+/*---Description spacing---*/
+#projects p {
+    margin: 5px 0;
+}
+
+/*---Highlighted Links---*/
+#projects a {
+    display: inline-block;
+    margin-top: 5px;
+    padding: 6px 12px;
+    background-color: #2c3e50;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: 0.3s;
+}
+
+/* Hover effect */
+#projects a:hover {
+    background-color: #f39c12;
+}
