@@ -151,3 +151,11 @@ tr:nth-child(even) {
 #projects a:hover {
     background-color: #f39c12;
 }
+
+/*---Disabled Link---*/
+#projects a.disabled {
+    background-color: transparent;
+    color: #777;
+    padding: 0;
+    cursor: default;
+}
