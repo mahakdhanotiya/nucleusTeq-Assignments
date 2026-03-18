@@ -86,3 +86,29 @@ section {
     line-height: 1.6;
     font-weight: 500;
 }
+
+/*---Education Table Styling---*/
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table, th, td {
+    border: 1px solid #333;
+}
+
+th {
+    text-align: center;
+    padding: 10px;
+    background-color: #f2f2f2;
+}
+
+td {
+    padding: 10px;
+}
+
+/*---Alternate row coloring---*/
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
