@@ -186,3 +186,30 @@ const students = [
     attendance: 60  
   }
 ];
+
+
+// FAIL CONDITION CHECK
+
+
+students.forEach(function(student) {
+  let hasFailed = false;
+  let failReason = "";
+
+  // checking subject marks
+  student.marks.forEach(function(mark) {
+    if (mark.score <= 40) {
+      hasFailed = true;
+      failReason = "Failed in " + mark.subject;
+    }
+  });
+
+  // checking attendance
+  if (student.attendance < 75) {
+    hasFailed = true;
+    failReason = "Low Attendance";
+  }
+
+  if (hasFailed) {
+    console.log(student.name + " Grade: Fail (" + failReason + ")");
+  }
+});
