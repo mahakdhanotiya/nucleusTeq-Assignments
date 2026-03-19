@@ -61,7 +61,7 @@ students.forEach(function(student) {
 });
 
 
-//Subject-wise highest scores
+//SUBJECT-WISE HIGHEST SCORES
 
 // list of subjects
 let subjects = ["Math", "English", "Science", "History", "Computer"];
@@ -84,3 +84,32 @@ subjects.forEach(function(sub) {
 
   console.log("Highest in " + sub + ": " + topperName + " (" + highestScore + ")");
 });
+
+
+// SUBJECT-WISE AVERAGE
+
+let subjects = ["Math", "English", "Science", "History", "Computer"];
+
+subjects.forEach(function(sub) {
+  let total = 0;
+  let count = 0;
+
+  // loop through all students
+  students.forEach(function(student) {
+
+    // check marks for current subject
+    student.marks.forEach(function(mark) {
+
+      if (mark.subject === sub) {
+        total += mark.score;
+        count++;
+      }
+
+    });
+  });
+
+  let average = total / count; // calculate average
+
+  console.log("Average " + sub + " Score: " + average.toFixed(2));
+});
+
