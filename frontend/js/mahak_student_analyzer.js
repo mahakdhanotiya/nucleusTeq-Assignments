@@ -1,4 +1,4 @@
-// Student data
+// STUDENT DATA
 const students = [
 {
  name: "Lalit",
@@ -25,6 +25,8 @@ const students = [
 ];
 
 
+//TOTAL MARKS
+
 // function to calculate total marks 
 function calculateTotal(student) {
   let total = 0;
@@ -41,6 +43,8 @@ students.forEach(function(student) {
   console.log(student.name + " Total Marks: " + totalMarks);
 });
 
+
+//AVERAGE MARKS
 
 // function to calculate average marks
 function calculateAverage(student) {
@@ -211,5 +215,47 @@ students.forEach(function(student) {
 
   if (hasFailed) {
     console.log(student.name + " Grade: Fail (" + failReason + ")");
+  }
+});
+
+
+// FINAL GRADE CALCULATION
+
+
+students.forEach(function(student) {
+  let total = 0;
+  let hasFailed = false;
+  let failReason = "";
+
+  // calculate total marks and check subject fail
+  student.marks.forEach(function(mark) {
+    total += mark.score;
+
+    if (mark.score <= 40) {
+      hasFailed = true;
+      failReason = "Failed in " + mark.subject;
+    }
+  });
+
+  let average = total / student.marks.length;
+
+  // checking attendance condition
+  if (student.attendance < 75) {
+    hasFailed = true;
+    failReason = "Low Attendance";
+  }
+
+  if (hasFailed) {
+    console.log(student.name + " Grade: Fail (" + failReason + ")");
+  } else {
+    let grade = "";
+
+    // assign grade based on average
+    if (average >= 85) grade = "A";
+    else if (average >= 70) grade = "B";
+    else if (average >= 50) grade = "C";
+    else grade = "D";
+
+    console.log(student.name + " Grade: " + grade);
   }
 });
