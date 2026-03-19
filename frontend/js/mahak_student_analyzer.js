@@ -41,6 +41,7 @@ students.forEach(function(student) {
   console.log(student.name + " Total Marks: " + totalMarks);
 });
 
+
 // function to calculate average marks
 function calculateAverage(student) {
   let total = 0;
@@ -53,9 +54,33 @@ function calculateAverage(student) {
 
   return average;
 }
-
 // print average marks
 students.forEach(function(student) {
   let avg = calculateAverage(student);
   console.log(student.name + " Average Marks: " + avg);
+});
+
+
+//Subject-wise highest scores
+
+// list of subjects
+let subjects = ["Math", "English", "Science", "History", "Computer"];
+
+subjects.forEach(function(sub) {
+  let highestScore = 0;
+  let topperName = "";
+
+  students.forEach(function(student) {
+    student.marks.forEach(function(mark) {
+
+      // check if subject matches and score is highest
+      if (mark.subject === sub && mark.score > highestScore) {
+        highestScore = mark.score;
+        topperName = student.name;
+      }
+
+    });
+  });
+
+  console.log("Highest in " + sub + ": " + topperName + " (" + highestScore + ")");
 });
