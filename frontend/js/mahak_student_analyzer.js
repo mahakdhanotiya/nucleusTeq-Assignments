@@ -113,3 +113,26 @@ subjects.forEach(function(sub) {
   console.log("Average " + sub + " Score: " + average.toFixed(2));
 });
 
+
+
+// OVERALL CLASS TOPPER
+
+let topperName = "";
+let highestMarks = 0;
+
+students.forEach(function(student) {
+  let total = 0;
+
+  // calculate total marks of this student
+  student.marks.forEach(function(mark) {
+    total += mark.score;
+  });
+
+  // check if current student has highest marks
+  if (total > highestMarks) {
+    highestMarks = total;
+    topperName = student.name;
+  }
+});
+
+console.log("Class Topper: " + topperName + " with " + highestMarks + " marks");
