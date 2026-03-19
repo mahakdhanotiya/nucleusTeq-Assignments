@@ -25,19 +25,37 @@ const students = [
 ];
 
 
-// function to calculate total marks of a student
+// function to calculate total marks 
 function calculateTotal(student) {
   let total = 0;
 
-  // loop through each subject
   for (let i = 0; i < student.marks.length; i++) {
     total += student.marks[i].score;
   }
 
   return total;
 }
-//Print total marks
+//Print result 
 students.forEach(function(student) {
   let totalMarks = calculateTotal(student);
   console.log(student.name + " Total Marks: " + totalMarks);
+});
+
+// function to calculate average marks
+function calculateAverage(student) {
+  let total = 0;
+
+  for (let i = 0; i < student.marks.length; i++) {
+    total += student.marks[i].score;
+  }
+
+  let average = total / student.marks.length;
+
+  return average;
+}
+
+// print average marks
+students.forEach(function(student) {
+  let avg = calculateAverage(student);
+  console.log(student.name + " Average Marks: " + avg);
 });
