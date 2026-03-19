@@ -144,7 +144,7 @@ console.log("Class Topper: " + topperName + " with " + highestMarks + " marks");
 
 //Adding test data to original data
 
-const students = [
+const studentsTest = [
   {
     name: "Lalit",
     marks: [
@@ -195,7 +195,7 @@ const students = [
 // FAIL CONDITION CHECK
 
 
-students.forEach(function(student) {
+studentsTest.forEach(function(student) {
   let hasFailed = false;
   let failReason = "";
 
@@ -222,7 +222,7 @@ students.forEach(function(student) {
 // FINAL GRADE CALCULATION
 
 
-students.forEach(function(student) {
+studentsTest.forEach(function(student) {
   let total = 0;
   let hasFailed = false;
   let failReason = "";

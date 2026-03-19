@@ -1,4 +1,4 @@
-# 📊 Student Performance Analyzer (JavaScript)
+# Student Performance Analyzer (JavaScript)
 
 ## Overview
 
@@ -77,4 +77,4 @@ frontend/js/
 ### Grade Calculation
 - Applies fail conditions (marks ≤ 40 or attendance < 75)  
 - Assigns grades using if-else conditions  
-![Grade](screenshots/final-grade-logic.png)
+![Grade](screenshots/Grade-logic.png)
