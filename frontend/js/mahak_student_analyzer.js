@@ -92,7 +92,6 @@ subjects.forEach(function(sub) {
 
 // SUBJECT-WISE AVERAGE
 
-let subjects = ["Math", "English", "Science", "History", "Computer"];
 
 subjects.forEach(function(sub) {
   let total = 0;
