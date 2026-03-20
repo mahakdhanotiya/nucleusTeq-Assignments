@@ -1,17 +1,24 @@
+/*--Body--*/
+
 body {
     font-family: Arial;
     margin: 20px;
 }
 
+/*--Header--*/
+
 header {
     text-align: center;
 }
 
+/*--Sections--*/
 section {
     margin-bottom: 20px;
     padding: 10px;
     border: 1px solid #ccc;
 }
+
+/*--Controls section--*/
 
 #controls h2 {
     width: 100%;
@@ -22,5 +29,13 @@ section {
     display: flex;
     gap: 15px;
     flex-wrap: wrap;
+}
+
+/*--Product Grid--*/
+
+#productGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
 }
 
