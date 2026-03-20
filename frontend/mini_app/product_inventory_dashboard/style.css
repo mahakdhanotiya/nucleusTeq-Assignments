@@ -12,3 +12,15 @@ section {
     padding: 10px;
     border: 1px solid #ccc;
 }
+
+#controls h2 {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+#controls {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+

@@ -13,8 +13,35 @@
         <h1>Product Inventory Dashboard</h1>
     </header>
 
-    <section id="controls">
+<section id="controls">
         <h2>Controls</h2>
+        <!-- Search -->
+    <input type="text" id="searchInput" placeholder="Search product...">
+
+    <!-- Category Filter -->
+    <select id="categoryFilter">
+        <option value="all">All Categories</option>
+        <option value="electronics">Electronics</option>
+        <option value="clothing">Clothing</option>
+        <option value="books">Books</option>
+        <option value="accessories">Accessories</option>
+    </select>
+
+    <!-- Sorting -->
+    <select id="sortOption">
+        <option value="">Sort By</option>
+        <option value="low-high">Price: Low to High</option>
+        <option value="high-low">Price: High to Low</option>
+        <option value="a-z">A → Z</option>
+        <option value="z-a">Z → A</option>
+    </select>
+
+    <!-- Low Stock -->
+    <label>
+        <input type="checkbox" id="lowStockFilter">
+        Low Stock (&lt; 5)
+    </label>
+
     </section>
 
     <!-- Analytics Section -->
