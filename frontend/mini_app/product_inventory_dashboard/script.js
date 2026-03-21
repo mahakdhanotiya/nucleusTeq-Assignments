@@ -253,3 +253,32 @@ document.getElementById("lowStockFilter").addEventListener("change", function() 
     renderProducts(filteredProducts);
     renderAnalytics(filteredProducts);
 });
+
+// ===== SORTING FUNCTIONALITY =====
+
+document.getElementById("sortOption").addEventListener("change", function() {
+
+    // Get selected sorting option
+    let option = this.value;
+
+    // Retrieve products from localStorage
+    let products = JSON.parse(localStorage.getItem("products"));
+
+    // Apply sorting based on selected option
+    if (option === "low-high") {
+        products.sort((a, b) => a.price - b.price);
+    } 
+    else if (option === "high-low") {
+        products.sort((a, b) => b.price - a.price);
+    } 
+    else if (option === "a-z") {
+        products.sort((a, b) => a.name.localeCompare(b.name));
+    } 
+    else if (option === "z-a") {
+        products.sort((a, b) => b.name.localeCompare(a.name));
+    }
+
+    // Update UI
+    renderProducts(products);
+    renderAnalytics(products);
+});
