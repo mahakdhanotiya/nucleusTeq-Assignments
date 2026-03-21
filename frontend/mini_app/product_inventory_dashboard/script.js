@@ -52,4 +52,16 @@ function renderProducts(products) {
     });
 }
 
-renderProducts(productList);
+/*---LOCAL STORAGE SETUP---*/
+
+
+let storedProducts = JSON.parse(localStorage.getItem("products"));
+
+if (!storedProducts) {
+
+    localStorage.setItem("products", JSON.stringify(productList));
+    
+    storedProducts = productList;
+}
+
+renderProducts(storedProducts);
