@@ -91,3 +91,32 @@ section {
     min-width: 200px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
+
+/*---ADD PRODUCT FORM ---*/
+
+#productForm {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 400px;
+    margin-top: 10px;
+}
+
+#productForm input,
+#productForm select {
+    padding: 6px;
+}
+
+#productForm button {
+    padding: 8px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#add-product {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+}
