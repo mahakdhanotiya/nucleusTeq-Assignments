@@ -75,3 +75,19 @@ section {
     border: none;
 }
 
+/*---ANALYTICS---*/
+
+#analyticsContainer {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.analytics-card {
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 8px;
+    background-color: #fff;
+    min-width: 200px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}

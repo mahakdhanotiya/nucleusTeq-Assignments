@@ -64,4 +64,44 @@ if (!storedProducts) {
     storedProducts = productList;
 }
 
+//---ANALYTICS FUNCTION----//
+
+function renderAnalytics(products) {
+
+    let container = document.getElementById("analyticsContainer");
+
+    // total products
+    let totalProducts = products.length;
+
+    // total inventory value
+    let totalValue = 0;
+    products.forEach(function(product) {
+        totalValue += product.price * product.stock;
+    });
+
+    // out of stock count
+    let outOfStock = products.filter(function(product) {
+        return product.stock === 0;
+    }).length;
+
+    // UI
+    container.innerHTML = `
+        <div class="analytics-card">
+            <h3>Total Products</h3>
+            <p>${totalProducts}</p>
+        </div>
+
+        <div class="analytics-card">
+            <h3>Total Inventory Value</h3>
+            <p>₹${totalValue}</p>
+        </div>
+
+        <div class="analytics-card">
+            <h3>Out of Stock</h3>
+            <p>${outOfStock}</p>
+        </div>
+    `;
+}
+
 renderProducts(storedProducts);
+renderAnalytics(storedProducts);
