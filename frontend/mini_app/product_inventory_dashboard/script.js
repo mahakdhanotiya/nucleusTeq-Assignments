@@ -227,3 +227,29 @@ document.getElementById("categoryFilter").addEventListener("change", function() 
     renderProducts(filteredProducts);
     renderAnalytics(filteredProducts);
 });
+
+/*---LOW STOCK FILTER---*/
+
+document.getElementById("lowStockFilter").addEventListener("change", function() {
+
+    // Check if filter is enabled
+    let isChecked = this.checked;
+
+    // Retrieve products from localStorage
+    let products = JSON.parse(localStorage.getItem("products"));
+
+    let filteredProducts;
+
+    // Filter products with stock less than 5
+    if (isChecked) {
+        filteredProducts = products.filter(function(product) {
+            return product.stock < 5;
+        });
+    } else {
+        filteredProducts = products;
+    }
+
+    // Update UI
+    renderProducts(filteredProducts);
+    renderAnalytics(filteredProducts);
+});
