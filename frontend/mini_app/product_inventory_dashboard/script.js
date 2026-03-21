@@ -30,7 +30,7 @@ function renderProducts(products) {
 
     container.innerHTML = "";
 
-    if (products.length === 0) {
+    if (!products || products.length === 0) {
         container.innerHTML = `<p style="text-align:center; font-weight:bold; padding:20px;">
         No products found
         </p>
@@ -58,7 +58,7 @@ function renderProducts(products) {
 /*---LOCAL STORAGE SETUP---*/
 
 
-let storedProducts = JSON.parse(localStorage.getItem("products"));
+let storedProducts = JSON.parse(localStorage.getItem("products")) || [];
 
 if (!storedProducts) {
 
@@ -126,7 +126,7 @@ document.getElementById("productForm").addEventListener("submit", function(e) {
     }
 
     // Get existing products from localStorage
-    let products = JSON.parse(localStorage.getItem("products"));
+    let products = JSON.parse(localStorage.getItem("products")) || [];
 
     // Create new product object
     let newProduct = {
@@ -164,7 +164,7 @@ function deleteProduct(id) {
     }
 
     // Retrieve existing products from localStorage
-    let products = JSON.parse(localStorage.getItem("products"));
+    let products = JSON.parse(localStorage.getItem("products")) || [];
 
     // Remove selected product
     products = products.filter(function(product) {
@@ -211,7 +211,7 @@ document.getElementById("categoryFilter").addEventListener("change", function() 
     let selectedCategory = this.value;
 
     // Retrieve products from localStorage
-    let products = JSON.parse(localStorage.getItem("products"));
+    let products = JSON.parse(localStorage.getItem("products")) || [];
 
     let filteredProducts;
 
@@ -237,7 +237,7 @@ document.getElementById("lowStockFilter").addEventListener("change", function() 
     let isChecked = this.checked;
 
     // Retrieve products from localStorage
-    let products = JSON.parse(localStorage.getItem("products"));
+    let products = JSON.parse(localStorage.getItem("products")) || [];
 
     let filteredProducts;
 
@@ -263,7 +263,7 @@ document.getElementById("sortOption").addEventListener("change", function() {
     let option = this.value;
 
     // Retrieve products from localStorage
-    let products = JSON.parse(localStorage.getItem("products"));
+    let products = JSON.parse(localStorage.getItem("products")) || [];
 
     // Apply sorting based on selected option
     if (option === "low-high") {
@@ -289,7 +289,7 @@ document.getElementById("sortOption").addEventListener("change", function() {
 function fetchProducts() {
     return new Promise(function(resolve) {
         setTimeout(function() {
-            let products = JSON.parse(localStorage.getItem("products"));
+            let products = JSON.parse(localStorage.getItem("products")) || [];
             resolve(products);
         }, 2000);
     });

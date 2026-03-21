@@ -1,7 +1,7 @@
 /*--Body--*/
 
 body {
-    font-family: Arial;
+    font-family: Arial, sans-serif;
     margin: 20px;
 }
 
@@ -67,6 +67,7 @@ section {
     border-radius: 5px;
     cursor: pointer;
     font-weight: 600;
+    transition: all 0.2s ease;
 }
 
 .product-card button:hover {
