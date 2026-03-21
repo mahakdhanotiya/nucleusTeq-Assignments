@@ -22,4 +22,34 @@ let productList = [
     { id: 12, name: "Bag", price: 1800, category: "accessories", stock: 4 }
 ];
 
-alert("JS loaded");
+/*--RENDER PRODUCTS--*/
+
+function renderProducts(products) {
+
+    let container = document.getElementById("productGrid");
+
+    container.innerHTML = "";
+
+    if (products.length === 0) {
+        container.innerHTML = "<p>No products found</p>";
+        return;
+    }
+
+    products.forEach(function(product) {
+
+        let card = document.createElement("div");
+        card.className = "product-card";
+
+        card.innerHTML = `
+            <h3>${product.name}</h3>
+            <p>Category: ${product.category}</p>
+            <p>Price: ₹${product.price}</p>
+            <p>Stock: ${product.stock}</p>
+            <button>Delete</button>
+        `;
+
+        container.appendChild(card);
+    });
+}
+
+renderProducts(productList);
