@@ -103,8 +103,6 @@ function renderAnalytics(products) {
     `;
 }
 
-renderProducts(storedProducts);
-renderAnalytics(storedProducts);
 
 /*--ADD PRODUCT--*/
 
@@ -279,6 +277,27 @@ document.getElementById("sortOption").addEventListener("change", function() {
     }
 
     // Update UI
+    renderProducts(products);
+    renderAnalytics(products);
+});
+
+/*---FETCH PRODUCTS---*/
+
+function fetchProducts() {
+    return new Promise(function(resolve) {
+        setTimeout(function() {
+            let products = JSON.parse(localStorage.getItem("products"));
+            resolve(products);
+        }, 10000);
+    });
+}
+
+let loadingText = document.getElementById("loading");
+
+fetchProducts().then(function(products) {
+
+    loadingText.style.display = "none";
+
     renderProducts(products);
     renderAnalytics(products);
 });
