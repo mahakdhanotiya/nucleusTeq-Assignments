@@ -105,3 +105,46 @@ function renderAnalytics(products) {
 
 renderProducts(storedProducts);
 renderAnalytics(storedProducts);
+
+document.getElementById("productForm").addEventListener("submit", function(e) {
+
+    e.preventDefault();
+
+    // Get input values
+    let name = document.getElementById("name").value;
+    let price = document.getElementById("price").value;
+    let stock = document.getElementById("stock").value;
+    let category = document.getElementById("category").value;
+
+    // Validation
+    if (name === "" || price <= 0 || stock < 0 || category === "") {
+        alert("Please fill all fields correctly");
+        return;
+    }
+
+    // Get existing products from localStorage
+    let products = JSON.parse(localStorage.getItem("products"));
+
+    // Create new product object
+    let newProduct = {
+        id: Date.now(),
+        name: name,
+        price: Number(price),
+        stock: Number(stock),
+        category: category
+    };
+
+    // Add new product to array
+    products.push(newProduct);
+
+    // Save updated products to localStorage
+    localStorage.setItem("products", JSON.stringify(products));
+
+    // Re-render UI
+    renderProducts(products);
+    renderAnalytics(products);
+
+    // Reset form
+    document.getElementById("productForm").reset();
+});
+
