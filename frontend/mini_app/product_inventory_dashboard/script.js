@@ -45,7 +45,7 @@ function renderProducts(products) {
             <p>Category: ${product.category}</p>
             <p>Price: ₹${product.price}</p>
             <p>Stock: ${product.stock}</p>
-            <button>Delete</button>
+            <button onclick="deleteProduct(${product.id})">Delete</button>
         `;
 
         container.appendChild(card);
@@ -106,6 +106,7 @@ function renderAnalytics(products) {
 renderProducts(storedProducts);
 renderAnalytics(storedProducts);
 
+
 document.getElementById("productForm").addEventListener("submit", function(e) {
 
     e.preventDefault();
@@ -148,3 +149,20 @@ document.getElementById("productForm").addEventListener("submit", function(e) {
     document.getElementById("productForm").reset();
 });
 
+function deleteProduct(id) {
+
+    // Retrieving existing products from localStorage
+    let products = JSON.parse(localStorage.getItem("products"));
+
+    // Remove selected product
+    products = products.filter(function(product) {
+        return product.id !== id;
+    });
+
+    // Save Updated productlist to localStorage
+    localStorage.setItem("products", JSON.stringify(products));
+
+    // Update UI
+    renderProducts(products);
+    renderAnalytics(products);
+}
