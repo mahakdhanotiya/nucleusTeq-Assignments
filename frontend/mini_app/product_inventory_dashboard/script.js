@@ -1,0 +1,25 @@
+/*--PRODUCT DATA--*/
+
+let productList = [
+    // Electronics
+    { id: 1, name: "Laptop", price: 50000, category: "electronics", stock: 10 },
+    { id: 2, name: "Mobile", price: 30000, category: "electronics", stock: 5 },
+    { id: 3, name: "Headphones", price: 2000, category: "electronics", stock: 3 },
+
+    // Clothing
+    { id: 4, name: "T-Shirt", price: 800, category: "clothing", stock: 25 },
+    { id: 5, name: "Jeans", price: 1500, category: "clothing", stock: 8 },
+    { id: 6, name: "Jacket", price: 2500, category: "clothing", stock: 2 },
+
+    // Books
+    { id: 7, name: "Book", price: 500, category: "books", stock: 5 },
+    { id: 8, name: "Notebook", price: 200, category: "books", stock: 0 },
+    { id: 9, name: "Story Book", price: 350, category: "books", stock: 7 },
+
+    // Accessories
+    { id: 10, name: "Watch", price: 1500, category: "accessories", stock: 0 },
+    { id: 11, name: "Sunglasses", price: 1200, category: "accessories", stock: 6 },
+    { id: 12, name: "Bag", price: 1800, category: "accessories", stock: 4 }
+];
+
+alert("JS loaded");
