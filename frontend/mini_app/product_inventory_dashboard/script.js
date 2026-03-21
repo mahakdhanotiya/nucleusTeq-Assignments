@@ -288,7 +288,7 @@ function fetchProducts() {
         setTimeout(function() {
             let products = JSON.parse(localStorage.getItem("products"));
             resolve(products);
-        }, 10000);
+        }, 2000);
     });
 }
 
@@ -301,3 +301,5 @@ fetchProducts().then(function(products) {
     renderProducts(products);
     renderAnalytics(products);
 });
+
+
