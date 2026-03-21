@@ -31,7 +31,10 @@ function renderProducts(products) {
     container.innerHTML = "";
 
     if (products.length === 0) {
-        container.innerHTML = "<p>No products found</p>";
+        container.innerHTML = `<p style="text-align:center; font-weight:bold; padding:20px;">
+        No products found
+        </p>
+        `;
         return;
     }
 
@@ -292,14 +295,23 @@ function fetchProducts() {
     });
 }
 
+// Select all controls (search, filters, sorting)
+let controls = document.querySelectorAll("#controls input, #controls select");
+
+// Disable controls before loading
+controls.forEach(control => control.disabled = true);
+
 let loadingText = document.getElementById("loading");
 
 fetchProducts().then(function(products) {
 
+    // Hide loader
     loadingText.style.display = "none";
+
+    // Enable controls after loading
+    controls.forEach(control => control.disabled = false);
 
     renderProducts(products);
     renderAnalytics(products);
 });
-
 
