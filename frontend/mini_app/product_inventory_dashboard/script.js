@@ -151,7 +151,15 @@ document.getElementById("productForm").addEventListener("submit", function(e) {
 
 function deleteProduct(id) {
 
-    // Retrieving existing products from localStorage
+    // Ask for confirmation
+    let isConfirmed = confirm("Are you sure you want to delete this product?");
+
+    // If user clicks Cancel
+    if (!isConfirmed) {
+        return;
+    }
+
+    // Retrieve existing products from localStorage
     let products = JSON.parse(localStorage.getItem("products"));
 
     // Remove selected product
@@ -159,7 +167,7 @@ function deleteProduct(id) {
         return product.id !== id;
     });
 
-    // Save Updated productlist to localStorage
+    // Save updated list
     localStorage.setItem("products", JSON.stringify(products));
 
     // Update UI
