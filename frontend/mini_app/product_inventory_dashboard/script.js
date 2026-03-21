@@ -73,7 +73,7 @@ function renderAnalytics(products) {
     // total products
     let totalProducts = products.length;
 
-    // total inventory value
+    // Calculate total inventory value
     let totalValue = 0;
     products.forEach(function(product) {
         totalValue += product.price * product.stock;
@@ -106,6 +106,7 @@ function renderAnalytics(products) {
 renderProducts(storedProducts);
 renderAnalytics(storedProducts);
 
+/*--ADD PRODUCT--*/
 
 document.getElementById("productForm").addEventListener("submit", function(e) {
 
@@ -149,6 +150,8 @@ document.getElementById("productForm").addEventListener("submit", function(e) {
     document.getElementById("productForm").reset();
 });
 
+/*---DELETE PRODUCT---*/
+
 function deleteProduct(id) {
 
     // Ask for confirmation
@@ -174,3 +177,27 @@ function deleteProduct(id) {
     renderProducts(products);
     renderAnalytics(products);
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+
+    /*---SEARCH FUNCTIONALITY---*/
+
+
+    document.getElementById("searchInput").addEventListener("input", function() {
+
+     // Get search input (case-insensitive)   
+    let searchValue = this.value.toLowerCase();
+
+    // Retrieve products from localStorage
+    let products = JSON.parse(localStorage.getItem("products")) || [];
+
+    // Filter products by name
+    let filteredProducts = products.filter(function(product) {
+        return product.name.toLowerCase().includes(searchValue);
+    });
+
+    //Update UI
+    renderProducts(filteredProducts);
+    renderAnalytics(filteredProducts);
+});
+});
