@@ -201,3 +201,29 @@ document.addEventListener("DOMContentLoaded", function() {
     renderAnalytics(filteredProducts);
 });
 });
+
+/*---CATEGORY FILTER---*/
+
+document.getElementById("categoryFilter").addEventListener("change", function() {
+
+    // Get selected category
+    let selectedCategory = this.value;
+
+    // Retrieve products from localStorage
+    let products = JSON.parse(localStorage.getItem("products"));
+
+    let filteredProducts;
+
+    // Show all or filter by category
+    if (selectedCategory === "all") {
+        filteredProducts = products;
+    } else {
+        filteredProducts = products.filter(function(product) {
+            return product.category === selectedCategory;
+        });
+    }
+
+    // Update UI
+    renderProducts(filteredProducts);
+    renderAnalytics(filteredProducts);
+});
