@@ -138,3 +138,21 @@ section {
         transform: rotate(360deg);
     }
 }
+
+/*---RESPONSIVE DESIGN---*/
+
+@media (max-width: 600px) {
+
+    #productGrid {
+        grid-template-columns: 1fr;
+    }
+
+    #controls {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    #productForm {
+        max-width: 100%;
+    }
+}

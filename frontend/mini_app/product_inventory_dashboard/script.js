@@ -255,7 +255,7 @@ document.getElementById("lowStockFilter").addEventListener("change", function() 
     renderAnalytics(filteredProducts);
 });
 
-// ===== SORTING FUNCTIONALITY =====
+/*---SORTING FUNCTIONALITY---*/
 
 document.getElementById("sortOption").addEventListener("change", function() {
 
