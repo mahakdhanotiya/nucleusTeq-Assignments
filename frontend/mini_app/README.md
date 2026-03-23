@@ -41,7 +41,7 @@
 - Total Inventory Value (price × stock)
 - Out of Stock Count
 
-### Data Persistence
+### Data Persistence (Feature)
 - Uses Local Storage
 - Data remains after page refresh
 
