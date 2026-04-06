@@ -1,3 +1,5 @@
+Q1: Explain the difference between primitive and reference data types with examples.
+
 Primitive Data Types:
 Primitive data types are basic data types that store simple values directly in memory.
 They are predefined in Java and are faster to access.
