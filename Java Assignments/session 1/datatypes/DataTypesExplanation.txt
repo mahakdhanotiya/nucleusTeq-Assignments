@@ -1,0 +1,22 @@
+Primitive Data Types:
+Primitive data types are basic data types that store simple values directly in memory.
+They are predefined in Java and are faster to access.
+
+Examples: int, float, double, char, boolean
+
+Reference Data Types:
+Reference data types store the address (reference) of an object in memory instead of the actual value.
+They are used to work with objects and more complex data structures.
+
+Examples: String, Arrays, Objects
+
+Difference:
+Primitive Data Types:
+- Store actual value
+- Fixed size
+- Faster access
+
+Reference Data Types:
+- Store memory address
+- Can store complex data
+- Slightly slower as they refer to objects
