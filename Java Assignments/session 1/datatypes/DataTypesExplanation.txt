@@ -4,13 +4,21 @@ Primitive Data Types:
 Primitive data types are basic data types that store simple values directly in memory.
 They are predefined in Java and are faster to access.
 
-Examples: int, float, double, char, boolean
+Examples:
+int a = 10;
+double price = 99.5;
+char grade = 'A';
+boolean isPassed = true;
 
 Reference Data Types:
 Reference data types store the address (reference) of an object in memory instead of the actual value.
 They are used to work with objects and more complex data structures.
 
-Examples: String, Arrays, Objects
+Examples:
+String - String name = "Mahak";
+Array - int[] arr = {1, 2, 3};
+
+Object - Student s1 = new Student();
 
 Difference:
 Primitive Data Types:
