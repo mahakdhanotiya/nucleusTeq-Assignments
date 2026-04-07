@@ -35,4 +35,10 @@ public class Student {
         System.out.println("Roll No: " + rollNumber);
         System.out.println("Marks: " + marks);
     }
+    
+    void display(String message) {
+        System.out.println(message);
+        display();
+
+    }
 }

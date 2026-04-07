@@ -7,7 +7,7 @@ public class Main {
         s1.setRollNumber(101);
         s1.setMarks(88.5);
 
-        s1.display();
+        s1.display("Student Details:");
 
         GraduateStudent g1 = new GraduateStudent();
 

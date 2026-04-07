@@ -15,7 +15,7 @@ public class FileReadExample {
             sc.close();
 
         } catch (Exception e) {
-            System.out.println("Error reading file");
+            System.out.println("Error reading file:" +e.getMessage()) ;
         }
     }
 }
