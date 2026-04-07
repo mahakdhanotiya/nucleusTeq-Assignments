@@ -1,0 +1,2 @@
+Hello, I am Mahak.
+This is a file reading example.
