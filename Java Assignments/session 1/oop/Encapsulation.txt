@@ -1,0 +1,27 @@
+Encapsulation
+
+Encapsulation is the process of wrapping data (variables) and methods into a single unit.
+
+In encapsulation, variables are declared as private so that they cannot be accessed directly from outside the class. Getter and setter methods are used to access and modify the data.
+
+This helps in data hiding and improves security. It also provides better control over the data.
+
+Advantages of Encapsulation:
+- Data hiding
+- Improved security
+- Better control over data
+- Code becomes more maintainable
+
+Example:
+
+class Student {
+    private String name;
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+}
