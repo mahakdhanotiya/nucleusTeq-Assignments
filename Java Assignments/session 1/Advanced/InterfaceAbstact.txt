@@ -1,0 +1,14 @@
+Interfaces and Abstract Classes
+
+Abstract Class:
+An abstract class is a class that cannot be instantiated.
+ It can contain both abstract methods (methods without body) and normal methods (methods with body).
+
+Interface:
+An interface is a blueprint of a class that contains only abstract methods.
+ A class implements an interface using the 'implements' keyword.
+
+Difference between Abstract Class and Interface:
+- An abstract class can have both abstract and normal methods, while an interface contains only abstract methods.
+- A class extends an abstract class, whereas it implements an interface.
+- Abstract class supports single inheritance, while a class can implement multiple interfaces.
