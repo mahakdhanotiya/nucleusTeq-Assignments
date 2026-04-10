@@ -2,6 +2,7 @@ package com.example.usermanagementsystem.service;
 
 import com.example.usermanagementsystem.model.User;
 import com.example.usermanagementsystem.repository.UserRepository;
+import com.example.usermanagementsystem.exception.UserNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,7 +23,12 @@ public class UserService {
     }
 
     public User getUserById(int id) {
-        return repo.getUserById(id);
+        User user = repo.getUserById(id);
+
+    if (user == null) {
+        throw new UserNotFoundException("User not found with id: " + id);
+    }
+    return user;
     }
 
     public String addUser(User user) {
