@@ -1,35 +1,40 @@
 package com.example.usermanagementsystem.service;
 
+import com.example.usermanagementsystem.model.User;
+import com.example.usermanagementsystem.repository.UserRepository;
 import org.springframework.stereotype.Service;
-import java.util.*;
+
+import java.util.List;
 
 @Service
 public class UserService {
 
-    private List<String> users = new ArrayList<>();
+    private final UserRepository repo;
 
-    // Dummy data 
-    public UserService() {
-        users.add("Rahul Sharma");
-        users.add("Aman Verma");
-        users.add("Priya Singh");
-        users.add("Neha Gupta");
-        users.add("Arjun Mehta");
+    public UserService(UserRepository repo) {
+        this.repo = repo;
     }
 
-    public List<String> getAllUsers() {
-        return users;
+    public List<User> getAllUsers() {
+        return repo.getAllUsers();
     }
 
-    public String addUser(String name) {
-        users.add(name);
+    public User getUserById(int id) {
+        return repo.getUserById(id);
+    }
+
+    public String addUser(User user) {
+        repo.addUser(user);
         return "User added successfully";
     }
 
-    public String getUserById(int id) {
-        if (id < users.size()) {
-            return users.get(id);
-        }
-        return "User not found";
+    public String deleteUser(int id) {
+        repo.deleteUser(id);
+        return "User deleted successfully";
+    }
+
+    public String updateUser(int id, String name, String email) {
+        repo.updateUser(id, name, email);
+        return "User updated successfully";
     }
 }
