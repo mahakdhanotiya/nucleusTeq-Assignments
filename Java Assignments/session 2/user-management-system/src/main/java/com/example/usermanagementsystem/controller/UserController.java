@@ -1,15 +1,39 @@
-package com.example.usermanagementsystem;
+package com.example.usermanagementsystem.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.example.usermanagementsystem.service.UserService;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
+@RequestMapping("/users")
 public class UserController {
 
-    @GetMapping("/hello")
-    public String hello() {
-        return "Hello Mahak ";
+    private final UserService userService;
+
+    // constructor injection 
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @GetMapping
+    public List<String> getUsers() {
+        return userService.getAllUsers();
+    }
+
+    @PostMapping
+    public String addUser(@RequestParam String name) {
+        return userService.addUser(name);
+    }
+
+        @GetMapping("/add")
+    public String addUserFromBrowser(@RequestParam String name) {
+        return userService.addUser(name);
+
+    }
+
+    @GetMapping("get/{id}")
+    public String getUser(@PathVariable int id) {
+        return userService.getUserById(id);
     }
 }
-    
-
