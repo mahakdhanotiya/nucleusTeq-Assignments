@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+//Service layer for handling business logic
+
 @Service
 public class UserService {
 
