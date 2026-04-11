@@ -5,6 +5,7 @@ import com.example.usermanagementsystem.repository.UserRepository;
 import com.example.usermanagementsystem.exception.UserNotFoundException;
 import com.example.usermanagementsystem.exception.UserAlreadyExistsException;
 import com.example.usermanagementsystem.exception.InvalidUserDataException;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,11 +17,13 @@ public class UserService {
 
     private final UserRepository repo;
 
+    //Constructor Injection
     public UserService(UserRepository repo) {
         this.repo = repo;
+
     }
 
-    
+
     //----- GET ALL USERS ------
 
     public List<User> getAllUsers() {
@@ -35,10 +38,10 @@ public class UserService {
         // Fetch user by ID and throw exception if not found
         User user = repo.getUserById(id);
 
-    if (user == null) {
-        throw new UserNotFoundException("User not found with id: " + id);
-    }
-    return user;
+        if (user == null) {
+           throw new UserNotFoundException("User not found with id: " + id);
+        }
+        return user;
     }
 
 
@@ -46,25 +49,24 @@ public class UserService {
 
     public String addUser(User user) {
 
-        // Validate user input (name & email should not be empty)
+        // Validate user input 
 
         if (user.getName() == null || user.getName().isEmpty()) {
-        throw new InvalidUserDataException("User name cannot be empty");
-    }
-     // Check if email is empty
+            throw new InvalidUserDataException("User name cannot be empty");
+        }
 
-    if (user.getEmail() == null || user.getEmail().isEmpty()) {
-        throw new InvalidUserDataException("User email cannot be empty");
-    }
+        if (user.getEmail() == null || user.getEmail().isEmpty()) {
+            throw new InvalidUserDataException("User email cannot be empty");
+        }
        //Check for duplicate user ID
 
         User existingUser = repo.getUserById(user.getId());
 
-    if (existingUser != null) {
-        throw new UserAlreadyExistsException("User with this ID already exists");
-    }
-    repo.addUser(user);
-    return "User added successfully";
+        if (existingUser != null) {
+            throw new UserAlreadyExistsException("User with this ID already exists");
+        }
+        repo.addUser(user);
+        return "User added successfully";
     }
 
 
@@ -75,25 +77,27 @@ public class UserService {
         //Check if user exists before deleting
         User user = repo.getUserById(id);
 
-    if (user == null) {
-        throw new UserNotFoundException("User not found with id: " + id);
-    }
-    repo.deleteUser(id);
-    return "User deleted successfully";
+        if (user == null) {
+           throw new UserNotFoundException("User not found with id: " + id);
+        }
+        repo.deleteUser(id);
+        return "User deleted successfully";
     }
 
 
-     //------ UPDATE USER-------
+    //------ UPDATE USER-------
 
     public String updateUser(int id, String name, String email) {
 
         // Check if user exists before updating
         User user = repo.getUserById(id);
 
-    if (user == null) {
-        throw new UserNotFoundException("User not found with id: " + id);
+        if (user == null) {
+           throw new UserNotFoundException("User not found with id: " + id);
+        }
+
+        repo.updateUser(id, name, email);
+        return "User updated successfully";
     }
-    repo.updateUser(id, name, email);
-    return "User updated successfully";
-    }
+
 }

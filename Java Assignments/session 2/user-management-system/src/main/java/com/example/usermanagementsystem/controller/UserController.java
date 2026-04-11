@@ -48,4 +48,5 @@ public class UserController {
                              @RequestParam String email) {
         return service.updateUser(id, name, email);
     }
+    
 }
