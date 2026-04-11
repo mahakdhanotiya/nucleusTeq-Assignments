@@ -10,8 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-//Service layer for handling business logic
-
+// Service layer for handling all user-related operations such as CRUD and validation
 @Service
 public class UserService {
 

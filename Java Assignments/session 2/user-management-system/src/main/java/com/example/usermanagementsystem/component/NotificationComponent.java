@@ -2,6 +2,7 @@ package com.example.usermanagementsystem.component;
 
 import org.springframework.stereotype.Component;
 
+// Component for handling notification logic
 @Component
 public class NotificationComponent {
 

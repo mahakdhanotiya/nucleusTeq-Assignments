@@ -1,12 +1,14 @@
 package com.example.usermanagementsystem.model;
 
+// Model class representing user entity
 public class User {
 
     private int id;
     private String name;
     private String email;
 
-    // Constructor
+    // Parameterized constructor
+
     public User(int id, String name, String email) {
         this.id = id;
         this.name = name;
@@ -14,9 +16,12 @@ public class User {
     }
 
     // Default constructor 
+
     public User() {}
+    
 
     // Getters
+
     public int getId() {
         return id;
     }
@@ -30,6 +35,7 @@ public class User {
     }
 
     // Setters
+
     public void setId(int id) {
         this.id = id;
     }

@@ -21,7 +21,8 @@ public class MessageFormatterService {
     // Returns formatted message based on type (short or long)
 
     public String formatMessage(String message, String type) {
-
+  
+        // Use short formatter if type is 'short', otherwise use long formatter
         if (type.equalsIgnoreCase("short")) {
             return shortFormatter.formatMessage(message);
         } else {
