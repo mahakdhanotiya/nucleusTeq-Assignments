@@ -2,6 +2,8 @@ package com.example.user_search_system.controller;
 
 import com.example.user_search_system.model.User;
 import com.example.user_search_system.service.UserService;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,12 +26,14 @@ public class UserController {
      // API to search users based on optional parameters
     
     @GetMapping("/search")
-    public List<User> searchUsers(
+    public ResponseEntity<List<User>> searchUsers(
             @RequestParam(required = false) Integer id,
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Integer age,
             @RequestParam(required = false) String role
     ) {
-        return userService.searchUsers(id, name, age, role);
+        List<User> users = userService.searchUsers(id, name, age, role);
+
+        return ResponseEntity.ok(users);
     }
 }
