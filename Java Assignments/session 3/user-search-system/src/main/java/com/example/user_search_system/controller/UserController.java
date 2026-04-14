@@ -3,6 +3,7 @@ package com.example.user_search_system.controller;
 import com.example.user_search_system.model.User;
 import com.example.user_search_system.service.UserService;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,4 +37,15 @@ public class UserController {
 
         return ResponseEntity.ok(users);
     }
+
+
+    //  API to create a new user
+
+    @PostMapping("/submit")
+    public ResponseEntity<User> addUser(@RequestBody User user) {
+        User savedUser = userService.addUser(user);
+        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
+    }
+
 }
+
