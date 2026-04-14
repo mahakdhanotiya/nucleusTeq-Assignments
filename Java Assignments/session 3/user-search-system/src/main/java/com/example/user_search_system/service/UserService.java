@@ -3,6 +3,8 @@ package com.example.user_search_system.service;
 import com.example.user_search_system.model.User;
 import com.example.user_search_system.repository.UserRepository;
 import com.example.user_search_system.exception.InvalidUserException;
+import com.example.user_search_system.exception.UserNotFoundException;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -76,12 +78,11 @@ public class UserService {
 
         boolean removed = users.removeIf(user -> user.getId().equals(id));
 
-        if (removed) {
-            return "User deleted successfully";
+        if (!removed) {
+           throw new UserNotFoundException("User not found");
         }
-        else {
-            return "User not found";
-        }
+
+        return "User deleted successfully";
     }
 
 }
