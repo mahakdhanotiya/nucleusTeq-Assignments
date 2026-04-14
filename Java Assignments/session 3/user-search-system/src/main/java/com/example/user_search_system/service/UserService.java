@@ -3,6 +3,7 @@ package com.example.user_search_system.service;
 import com.example.user_search_system.model.User;
 import com.example.user_search_system.repository.UserRepository;
 import com.example.user_search_system.exception.InvalidUserException;
+import com.example.user_search_system.exception.UserAlreadyExistsException;
 import com.example.user_search_system.exception.UserNotFoundException;
 
 import org.springframework.stereotype.Service;
@@ -24,8 +25,9 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+    
 
-     // Method to search users based on name, age, and role
+    // Method to search users based on name, age, and role
      
     public List<User> searchUsers(Integer id, String name, Integer age, String role) {
 
@@ -41,11 +43,12 @@ public class UserService {
     }
 
 
+
     // Method to add a new user
 
     public User addUser(User user) {
 
-        // Basic validation
+        // validation checks
 
         if (user.getName() == null || user.getName().isEmpty()) {
             throw new InvalidUserException("Name cannot be empty");
@@ -58,11 +61,23 @@ public class UserService {
         if (user.getAge() == null) {
             throw new InvalidUserException("Age is required");
         }
+        //  Duplicate ID check
+
+        boolean exists = userRepository.getAllUsers()
+                .stream()
+                .anyMatch(u -> u.getId().equals(user.getId()));
+
+        if (exists) {
+            throw new UserAlreadyExistsException("User with this ID already exists");
+        }
+
+        // Add user
 
         userRepository.getAllUsers().add(user);
         return user;
 
     }
+
 
 
     // Method to delete user by id
