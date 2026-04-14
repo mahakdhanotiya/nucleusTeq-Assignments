@@ -2,6 +2,7 @@ package com.example.user_search_system.service;
 
 import com.example.user_search_system.model.User;
 import com.example.user_search_system.repository.UserRepository;
+import com.example.user_search_system.exception.InvalidUserException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,17 +38,23 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    
+
     // Method to add a new user
 
     public User addUser(User user) {
 
         // Basic validation
-        if (user.getName() == null || user.getName().isEmpty()
-              || user.getAge() == null
-              || user.getRole() == null || user.getRole().isEmpty()) {
 
-            throw new RuntimeException("Invalid user data");
+        if (user.getName() == null || user.getName().isEmpty()) {
+            throw new InvalidUserException("Name cannot be empty");
+         }
+
+        if (user.getRole() == null || user.getRole().isEmpty()) {
+            throw new InvalidUserException("Role cannot be empty");
+        }
+
+        if (user.getAge() == null) {
+            throw new InvalidUserException("Age is required");
         }
 
         userRepository.getAllUsers().add(user);
