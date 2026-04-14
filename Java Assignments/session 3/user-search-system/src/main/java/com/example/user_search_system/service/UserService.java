@@ -37,6 +37,7 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    
     // Method to add a new user
 
     public User addUser(User user) {
@@ -47,10 +48,33 @@ public class UserService {
               || user.getRole() == null || user.getRole().isEmpty()) {
 
             throw new RuntimeException("Invalid user data");
-    }
-    
+        }
+
         userRepository.getAllUsers().add(user);
         return user;
 
     }
+
+
+    // Method to delete user by id
+ 
+    public String deleteUser(Integer id, Boolean confirm) {
+
+        // Check confirmation
+        if (confirm == null || !confirm) {
+            return "Confirmation required";
+        }
+
+        List<User> users = userRepository.getAllUsers();
+
+        boolean removed = users.removeIf(user -> user.getId().equals(id));
+
+        if (removed) {
+            return "User deleted successfully";
+        }
+        else {
+            return "User not found";
+        }
+    }
+
 }

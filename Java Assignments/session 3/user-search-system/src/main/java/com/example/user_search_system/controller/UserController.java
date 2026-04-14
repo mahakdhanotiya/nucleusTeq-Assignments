@@ -47,5 +47,16 @@ public class UserController {
         return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
 
+
+    // API to delete user by id with confirmation
+ 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteUser(
+           @PathVariable Integer id,
+           @RequestParam(required = false) Boolean confirm
+    ) {
+        String response = userService.deleteUser(id, confirm);
+        return ResponseEntity.ok(response);
+    }
 }
 
