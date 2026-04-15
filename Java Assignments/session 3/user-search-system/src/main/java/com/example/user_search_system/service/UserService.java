@@ -28,7 +28,7 @@ public class UserService {
 
 
 
-    // Method to search users based on name, age, and role
+    // Method to search users based on id, name, age, and role
      
     public List<User> searchUsers(Integer id, String name, Integer age, String role) {
 
@@ -53,6 +53,15 @@ public class UserService {
     // Method to add a new user
 
     public User addUser(User user) {
+
+        // TRIM
+        if (user.getName() != null) {
+            user.setName(user.getName().trim());
+        }
+
+        if (user.getRole() != null) {
+        user.setRole(user.getRole().trim());
+        }
 
         // validation checks
 
