@@ -1,15 +1,16 @@
 package com.example.user_search_system.service;
 
-import com.example.user_search_system.model.User;
-import com.example.user_search_system.repository.UserRepository;
-import com.example.user_search_system.exception.InvalidUserException;
-import com.example.user_search_system.exception.UserAlreadyExistsException;
-import com.example.user_search_system.exception.UserNotFoundException;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import com.example.user_search_system.exception.InvalidUserException;
+import com.example.user_search_system.exception.UserAlreadyExistsException;
+import com.example.user_search_system.exception.UserNotFoundException;
+import com.example.user_search_system.model.User;
+import com.example.user_search_system.repository.UserRepository;
 
 
  // Service class to handle business logic
@@ -25,21 +26,26 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    
+
 
     // Method to search users based on name, age, and role
      
     public List<User> searchUsers(Integer id, String name, Integer age, String role) {
 
-        return userRepository.getAllUsers()
-                .stream()
-                .filter(user ->
-                        (id == null || user.getId().equals(id)) &&
-                        (name == null || user.getName().equalsIgnoreCase(name)) &&
-                        (age == null || user.getAge().equals(age)) &&
-                        (role == null || user.getRole().equalsIgnoreCase(role))
-                )
-                .collect(Collectors.toList());
+        List<User> filteredUsers = userRepository.getAllUsers()
+        .stream()
+        .filter(user ->
+                (id == null || user.getId().equals(id)) &&
+                (name == null || user.getName().equalsIgnoreCase(name)) &&
+                (age == null || user.getAge().equals(age)) &&
+                (role == null || user.getRole().equalsIgnoreCase(role))
+        )
+        .collect(Collectors.toList());
+
+       //  sorting added
+        filteredUsers.sort(Comparator.comparing(User::getId));
+
+        return filteredUsers;
     }
 
 
@@ -97,7 +103,7 @@ public class UserService {
            throw new UserNotFoundException("User not found");
         }
 
-        return "User deleted successfully";
+        return "User with ID " + id + " deleted successfully";
     }
 
 }
