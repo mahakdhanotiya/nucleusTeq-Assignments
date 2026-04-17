@@ -60,7 +60,7 @@ public class TodoService {
        return response;
     }
 
-    
+
 
     // GET API: Fetch all todos and convert to ResponseDTO list
      public List<TodoResponseDTO> getAllTodos() {
@@ -88,5 +88,35 @@ public class TodoService {
 
        // Convert to DTO using mapper
        return TodoMapper.toResponseDTO(optionalTodo.get());
+    }
+
+
+
+    // UPDATE API: Update todo by ID
+    public TodoResponseDTO updateTodo(Long id, TodoRequestDTO todoDTO) {
+
+        Optional<Todo> optionalTodo = todoRepository.findById(id);
+
+        if (optionalTodo.isEmpty()) {
+            throw new RuntimeException("Todo not found with id: " + id);
+        }
+
+        Todo todo = optionalTodo.get();
+
+        // Update fields
+        todo.setTitle(todoDTO.getTitle());
+        todo.setDescription(todoDTO.getDescription());
+
+        String statusStr = todoDTO.getStatus();
+
+        if (statusStr == null || statusStr.isBlank()) {
+           todo.setStatus(Status.PENDING);
+        } else {
+           todo.setStatus(Status.valueOf(statusStr.toUpperCase()));
+        }
+
+        Todo updatedTodo = todoRepository.save(todo);
+
+        return TodoMapper.toResponseDTO(updatedTodo);
     }
 }

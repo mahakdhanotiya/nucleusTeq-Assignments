@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,7 +36,7 @@ public class TodoController {
         // Call service layer and return response DTO
         return todoService.createTodo(todoDTO);
     }
-    
+
 
     @GetMapping
     // GET API: Fetch all todos
@@ -51,5 +52,15 @@ public class TodoController {
     public TodoResponseDTO getTodoById(@PathVariable Long id) {
 
        return todoService.getTodoById(id);
+    }
+
+
+    @PutMapping("/{id}")
+    // UPDATE API: Update todo by ID
+    public TodoResponseDTO updateTodo(
+            @PathVariable Long id,
+            @RequestBody TodoRequestDTO todoDTO) {
+
+        return todoService.updateTodo(id, todoDTO);
     }
 }
