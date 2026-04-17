@@ -10,6 +10,8 @@ import com.mahak.todo.todoapp.dto.TodoRequestDTO;
 import com.mahak.todo.todoapp.dto.TodoResponseDTO;
 import com.mahak.todo.todoapp.service.TodoService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/todos")
 public class TodoController {
@@ -21,7 +23,7 @@ public class TodoController {
     // handles POST request to create a new todo
     
     @PostMapping
-    public TodoResponseDTO createTodo(@RequestBody TodoRequestDTO todoDTO) {
+    public TodoResponseDTO createTodo(@Valid @RequestBody TodoRequestDTO todoDTO) {
         
         // Call service layer and return response DTO
         return todoService.createTodo(todoDTO);

@@ -28,14 +28,17 @@ public class TodoService {
 
         String statusStr = todoDTO.getStatus();
 
-        // basic validation for status
-        if (statusStr == null || statusStr.isBlank()) {
-            throw new IllegalArgumentException("Status cannot be null or empty");
+        Status status;
 
+        //setting default value for status
+        if (statusStr == null || statusStr.isBlank()) {
+        
+        status = Status.PENDING;
+        }
+         else {
+        status = Status.valueOf(statusStr.toUpperCase());
         }
 
-        // convert String to Enum
-        Status status = Status.valueOf(statusStr.toUpperCase());
         todo.setStatus(status);
 
 
@@ -55,5 +58,4 @@ public class TodoService {
 
        return response;
     }
-}
-
+  }
