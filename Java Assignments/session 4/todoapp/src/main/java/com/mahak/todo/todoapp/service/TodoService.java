@@ -11,6 +11,7 @@ import com.mahak.todo.todoapp.dto.TodoRequestDTO;
 import com.mahak.todo.todoapp.dto.TodoResponseDTO;
 import com.mahak.todo.todoapp.entity.Status;
 import com.mahak.todo.todoapp.entity.Todo;
+import com.mahak.todo.todoapp.exception.TodoNotFoundException;
 import com.mahak.todo.todoapp.mapper.TodoMapper;
 import com.mahak.todo.todoapp.repository.TodoRepository;
 
@@ -23,7 +24,7 @@ public class TodoService {
      public TodoService(TodoRepository todoRepository) {
         this.todoRepository = todoRepository;
     }
-    
+
 
     // CREATE API: Add a new todo
 
@@ -85,7 +86,7 @@ public class TodoService {
 
        // If not found → throw exception
        if (optionalTodo.isEmpty()) {
-           throw new RuntimeException("Todo not found with id: " + id);
+           throw new TodoNotFoundException("Todo not found with id: " + id);
         }
 
        // Convert to DTO using mapper
@@ -100,7 +101,7 @@ public class TodoService {
         Optional<Todo> optionalTodo = todoRepository.findById(id);
 
         if (optionalTodo.isEmpty()) {
-            throw new RuntimeException("Todo not found with id: " + id);
+            throw new TodoNotFoundException("Todo not found with id: " + id);
         }
 
         Todo todo = optionalTodo.get();
@@ -130,7 +131,7 @@ public class TodoService {
         Optional<Todo> optionalTodo = todoRepository.findById(id);
 
         if (optionalTodo.isEmpty()) {
-           throw new RuntimeException("Todo not found with id: " + id);
+           throw new TodoNotFoundException("Todo not found with id: " + id);
         }
 
         todoRepository.deleteById(id);
