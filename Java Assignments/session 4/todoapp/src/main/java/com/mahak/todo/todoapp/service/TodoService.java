@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.mahak.todo.todoapp.dto.TodoRequestDTO;
@@ -18,6 +20,8 @@ import com.mahak.todo.todoapp.repository.TodoRepository;
 
 @Service
 public class TodoService {
+
+    private static final Logger logger = LoggerFactory.getLogger(TodoService.class);
     
      //constructor injection
      private final TodoRepository todoRepository;
@@ -30,6 +34,9 @@ public class TodoService {
     // CREATE API: Add a new todo
 
      public TodoResponseDTO createTodo(TodoRequestDTO todoDTO) {
+
+        logger.info("Creating new todo with title: {}", todoDTO.getTitle());
+
 
         Todo todo = new Todo(); // creating new entity object
        
@@ -56,6 +63,8 @@ public class TodoService {
         // set current timestamp
         todo.setCreatedAt(LocalDateTime.now());
 
+        logger.info("Saving todo to database");
+
         // save todo to database
        Todo savedTodo = todoRepository.save(todo); 
 
@@ -68,6 +77,8 @@ public class TodoService {
 
     // GET API: Fetch all todos and convert to ResponseDTO list
      public List<TodoResponseDTO> getAllTodos() {
+
+       logger.info("Fetching all todos from database");
 
        // Fetch all todo entities from database
        List<Todo> todos = todoRepository.findAll();
@@ -83,10 +94,13 @@ public class TodoService {
     // GET API: Fetch todo by ID and convert to ResponseDTO
     public TodoResponseDTO getTodoById(Long id) {
 
-       Optional<Todo> optionalTodo = todoRepository.findById(id);
+        logger.info("Fetching todo with id: {}", id);
+
+        Optional<Todo> optionalTodo = todoRepository.findById(id);
 
        // If not found → throw exception
        if (optionalTodo.isEmpty()) {
+           logger.error("Todo not found with id: {}", id);
            throw new TodoNotFoundException("Todo not found with id: " + id);
         }
 
@@ -99,9 +113,12 @@ public class TodoService {
     // UPDATE API: Update todo by ID
     public TodoResponseDTO updateTodo(Long id, TodoRequestDTO todoDTO) {
 
+        logger.info("Updating todo with id: {}", id);
+
         Optional<Todo> optionalTodo = todoRepository.findById(id);
 
         if (optionalTodo.isEmpty()) {
+            logger.error("Todo not found with id: {}", id);
             throw new TodoNotFoundException("Todo not found with id: " + id);
         }
 
@@ -130,6 +147,7 @@ public class TodoService {
             todo.setStatus(newStatus);
 
         } else {
+            logger.error("Invalid status transition for todo id: {}", id);
             throw new InvalidStatusTransitionException("Invalid status transition:" + currentStatus + "->" +  newStatus);
         }
 
@@ -143,9 +161,13 @@ public class TodoService {
     // DELETE API: Delete todo by ID
     public void deleteTodo(Long id) {
 
+        logger.info("Deleting todo with id: {}", id);
+
+
         Optional<Todo> optionalTodo = todoRepository.findById(id);
 
         if (optionalTodo.isEmpty()) {
+           logger.error("Todo not found with id: {}", id);
            throw new TodoNotFoundException("Todo not found with id: " + id);
         }
 
