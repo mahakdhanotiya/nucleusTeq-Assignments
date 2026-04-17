@@ -14,4 +14,11 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
+    
+    // Handle InvalidStatusTransitionException
+    @ExceptionHandler(InvalidStatusTransitionException.class)
+    public ResponseEntity<String> handleInvalidStatusTransition(InvalidStatusTransitionException ex) {
+
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 }

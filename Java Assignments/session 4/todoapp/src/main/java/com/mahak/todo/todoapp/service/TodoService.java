@@ -11,6 +11,7 @@ import com.mahak.todo.todoapp.dto.TodoRequestDTO;
 import com.mahak.todo.todoapp.dto.TodoResponseDTO;
 import com.mahak.todo.todoapp.entity.Status;
 import com.mahak.todo.todoapp.entity.Todo;
+import com.mahak.todo.todoapp.exception.InvalidStatusTransitionException;
 import com.mahak.todo.todoapp.exception.TodoNotFoundException;
 import com.mahak.todo.todoapp.mapper.TodoMapper;
 import com.mahak.todo.todoapp.repository.TodoRepository;
@@ -129,7 +130,7 @@ public class TodoService {
             todo.setStatus(newStatus);
 
         } else {
-            throw new RuntimeException("Invalid status transition:" + currentStatus + "->" +  newStatus);
+            throw new InvalidStatusTransitionException("Invalid status transition:" + currentStatus + "->" +  newStatus);
         }
 
         Todo updatedTodo = todoRepository.save(todo);
