@@ -1,6 +1,5 @@
 package com.mahak.todo.todoapp.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,9 +14,13 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/todos")
 public class TodoController {
+    
+    // service layer call
+    private final TodoService todoService;
 
-    @Autowired
-    private TodoService todoService; // service layer call
+    public TodoController(TodoService todoService) {
+        this.todoService = todoService;
+    } 
 
 
     // handles POST request to create a new todo

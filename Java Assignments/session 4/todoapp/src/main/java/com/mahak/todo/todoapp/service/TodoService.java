@@ -2,20 +2,24 @@ package com.mahak.todo.todoapp.service;
 
 import java.time.LocalDateTime;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.mahak.todo.todoapp.dto.TodoRequestDTO;
 import com.mahak.todo.todoapp.dto.TodoResponseDTO;
 import com.mahak.todo.todoapp.entity.Status;
 import com.mahak.todo.todoapp.entity.Todo;
+import com.mahak.todo.todoapp.mapper.TodoMapper;
 import com.mahak.todo.todoapp.repository.TodoRepository;
 
 @Service
 public class TodoService {
-
-    @Autowired
-    private TodoRepository todoRepository; // repository for DB operations
+    
+     //constructor injection
+     private final TodoRepository todoRepository;
+ 
+     public TodoService(TodoRepository todoRepository) {
+        this.todoRepository = todoRepository;
+    }
 
      public TodoResponseDTO createTodo(TodoRequestDTO todoDTO) {
 
@@ -49,13 +53,7 @@ public class TodoService {
        Todo savedTodo = todoRepository.save(todo); 
 
        // Entity → ResponseDTO
-       TodoResponseDTO response = new TodoResponseDTO();
-       response.setId(savedTodo.getId());
-       response.setTitle(savedTodo.getTitle());
-       response.setDescription(savedTodo.getDescription());
-       response.setStatus(savedTodo.getStatus().name());
-       response.setCreatedAt(savedTodo.getCreatedAt());
-
+       TodoResponseDTO response = TodoMapper.toResponseDTO(savedTodo);
        return response;
     }
-  }
+}
