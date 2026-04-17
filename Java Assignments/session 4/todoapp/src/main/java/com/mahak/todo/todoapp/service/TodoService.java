@@ -110,12 +110,26 @@ public class TodoService {
         todo.setTitle(todoDTO.getTitle());
         todo.setDescription(todoDTO.getDescription());
 
+        Status currentStatus = todo.getStatus();
+
         String statusStr = todoDTO.getStatus();
 
+        Status newStatus;
+
         if (statusStr == null || statusStr.isBlank()) {
-           todo.setStatus(Status.PENDING);
+           newStatus = Status.PENDING;
         } else {
-           todo.setStatus(Status.valueOf(statusStr.toUpperCase()));
+           newStatus = Status.valueOf(statusStr.toUpperCase());
+        }
+
+        // Validate transition
+        if ((currentStatus == Status.PENDING && newStatus == Status.COMPLETED) ||
+            (currentStatus == Status.COMPLETED && newStatus == Status.PENDING)) {
+
+            todo.setStatus(newStatus);
+
+        } else {
+            throw new RuntimeException("Invalid status transition:" + currentStatus + "->" +  newStatus);
         }
 
         Todo updatedTodo = todoRepository.save(todo);
