@@ -2,6 +2,7 @@ package com.mahak.todo.todoapp.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -59,6 +60,7 @@ public class TodoService {
        return response;
     }
 
+    
 
     // GET API: Fetch all todos and convert to ResponseDTO list
      public List<TodoResponseDTO> getAllTodos() {
@@ -70,5 +72,21 @@ public class TodoService {
        return todos.stream()
         .map(TodoMapper::toResponseDTO)
         .collect(Collectors.toList());
+    }
+
+
+
+    // GET API: Fetch todo by ID and convert to ResponseDTO
+    public TodoResponseDTO getTodoById(Long id) {
+
+       Optional<Todo> optionalTodo = todoRepository.findById(id);
+
+       // If not found → throw exception
+       if (optionalTodo.isEmpty()) {
+           throw new RuntimeException("Todo not found with id: " + id);
+        }
+
+       // Convert to DTO using mapper
+       return TodoMapper.toResponseDTO(optionalTodo.get());
     }
 }

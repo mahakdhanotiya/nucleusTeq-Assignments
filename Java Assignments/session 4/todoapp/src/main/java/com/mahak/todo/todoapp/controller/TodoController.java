@@ -3,6 +3,7 @@ package com.mahak.todo.todoapp.controller;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,6 +35,7 @@ public class TodoController {
         // Call service layer and return response DTO
         return todoService.createTodo(todoDTO);
     }
+    
 
     @GetMapping
     // GET API: Fetch all todos
@@ -41,5 +43,13 @@ public class TodoController {
 
        // Call service layer to get all todos
        return todoService.getAllTodos();
+    }
+
+
+    @GetMapping("/{id}")
+    // GET API: Fetch todo by ID
+    public TodoResponseDTO getTodoById(@PathVariable Long id) {
+
+       return todoService.getTodoById(id);
     }
 }
