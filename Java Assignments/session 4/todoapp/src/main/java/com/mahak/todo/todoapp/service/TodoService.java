@@ -5,7 +5,8 @@ import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.mahak.todo.todoapp.dto.TodoDTO;
+import com.mahak.todo.todoapp.dto.TodoRequestDTO;
+import com.mahak.todo.todoapp.dto.TodoResponseDTO;
 import com.mahak.todo.todoapp.entity.Status;
 import com.mahak.todo.todoapp.entity.Todo;
 import com.mahak.todo.todoapp.repository.TodoRepository;
@@ -16,7 +17,7 @@ public class TodoService {
     @Autowired
     private TodoRepository todoRepository; // repository for DB operations
 
-    public Todo createTodo(TodoDTO todoDTO) {
+     public TodoResponseDTO createTodo(TodoRequestDTO todoDTO) {
 
         Todo todo = new Todo(); // creating new entity object
 
@@ -42,6 +43,17 @@ public class TodoService {
         todo.setCreatedAt(LocalDateTime.now());
 
         // saving todo to database
-        return todoRepository.save(todo);
+       Todo savedTodo = todoRepository.save(todo); 
+
+       // Entity → ResponseDTO
+       TodoResponseDTO response = new TodoResponseDTO();
+       response.setId(savedTodo.getId());
+       response.setTitle(savedTodo.getTitle());
+       response.setDescription(savedTodo.getDescription());
+       response.setStatus(savedTodo.getStatus().name());
+       response.setCreatedAt(savedTodo.getCreatedAt());
+
+       return response;
     }
 }
+

@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.mahak.todo.todoapp.dto.TodoDTO;
-import com.mahak.todo.todoapp.entity.Todo;
+import com.mahak.todo.todoapp.dto.TodoRequestDTO;
+import com.mahak.todo.todoapp.dto.TodoResponseDTO;
 import com.mahak.todo.todoapp.service.TodoService;
 
 @RestController
@@ -21,7 +21,9 @@ public class TodoController {
     // handles POST request to create a new todo
     
     @PostMapping
-    public Todo createTodo(@RequestBody TodoDTO todoDTO) {
+    public TodoResponseDTO createTodo(@RequestBody TodoRequestDTO todoDTO) {
+        
+        // Call service layer and return response DTO
         return todoService.createTodo(todoDTO);
     }
 }
