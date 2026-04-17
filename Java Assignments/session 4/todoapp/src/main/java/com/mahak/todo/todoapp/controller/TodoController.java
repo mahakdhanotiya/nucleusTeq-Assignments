@@ -2,6 +2,8 @@ package com.mahak.todo.todoapp.controller;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,7 +21,10 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/todos")
+
 public class TodoController {
+
+    private static final Logger logger = LoggerFactory.getLogger(TodoController.class);
     
     // service layer call
     private final TodoService todoService;
@@ -33,6 +38,8 @@ public class TodoController {
     
     @PostMapping
     public TodoResponseDTO createTodo(@Valid @RequestBody TodoRequestDTO todoDTO) {
+
+        logger.info("Received request to create todo with title: {}", todoDTO.getTitle());
         
         // Call service layer and return response DTO
         return todoService.createTodo(todoDTO);
@@ -43,6 +50,8 @@ public class TodoController {
     // GET API: Fetch all todos
     public List<TodoResponseDTO> getAllTodos() {
 
+       logger.info("Received request to fetch all todos");
+
        // Call service layer to get all todos
        return todoService.getAllTodos();
     }
@@ -51,6 +60,8 @@ public class TodoController {
     @GetMapping("/{id}")
     // GET API: Fetch todo by ID
     public TodoResponseDTO getTodoById(@PathVariable Long id) {
+
+        logger.info("Received request to fetch todo with id: {}", id);
 
        return todoService.getTodoById(id);
     }
@@ -62,6 +73,8 @@ public class TodoController {
             @PathVariable Long id,
             @RequestBody TodoRequestDTO todoDTO) {
 
+        logger.info("Received request to update todo with id: {}", id);
+
         return todoService.updateTodo(id, todoDTO);
     }
 
@@ -70,8 +83,10 @@ public class TodoController {
     // DELETE API: Delete todo by ID
     public String deleteTodo(@PathVariable Long id) {
 
-         todoService.deleteTodo(id);
+        logger.info("Received request to delete todo with id: {}", id);
 
-         return "Todo deleted successfully";
+        todoService.deleteTodo(id);
+
+        return "Todo deleted successfully";
     }
 }
