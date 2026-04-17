@@ -1,6 +1,8 @@
 package com.mahak.todo.todoapp.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -46,14 +48,27 @@ public class TodoService {
         todo.setStatus(status);
 
 
-        // setting current timestamp
+        // set current timestamp
         todo.setCreatedAt(LocalDateTime.now());
 
-        // saving todo to database
+        // save todo to database
        Todo savedTodo = todoRepository.save(todo); 
 
-       // Entity → ResponseDTO
+       // Convert Entity to ResponseDTO
        TodoResponseDTO response = TodoMapper.toResponseDTO(savedTodo);
        return response;
+    }
+
+
+    // GET API: Fetch all todos and convert to ResponseDTO list
+     public List<TodoResponseDTO> getAllTodos() {
+
+       // Fetch all todo entities from database
+       List<Todo> todos = todoRepository.findAll();
+
+       // Convert Entity → DTO using mapper
+       return todos.stream()
+        .map(TodoMapper::toResponseDTO)
+        .collect(Collectors.toList());
     }
 }
