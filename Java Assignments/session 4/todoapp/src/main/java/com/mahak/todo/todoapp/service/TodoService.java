@@ -23,11 +23,13 @@ public class TodoService {
      public TodoService(TodoRepository todoRepository) {
         this.todoRepository = todoRepository;
     }
+    
+
+    // CREATE API: Add a new todo
 
      public TodoResponseDTO createTodo(TodoRequestDTO todoDTO) {
 
         Todo todo = new Todo(); // creating new entity object
-
        
         // mapping DTO fields to entity
         todo.setTitle(todoDTO.getTitle());
@@ -118,5 +120,19 @@ public class TodoService {
         Todo updatedTodo = todoRepository.save(todo);
 
         return TodoMapper.toResponseDTO(updatedTodo);
+    }
+
+
+
+    // DELETE API: Delete todo by ID
+    public void deleteTodo(Long id) {
+
+        Optional<Todo> optionalTodo = todoRepository.findById(id);
+
+        if (optionalTodo.isEmpty()) {
+           throw new RuntimeException("Todo not found with id: " + id);
+        }
+
+        todoRepository.deleteById(id);
     }
 }
