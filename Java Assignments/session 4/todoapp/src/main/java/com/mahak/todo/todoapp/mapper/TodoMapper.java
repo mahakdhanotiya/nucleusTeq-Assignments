@@ -22,6 +22,9 @@ public class TodoMapper {
     }
 
 
+    // Converts TodoRequestDTO to Todo entity
+    // Handles default status (PENDING) if not provided
+    
     public static Todo toEntity(TodoRequestDTO dto) {
 
         Todo todo = new Todo();
