@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import com.mahak.todo.todoapp.component.NotificationServiceClient;
 import com.mahak.todo.todoapp.dto.TodoRequestDTO;
 import com.mahak.todo.todoapp.dto.TodoResponseDTO;
 import com.mahak.todo.todoapp.entity.Status;
@@ -17,7 +18,6 @@ import com.mahak.todo.todoapp.exception.InvalidStatusTransitionException;
 import com.mahak.todo.todoapp.exception.TodoNotFoundException;
 import com.mahak.todo.todoapp.mapper.TodoMapper;
 import com.mahak.todo.todoapp.repository.TodoRepository;
-
 @Service
 public class TodoService {
 
@@ -25,9 +25,12 @@ public class TodoService {
     
      //constructor injection
      private final TodoRepository todoRepository;
+     private final NotificationServiceClient notificationServiceClient;
  
-     public TodoService(TodoRepository todoRepository) {
+     public TodoService(TodoRepository todoRepository,
+                        NotificationServiceClient notificationServiceClient) {
         this.todoRepository = todoRepository;
+        this.notificationServiceClient = notificationServiceClient;
     }
 
 
@@ -67,6 +70,8 @@ public class TodoService {
 
         // save todo to database
        Todo savedTodo = todoRepository.save(todo); 
+
+       notificationServiceClient.sendNotification("New todo created: " + todoDTO.getTitle());
 
        // Convert Entity to ResponseDTO
        TodoResponseDTO response = TodoMapper.toResponseDTO(savedTodo);
