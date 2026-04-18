@@ -39,29 +39,9 @@ public class TodoService {
      public TodoResponseDTO createTodo(TodoRequestDTO todoDTO) {
 
         logger.info("Creating new todo with title: {}", todoDTO.getTitle());
-
-
-        Todo todo = new Todo(); // creating new entity object
        
-        // mapping DTO fields to entity
-        todo.setTitle(todoDTO.getTitle());
-        todo.setDescription(todoDTO.getDescription());
-
-        String statusStr = todoDTO.getStatus();
-
-        Status status;
-
-        //setting default value for status
-        if (statusStr == null || statusStr.isBlank()) {
-        
-        status = Status.PENDING;
-        }
-         else {
-        status = Status.valueOf(statusStr.toUpperCase());
-        }
-
-        todo.setStatus(status);
-
+        // use mapper for conversion
+       Todo todo = TodoMapper.toEntity(todoDTO);
 
         // set current timestamp
         todo.setCreatedAt(LocalDateTime.now());
@@ -70,7 +50,8 @@ public class TodoService {
 
         // save todo to database
        Todo savedTodo = todoRepository.save(todo); 
-
+       
+       //send notification
        notificationServiceClient.sendNotification("New todo created: " + todoDTO.getTitle());
 
        // Convert Entity to ResponseDTO
@@ -130,6 +111,9 @@ public class TodoService {
         Todo todo = optionalTodo.get();
 
         // Update fields
+        // mapper not used here to avoid overwriting existing fields like id, createdAt
+        // only specific fields are updated (partial update)
+
         todo.setTitle(todoDTO.getTitle());
         todo.setDescription(todoDTO.getDescription());
 
