@@ -44,11 +44,6 @@ public class Interview {
     @JoinColumn(name = "candidate_id", nullable = false)
     private CandidateProfile candidate;
 
-    // Panel (User with PANEL role)
-    @ManyToOne
-    @JoinColumn(name = "panel_id")
-    private User panel;
-
     // Default constructor
     public Interview() {}
 
@@ -98,11 +93,4 @@ public class Interview {
         this.candidate = candidate;
     }
 
-    public User getPanel() {
-        return panel;
-    }
-
-    public void setPanel(User panel) {
-        this.panel = panel;
-    }
 }
