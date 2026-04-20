@@ -27,6 +27,15 @@ public class Feedback {
     @Column(nullable = false)
     private Integer rating;
 
+    @Column(nullable = false, length = 1000)
+    private String strengths;
+
+    @Column(nullable = false, length = 1000)
+    private String weaknesses;
+
+    @Column(nullable = false, length = 1000)
+    private String areasCovered;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private FeedbackStatus status;
@@ -37,8 +46,8 @@ public class Feedback {
     private Interview interview;
 
     // Panel (who gave feedback)
-    @ManyToOne
-    @JoinColumn(name = "panel_id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "panel_id", nullable = false)
     private User panel;
 
     // Default constructor
@@ -64,6 +73,30 @@ public class Feedback {
 
     public void setRating(Integer rating) {
         this.rating = rating;
+    }
+
+    public String getStrengths() {
+    return strengths;
+    }
+
+    public void setStrengths(String strengths) {
+        this.strengths = strengths;
+    }
+
+    public String getWeaknesses() {
+        return weaknesses;
+    }
+
+    public void setWeaknesses(String weaknesses) {
+        this.weaknesses = weaknesses;
+    }
+
+    public String getAreasCovered() {
+        return areasCovered;
+    }
+
+    public void setAreasCovered(String areasCovered) {
+        this.areasCovered = areasCovered;
     }
 
     public FeedbackStatus getStatus() {
