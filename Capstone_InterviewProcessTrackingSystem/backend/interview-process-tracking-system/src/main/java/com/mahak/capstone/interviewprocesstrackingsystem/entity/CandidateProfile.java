@@ -1,6 +1,7 @@
 package com.mahak.capstone.interviewprocesstrackingsystem.entity;
 
 import com.mahak.capstone.interviewprocesstrackingsystem.enums.ApplicationSource;
+import com.mahak.capstone.interviewprocesstrackingsystem.enums.InterviewStage;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,7 +23,7 @@ public class CandidateProfile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 10)
+    @Column(nullable = false, length = 10, unique = true)
     private String mobileNumber;
 
     @Column(nullable = false)
@@ -46,6 +47,13 @@ public class CandidateProfile {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private ApplicationSource source;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private InterviewStage currentStage = InterviewStage.PROFILING;
+
+    @Column(nullable = false)
+    private String applicationStatus = "PROFILING_COMPLETED";
 
     @OneToOne(optional = false)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
