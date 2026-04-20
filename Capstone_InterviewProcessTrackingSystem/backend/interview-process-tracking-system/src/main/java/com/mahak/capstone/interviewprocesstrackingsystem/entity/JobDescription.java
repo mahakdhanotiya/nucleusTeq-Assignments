@@ -38,6 +38,7 @@ public class JobDescription {
 
     private String location;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private JobType jobType;
 
