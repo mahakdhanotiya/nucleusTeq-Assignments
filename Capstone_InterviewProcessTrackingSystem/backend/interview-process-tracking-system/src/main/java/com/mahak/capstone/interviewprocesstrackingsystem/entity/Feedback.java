@@ -25,7 +25,7 @@ public class Feedback {
     private String comments;
 
     @Column(nullable = false)
-    private Integer rating;
+    private Integer rating; //later validate 1–5 in service layer
 
     @Column(nullable = false, length = 1000)
     private String strengths;

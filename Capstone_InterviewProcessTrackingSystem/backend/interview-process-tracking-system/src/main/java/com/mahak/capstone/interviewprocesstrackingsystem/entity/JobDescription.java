@@ -26,16 +26,21 @@ public class JobDescription {
     private String description;
 
     // Skills
+    @Column(nullable = false, length = 500)
     private String requiredSkills;
 
     // Experience Range
+    @Column(nullable = false)
     private Integer minExperience;
+
+    @Column(nullable = false)
     private Integer maxExperience;
 
     // Salary Range
     private Double minSalary;
     private Double maxSalary;
 
+    @Column(nullable = false)
     private String location;
 
     @Column(nullable = false)

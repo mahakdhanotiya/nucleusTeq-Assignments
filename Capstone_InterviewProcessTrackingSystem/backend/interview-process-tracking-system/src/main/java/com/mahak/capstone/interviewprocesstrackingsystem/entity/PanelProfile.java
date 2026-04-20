@@ -23,7 +23,7 @@ public class PanelProfile {
     @Column(nullable = false)
     private String designation;
 
-    @Column(nullable = false, length = 10)
+    @Column(nullable = false, length = 10, unique = true)
     private String mobileNumber;
 
     // Link to User 

@@ -59,8 +59,8 @@ public class CandidateProfile {
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "job_id")
+    @ManyToOne(optional=false)
+    @JoinColumn(name = "job_id", nullable = false)
     private JobDescription jobDescription;
 
     // Default constructor
