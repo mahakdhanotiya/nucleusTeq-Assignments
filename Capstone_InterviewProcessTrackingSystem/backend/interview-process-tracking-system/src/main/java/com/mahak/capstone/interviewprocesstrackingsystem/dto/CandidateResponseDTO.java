@@ -1,5 +1,9 @@
 package com.mahak.capstone.interviewprocesstrackingsystem.dto;
 
+import com.mahak.capstone.interviewprocesstrackingsystem.enums.ApplicationSource;
+import com.mahak.capstone.interviewprocesstrackingsystem.enums.ApplicationStatus;
+import com.mahak.capstone.interviewprocesstrackingsystem.enums.InterviewStage;
+
 /**
  * DTO used for sending response to client
  */
@@ -20,9 +24,9 @@ public class CandidateResponseDTO {
     private Integer noticePeriod;
     private String preferredLocation;
 
-    private String source;
-    private String currentStage;
-    private String applicationStatus;
+    private ApplicationSource source;
+    private InterviewStage currentStage;
+    private ApplicationStatus applicationStatus;
 
     private Long userId;
     private Long jobId;
@@ -109,27 +113,27 @@ public class CandidateResponseDTO {
         this.preferredLocation = preferredLocation;
     }
 
-    public String getSource() {
+    public ApplicationSource getSource() {
         return source;
     }
 
-    public void setSource(String source) {
+    public void setSource(ApplicationSource source) {
         this.source = source;
     }
 
-    public String getCurrentStage() {
+    public InterviewStage getCurrentStage() {
         return currentStage;
     }
 
-    public void setCurrentStage(String currentStage) {
+    public void setCurrentStage(InterviewStage currentStage) {
         this.currentStage = currentStage;
     }
 
-    public String getApplicationStatus() {
+    public ApplicationStatus getApplicationStatus() {
         return applicationStatus;
     }
 
-    public void setApplicationStatus(String applicationStatus) {
+    public void setApplicationStatus(ApplicationStatus applicationStatus) {
         this.applicationStatus = applicationStatus;
     }
 
