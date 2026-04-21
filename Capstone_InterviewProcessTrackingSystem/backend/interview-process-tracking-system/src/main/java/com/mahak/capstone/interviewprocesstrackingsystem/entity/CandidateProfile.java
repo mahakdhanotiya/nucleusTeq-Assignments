@@ -1,6 +1,7 @@
 package com.mahak.capstone.interviewprocesstrackingsystem.entity;
 
 import com.mahak.capstone.interviewprocesstrackingsystem.enums.ApplicationSource;
+import com.mahak.capstone.interviewprocesstrackingsystem.enums.ApplicationStatus;
 import com.mahak.capstone.interviewprocesstrackingsystem.enums.InterviewStage;
 
 import jakarta.persistence.Column;
@@ -53,7 +54,8 @@ public class CandidateProfile {
     private InterviewStage currentStage = InterviewStage.PROFILING;
 
     @Column(nullable = false)
-    private String applicationStatus = "PROFILING_COMPLETED";
+    @Enumerated(EnumType.STRING)
+    private ApplicationStatus applicationStatus = ApplicationStatus.PROFILING_COMPLETED;
 
     @OneToOne(optional = false)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
@@ -150,6 +152,23 @@ public class CandidateProfile {
 
     public void setSource(ApplicationSource source) {
         this.source = source;
+    }
+
+
+    public InterviewStage getCurrentStage() {
+        return currentStage;
+    }
+
+    public void setCurrentStage(InterviewStage currentStage) {
+        this.currentStage = currentStage;
+    }
+
+    public ApplicationStatus getApplicationStatus() {
+        return applicationStatus;
+    }
+
+    public void setApplicationStatus(ApplicationStatus applicationStatus) {
+        this.applicationStatus = applicationStatus;
     }
 
     public User getUser() {
