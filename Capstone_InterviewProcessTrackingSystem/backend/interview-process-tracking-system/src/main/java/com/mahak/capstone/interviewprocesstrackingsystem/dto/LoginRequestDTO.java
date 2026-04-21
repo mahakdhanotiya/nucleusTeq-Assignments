@@ -1,8 +1,14 @@
 package com.mahak.capstone.interviewprocesstrackingsystem.dto;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 
 public class LoginRequestDTO {
 
-   private String email;
+    @Email(message = "Invalid email")
+    @NotBlank(message = "Email is required")
+    private String email;
+
+    @NotBlank(message = "Password is required")
     private String password;
 
     // getters
