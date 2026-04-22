@@ -7,6 +7,8 @@ import com.mahak.capstone.interviewprocesstrackingsystem.dto.LoginRequestDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.RegisterRequestDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.entity.User;
 import com.mahak.capstone.interviewprocesstrackingsystem.enums.Role;
+import com.mahak.capstone.interviewprocesstrackingsystem.exception.InvalidRequestException;
+import com.mahak.capstone.interviewprocesstrackingsystem.exception.ResourceNotFoundException;
 import com.mahak.capstone.interviewprocesstrackingsystem.repository.UserRepository;
 import com.mahak.capstone.interviewprocesstrackingsystem.security.JwtUtil;
 
@@ -34,7 +36,7 @@ public class AuthService {
         
         // check duplicate email
         if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
-            throw new RuntimeException("Email already exists");
+            throw new InvalidRequestException("Email already exists");
         }
 
         // create user entity
@@ -58,15 +60,14 @@ public class AuthService {
 
         // user fetch
         User user = userRepository.findByEmail(dto.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         // password check
         if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid password");
+            throw new InvalidRequestException("Invalid password");
         }
 
         //  generate JWT token
         return jwtUtil.generateToken(user.getEmail());
     }
-
 }
