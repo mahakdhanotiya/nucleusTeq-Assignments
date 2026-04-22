@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mahak.capstone.interviewprocesstrackingsystem.dto.ApiResponseDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.LoginRequestDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.LoginResponseDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.RegisterRequestDTO;
@@ -25,17 +26,20 @@ public class AuthController {
 
     // Register API
     @PostMapping("/register")
-    public String register(@Valid @RequestBody RegisterRequestDTO dto) {
+    public ApiResponseDTO<Void> register(@Valid @RequestBody RegisterRequestDTO dto) {
         authService.register(dto);
-        return "User registered successfully";
+        return new ApiResponseDTO<>(true, "User registered successfully", null);
     }
 
     // login API
     @PostMapping("/login")
-    public LoginResponseDTO login(@RequestBody LoginRequestDTO dto) {
+    public ApiResponseDTO<LoginResponseDTO> login(@RequestBody LoginRequestDTO dto) {
 
         String token = authService.login(dto);
 
-        return new LoginResponseDTO(token, "Login successful");
+        LoginResponseDTO response = new LoginResponseDTO(token);
+
+
+        return new ApiResponseDTO<>(true, "Login successful", response);
     }
 }
