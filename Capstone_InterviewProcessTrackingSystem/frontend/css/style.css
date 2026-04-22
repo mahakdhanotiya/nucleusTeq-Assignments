@@ -140,4 +140,18 @@ body {
 
 .footer-text a:hover {
   text-decoration: underline;
+
+}
+
+.error {
+  color: #dc2626;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.success {
+  color: green;
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 10px;
 }
