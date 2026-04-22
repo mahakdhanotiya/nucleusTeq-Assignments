@@ -9,7 +9,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.ApiResponseDTO;
 
-// This annotation makes this class handle exceptions globally across the project
+/**
+ * Global exception handler to manage all application exceptions
+ * and return consistent API responses.
+ */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -17,7 +20,9 @@ public class GlobalExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     
-    // Handle Resource Not Found (404)
+    /**
+     * Handles ResourceNotFoundException and returns HTTP 404 response.
+     */
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiResponseDTO<Void>> handleNotFound(ResourceNotFoundException ex) {
@@ -30,9 +35,10 @@ public class GlobalExceptionHandler {
         );
     }
 
-
-
-    // Handle Invalid Request (400)
+    
+    /**
+    * Handles InvalidRequestException and returns HTTP 400 response.
+    */
     
     @ExceptionHandler(InvalidRequestException.class)
     public ResponseEntity<ApiResponseDTO<Void>> handleBadRequest(InvalidRequestException ex) {
@@ -47,7 +53,9 @@ public class GlobalExceptionHandler {
 
 
     
-    // Handle All Other Exceptions (500)
+    /**
+    * Handles all uncaught exceptions and returns HTTP 500 response.
+    */
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponseDTO<Void>> handleGeneric(Exception ex) {

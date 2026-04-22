@@ -1,10 +1,8 @@
 package com.mahak.capstone.interviewprocesstrackingsystem.dto;
 
 public class LoginResponseDTO {
-
     private String token;
     
-
     public LoginResponseDTO() {}
 
     public LoginResponseDTO(String token) {
@@ -16,7 +14,6 @@ public class LoginResponseDTO {
     public String getToken() {
         return token;
     }
-
 
     // setters
     public void setToken(String token) {

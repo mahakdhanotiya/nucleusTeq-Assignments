@@ -1,4 +1,4 @@
-package com.mahak.capstone.interviewprocesstrackingsystem.service;
+package com.mahak.capstone.interviewprocesstrackingsystem.service.impl;
 
 import org.springframework.stereotype.Service;
 
@@ -11,6 +11,7 @@ import com.mahak.capstone.interviewprocesstrackingsystem.mapper.CandidateMapper;
 import com.mahak.capstone.interviewprocesstrackingsystem.repository.CandidateRepository;
 import com.mahak.capstone.interviewprocesstrackingsystem.repository.JobDescriptionRepository;
 import com.mahak.capstone.interviewprocesstrackingsystem.repository.UserRepository;
+import com.mahak.capstone.interviewprocesstrackingsystem.service.CandidateService;
 import com.mahak.capstone.interviewprocesstrackingsystem.validation.CandidateValidator;
 
 

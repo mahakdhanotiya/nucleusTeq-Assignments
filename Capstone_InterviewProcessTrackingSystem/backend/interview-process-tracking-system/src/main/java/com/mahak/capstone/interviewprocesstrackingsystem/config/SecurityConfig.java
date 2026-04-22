@@ -36,7 +36,12 @@ public class SecurityConfig {
     }
 
 
-    //  password encoder bean
+   /**
+ * Provides BCrypt password encoder bean for secure password hashing.
+ *
+ * @return PasswordEncoder instance
+ */
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
