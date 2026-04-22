@@ -2,6 +2,7 @@ package com.mahak.capstone.interviewprocesstrackingsystem.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +15,7 @@ import com.mahak.capstone.interviewprocesstrackingsystem.dto.RegisterRequestDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.service.AuthService;
 
 import jakarta.validation.Valid;
+
 
 @RestController
 @RequestMapping("/auth")
@@ -29,6 +31,7 @@ public class AuthController {
     }
 
     // Register API
+    @CrossOrigin(origins = "*")
     @PostMapping("/register")
     public ApiResponseDTO<Void> register(@Valid @RequestBody RegisterRequestDTO dto) {
 
