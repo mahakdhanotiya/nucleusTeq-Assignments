@@ -22,7 +22,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
+    private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     // This utility will help us extract data from JWT
     private final JwtUtil jwtUtil;
@@ -74,12 +74,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     // Set authentication in Spring Security context
                     SecurityContextHolder.getContext().setAuthentication(auth);
 
-                    logger.info("User authenticated: {} with role: {}", email, role);
+                    log.info("User authenticated: {} with role: {}", email, role);
                 }
 
          } catch (Exception e) {
             // If token is invalid
-            logger.error("Invalid token: {}", e.getMessage());
+            log.error("Invalid token: {}", e.getMessage());
         }
      }
 
