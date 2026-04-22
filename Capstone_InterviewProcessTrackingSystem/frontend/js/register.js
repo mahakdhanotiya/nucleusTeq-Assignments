@@ -58,6 +58,10 @@ form.addEventListener("submit", async (e) => {
             document.getElementById("successMessage").innerText = "Registered successfully ";
 
             form.reset();
+            setTimeout(() => {
+        window.location.href = "index.html";
+        }, 1500);
+
         } else {
             document.getElementById("emailError").innerText = data.message;
         }
