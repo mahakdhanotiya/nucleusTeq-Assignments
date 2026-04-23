@@ -1,35 +1,58 @@
 package com.mahak.capstone.interviewprocesstrackingsystem.dto;
 
 import com.mahak.capstone.interviewprocesstrackingsystem.enums.ApplicationSource;
-import com.mahak.capstone.interviewprocesstrackingsystem.enums.ApplicationStatus;
-import com.mahak.capstone.interviewprocesstrackingsystem.enums.InterviewStage;
+
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 /**
  * DTO used for incoming requests (Create/Update Candidate)
  */
 public class CandidateRequestDTO {
 
+    @NotBlank(message = "Mobile number is required")
+    @Pattern(regexp = "^[0-9]{10}$", message = "Mobile number must be 10 digits")
     private String mobileNumber;
-    private String resumePath;
+
+    /**
+     * Resume URL (Google Drive link, only PDF allowed)
+     */
+    @NotBlank(message = "Resume URL is required")
+    @Pattern(regexp = ".*\\.pdf$", message = "Resume must be a PDF file")
+    private String resumeUrl;
+
     private String currentCompany;
 
+    @NotNull(message = "Total experience is required")
+    @Min(value = 0, message = "Experience cannot be negative")
     private Integer totalExperience;
+
+    @Min(value = 0, message = "Relevant experience cannot be negative")
     private Integer relevantExperience;
 
     private Double currentCTC;
     private Double expectedCTC;
 
+    @Min(value = 0, message = "Notice period cannot be negative")
     private Integer noticePeriod;
+
     private String preferredLocation;
-
+    
+    @NotNull(message = "Application source is required")
     private ApplicationSource source;
-    private InterviewStage currentStage;
-    private ApplicationStatus applicationStatus;
 
+    @NotNull(message = "User ID is required")
     private Long userId;
+
+    @NotNull(message = "Job ID is required")
     private Long jobId;
 
+    // Default Constructor
     public CandidateRequestDTO() {}
+
+    //Getters and Setters
 
     public String getMobileNumber() {
         return mobileNumber;
@@ -39,12 +62,12 @@ public class CandidateRequestDTO {
         this.mobileNumber = mobileNumber;
     }
 
-    public String getResumePath() {
-        return resumePath;
+    public String getResumeUrl() {
+        return resumeUrl;
     }
 
-    public void setResumePath(String resumePath) {
-        this.resumePath = resumePath;
+    public void setResumeUrl(String resumeUrl) {
+        this.resumeUrl = resumeUrl;
     }
 
     public String getCurrentCompany() {
@@ -109,22 +132,6 @@ public class CandidateRequestDTO {
 
     public void setSource(ApplicationSource source) {
         this.source = source;
-    }
-
-    public InterviewStage getCurrentStage() {
-        return currentStage;
-    }
-
-    public void setCurrentStage(InterviewStage currentStage) {
-        this.currentStage = currentStage;
-    }
-
-    public ApplicationStatus getApplicationStatus() {
-        return applicationStatus;
-    }
-
-    public void setApplicationStatus(ApplicationStatus applicationStatus) {
-        this.applicationStatus = applicationStatus;
     }
 
     public Long getUserId() {

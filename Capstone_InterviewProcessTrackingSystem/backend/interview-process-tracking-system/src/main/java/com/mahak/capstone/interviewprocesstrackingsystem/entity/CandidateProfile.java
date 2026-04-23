@@ -1,5 +1,7 @@
 package com.mahak.capstone.interviewprocesstrackingsystem.entity;
 
+import java.time.LocalDateTime;
+
 import com.mahak.capstone.interviewprocesstrackingsystem.enums.ApplicationSource;
 import com.mahak.capstone.interviewprocesstrackingsystem.enums.ApplicationStatus;
 import com.mahak.capstone.interviewprocesstrackingsystem.enums.InterviewStage;
@@ -13,8 +15,18 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+
+/**
+ * Entity representing Candidate Profile.
+ * Stores candidate details and job application information.
+ *
+ * Business Rule:
+ * - One user can have only ONE active application at a time
+ *   (enforced in service layer, not database).
+ */
+
 
 @Entity
 @Table(name = "candidate_profiles")
@@ -24,49 +36,93 @@ public class CandidateProfile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 10, unique = true)
+    /**
+     * Candidate mobile number
+     */
+
+    @Column(nullable = false, length = 10)
     private String mobileNumber;
 
+
     @Column(nullable = false)
-    private String resumePath;
+    private String resumeUrl;
 
     private String currentCompany;
+
+    /**
+     * Total experience in years
+     */
 
     @Column(nullable = false)
     private Integer totalExperience;
 
+    /**
+     * Timestamp when profile is created
+     */
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
+
+    /**
+     * Relevant experience for the job
+     */
     private Integer relevantExperience;
 
     private Double currentCTC;
-
     private Double expectedCTC;
 
     private Integer noticePeriod;
 
     private String preferredLocation;
 
+    /**
+     * Source of application (Referral, LinkedIn, etc.)
+     */
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private ApplicationSource source;
 
+    /**
+     * Current interview stage
+     */
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private InterviewStage currentStage = InterviewStage.PROFILING;
+    private InterviewStage currentStage;
 
+    /**
+     * Application status
+     */
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private ApplicationStatus applicationStatus = ApplicationStatus.PROFILING_COMPLETED;
+    private ApplicationStatus applicationStatus;
 
-    @OneToOne(optional = false)
-    @JoinColumn(name = "user_id", nullable = false, unique = true)
+
+    /**
+     * Candidate user (Many applications possible over time)
+     */
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    /**
+     * Job applied for
+     */
     @ManyToOne(optional=false)
     @JoinColumn(name = "job_id", nullable = false)
     private JobDescription jobDescription;
 
     // Default constructor
     public CandidateProfile() {}
+
+    /**
+     * Automatically sets default values before saving
+     */
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
+        this.currentStage = InterviewStage.PROFILING;
+        this.applicationStatus = ApplicationStatus.PROFILING_COMPLETED;
+    }
 
     // Getters and Setters
 
@@ -82,12 +138,12 @@ public class CandidateProfile {
         this.mobileNumber = mobileNumber;
     }
 
-    public String getResumePath() {
-        return resumePath;
+    public String getResumeUrl() {
+        return resumeUrl;
     }
 
-    public void setResumePath(String resumePath) {
-        this.resumePath = resumePath;
+    public void setResumeUrl(String resumeUrl) {
+        this.resumeUrl = resumeUrl;
     }
 
     public String getCurrentCompany() {
@@ -171,6 +227,10 @@ public class CandidateProfile {
         this.applicationStatus = applicationStatus;
     }
 
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
     public User getUser() {
         return user;
     }
@@ -187,3 +247,6 @@ public class CandidateProfile {
         this.jobDescription = jobDescription;
     }
 }
+
+
+    

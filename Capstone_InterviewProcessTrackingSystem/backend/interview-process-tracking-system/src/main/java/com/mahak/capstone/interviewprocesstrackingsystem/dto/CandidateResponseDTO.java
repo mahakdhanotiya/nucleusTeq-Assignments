@@ -1,5 +1,7 @@
 package com.mahak.capstone.interviewprocesstrackingsystem.dto;
 
+import java.time.LocalDateTime;
+
 import com.mahak.capstone.interviewprocesstrackingsystem.enums.ApplicationSource;
 import com.mahak.capstone.interviewprocesstrackingsystem.enums.ApplicationStatus;
 import com.mahak.capstone.interviewprocesstrackingsystem.enums.InterviewStage;
@@ -12,7 +14,7 @@ public class CandidateResponseDTO {
     private Long id;
 
     private String mobileNumber;
-    private String resumePath;
+    private String resumeUrl;
     private String currentCompany;
 
     private Integer totalExperience;
@@ -30,6 +32,7 @@ public class CandidateResponseDTO {
 
     private Long userId;
     private Long jobId;
+    private LocalDateTime createdAt;
 
     public CandidateResponseDTO() {}
 
@@ -49,12 +52,12 @@ public class CandidateResponseDTO {
         this.mobileNumber = mobileNumber;
     }
 
-    public String getResumePath() {
-        return resumePath;
+    public String getResumeUrl() {
+        return resumeUrl;
     }
 
-    public void setResumePath(String resumePath) {
-        this.resumePath = resumePath;
+    public void setResumeUrl(String resumeUrl) {
+        this.resumeUrl = resumeUrl;
     }
 
     public String getCurrentCompany() {
@@ -151,5 +154,13 @@ public class CandidateResponseDTO {
 
     public void setJobId(Long jobId) {
         this.jobId = jobId;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+    this.createdAt = createdAt;
     }
 }
