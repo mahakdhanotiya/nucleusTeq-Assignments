@@ -13,5 +13,8 @@ public class ErrorConstants {
 
     public static final String JOB_NOT_FOUND = "Job not found";   
     public static final String JOB_ALREADY_INACTIVE = "Job is already inactive";   
-
+    public static final String ACTIVE_APPLICATION_EXISTS = "User already has an active application";
+    public static final String INVALID_RESUME_FORMAT = "Only PDF resumes are allowed";
+    public static final String INVALID_REQUEST = "Request body cannot be null";
+    public static final String CANDIDATE_NOT_FOUND = "Candidate not found";
 }
