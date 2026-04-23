@@ -1,12 +1,16 @@
 package com.mahak.capstone.interviewprocesstrackingsystem.service.impl;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import com.mahak.capstone.interviewprocesstrackingsystem.constants.ErrorConstants;
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.JobRequestDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.JobResponseDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.entity.JobDescription;
+import com.mahak.capstone.interviewprocesstrackingsystem.exception.InvalidRequestException;
+import com.mahak.capstone.interviewprocesstrackingsystem.exception.ResourceNotFoundException;
 import com.mahak.capstone.interviewprocesstrackingsystem.mapper.JobDescriptionMapper;
 import com.mahak.capstone.interviewprocesstrackingsystem.repository.JobDescriptionRepository;
 import com.mahak.capstone.interviewprocesstrackingsystem.service.JobDescriptionService;
@@ -23,6 +27,7 @@ public class JobDescriptionServiceImpl implements JobDescriptionService {
     public JobDescriptionServiceImpl(JobDescriptionRepository jobRepository) {
         this.jobRepository = jobRepository;
     }
+
 
     @Override
     public JobResponseDTO createJob(JobRequestDTO dto) {
@@ -43,4 +48,41 @@ public class JobDescriptionServiceImpl implements JobDescriptionService {
         // Entity → Response DTO
         return JobDescriptionMapper.toResponse(savedJob);
     }
-}
+
+
+    @Override
+    public List<JobResponseDTO> getAllJobs() {
+
+        logger.info("Fetching all active jobs");
+
+        List<JobResponseDTO> jobs = jobRepository.findByIsActiveTrue()
+        .stream()
+        .map(JobDescriptionMapper::toResponse)
+        .toList();
+
+        logger.info("Total active jobs fetched: {}", jobs.size());
+
+        return jobs;
+    }
+
+    
+     @Override
+    public void deactivateJob(Long id) {
+
+        logger.info("Deactivating job with id: {}", id);
+
+        JobDescription job = jobRepository.findById(id)
+                .orElseThrow(() -> {
+                    logger.error("Job not found with id: {}", id);
+                    return new ResourceNotFoundException(ErrorConstants.JOB_NOT_FOUND);
+                });
+        if (Boolean.FALSE.equals(job.getIsActive())) {
+            logger.error("Job already inactive with id: {}", id);
+            throw new InvalidRequestException(ErrorConstants.JOB_ALREADY_INACTIVE);
+        }
+        job.setIsActive(false);
+        jobRepository.save(job);
+
+        logger.info("Job deactivated successfully: {}", id);
+    }
+ }

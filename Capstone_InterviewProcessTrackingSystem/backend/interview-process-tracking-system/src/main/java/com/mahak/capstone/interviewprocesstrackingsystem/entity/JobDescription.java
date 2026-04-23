@@ -63,6 +63,9 @@ public class JobDescription {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(nullable = false)
+    private Boolean isActive;
+
 
     // Default Constructor
     public JobDescription() {}
@@ -70,6 +73,7 @@ public class JobDescription {
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
+        this.isActive  = true;
     }
 
     // Parameterized Constructor
@@ -175,5 +179,13 @@ public class JobDescription {
     public LocalDateTime getCreatedAt() {
         return createdAt;
     
+    }
+
+    public Boolean getIsActive() {
+        return isActive;
+}
+
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
     }
 }
