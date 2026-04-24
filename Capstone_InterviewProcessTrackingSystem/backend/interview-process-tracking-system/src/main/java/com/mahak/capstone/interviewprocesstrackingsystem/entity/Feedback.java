@@ -1,20 +1,38 @@
 package com.mahak.capstone.interviewprocesstrackingsystem.entity;
 
+import java.time.LocalDateTime;
+
 import com.mahak.capstone.interviewprocesstrackingsystem.enums.FeedbackStatus;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
+/**
+ * Represents feedback given by a panel member for an interview.
+ * 
+ * Rules:
+ * - One panel can give only one feedback per interview
+ * - Rating should be between 1–5 (validated in service layer)
+ */
 @Entity
-@Table(name = "feedbacks")
+@Table(
+    name = "feedbacks",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"interview_id", "panel_id"})
+    }
+)
 public class Feedback {
 
     @Id
@@ -24,8 +42,11 @@ public class Feedback {
     @Column(nullable = false, length = 1000)
     private String comments;
 
+    /**
+     * Rating from 1 to 5 (validate in service layer)
+     */
     @Column(nullable = false)
-    private Integer rating; //later validate 1–5 in service layer
+    private Integer rating;
 
     @Column(nullable = false, length = 1000)
     private String strengths;
@@ -40,20 +61,49 @@ public class Feedback {
     @Column(nullable = false)
     private FeedbackStatus status;
 
-    // Interview relation
-    @ManyToOne(optional = false)
+    /**
+     * Interview reference
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "interview_id", nullable = false)
     private Interview interview;
 
-    // Panel (who gave feedback)
-    @ManyToOne(optional = false)
+    /**
+     * Panel who submitted feedback
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "panel_id", nullable = false)
-    private User panel;
+    private PanelProfile panel;
 
-    // Default constructor
+    /**
+     * Audit fields
+     */
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
+
+
+    // Lifecycle hooks
+
+
+    @PrePersist
+    public void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+    
+    // Constructors
+
     public Feedback() {}
 
-    // Getters and Setters
+
+    // Getters & Setters
+
 
     public Long getId() {
         return id;
@@ -76,7 +126,7 @@ public class Feedback {
     }
 
     public String getStrengths() {
-    return strengths;
+        return strengths;
     }
 
     public void setStrengths(String strengths) {
@@ -115,11 +165,19 @@ public class Feedback {
         this.interview = interview;
     }
 
-    public User getPanel() {
+    public PanelProfile getPanel() {
         return panel;
     }
 
-    public void setPanel(User panel) {
+    public void setPanel(PanelProfile panel) {
         this.panel = panel;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
     }
 }
