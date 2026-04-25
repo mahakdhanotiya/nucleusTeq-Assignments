@@ -49,7 +49,10 @@ public class InterviewMapper {
 
             dto.setCandidateName(
                 interview.getCandidate().getUser().getFullName()
+            
             );
+        }else {
+            dto.setCandidateName("N/A");
         }
 
         return dto;

@@ -39,10 +39,20 @@ public class PanelProfileMapper {
 
         // user data
         if (panel.getUser() != null) {
-            dto.setName(panel.getUser().getFullName());
-            dto.setEmail(panel.getUser().getEmail());
-        }
+            dto.setName(
+                panel.getUser().getFullName() != null 
+                    ? panel.getUser().getFullName() 
+                    : "N/A"
+            );
 
+            dto.setEmail(
+                panel.getUser().getEmail() != null 
+                    ? panel.getUser().getEmail() 
+                    : "N/A"
+            );
+
+        }
         return dto;
     }
 }
+        

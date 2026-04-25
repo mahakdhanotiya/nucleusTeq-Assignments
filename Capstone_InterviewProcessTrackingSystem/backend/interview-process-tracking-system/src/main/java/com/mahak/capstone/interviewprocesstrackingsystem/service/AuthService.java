@@ -1,6 +1,6 @@
 package com.mahak.capstone.interviewprocesstrackingsystem.service;
-
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.LoginRequestDTO;
+import com.mahak.capstone.interviewprocesstrackingsystem.dto.LoginResponseDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.RegisterRequestDTO;
 
 /**
@@ -10,5 +10,5 @@ public interface AuthService {
 
     void register(RegisterRequestDTO registerRequestDTO);
 
-    String login(LoginRequestDTO loginRequestDTO);
+    LoginResponseDTO login(LoginRequestDTO loginRequestDTO);
 }

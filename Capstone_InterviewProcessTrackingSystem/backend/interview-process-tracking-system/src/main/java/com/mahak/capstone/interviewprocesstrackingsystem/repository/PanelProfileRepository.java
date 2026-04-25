@@ -10,5 +10,6 @@ public interface PanelProfileRepository extends JpaRepository<PanelProfile, Long
 
     // Find panel by user id
     Optional<PanelProfile> findByUserId(Long userId);
+    boolean existsByUserId(Long userId);
 
 }

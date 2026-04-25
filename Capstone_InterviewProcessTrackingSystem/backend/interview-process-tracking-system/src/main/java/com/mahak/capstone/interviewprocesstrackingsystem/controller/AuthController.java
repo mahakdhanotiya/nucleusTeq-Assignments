@@ -57,10 +57,9 @@ public class AuthController {
     @PostMapping(ApiConstants.LOGIN)
     public ApiResponseDTO<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO dto) {
         logger.info("Received login request for email: {}", dto.getEmail());
-        String token = authService.login(dto);
+        LoginResponseDTO response = authService.login(dto);
         logger.info("Login API completed for email: {}", dto.getEmail());
-        LoginResponseDTO response = new LoginResponseDTO(token);
-
+        
 
         return new ApiResponseDTO<>(true, "Login successful", response);
     }
