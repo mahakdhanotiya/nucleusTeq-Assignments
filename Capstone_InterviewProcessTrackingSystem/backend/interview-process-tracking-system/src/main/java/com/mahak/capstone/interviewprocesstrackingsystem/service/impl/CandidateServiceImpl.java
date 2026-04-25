@@ -136,6 +136,8 @@ public class CandidateServiceImpl implements CandidateService {
         return CandidateMapper.toDTO(candidate);
     }
 
+    
+
     @Override
     public CandidateResponseDTO getMyProfile() {
 

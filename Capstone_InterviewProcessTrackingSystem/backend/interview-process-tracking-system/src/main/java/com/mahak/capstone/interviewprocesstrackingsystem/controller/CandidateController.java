@@ -69,6 +69,22 @@ public class CandidateController {
         return new ApiResponseDTO<>(true, "Candidates fetched successfully", list);
     }
 
+
+    /**
+     * 
+     * candidate get their own profile
+     * GET /candidates/my-profile
+     */
+    @GetMapping("/my-profile")
+    @PreAuthorize("hasRole('CANDIDATE')")
+    public ApiResponseDTO<CandidateResponseDTO> getMyProfile() {
+        
+       CandidateResponseDTO response = candidateService.getMyProfile();
+
+    return new ApiResponseDTO<>(true, "Profile fetched successfully", response); 
+    }
+
+
     /**
      * Get Candidate by ID
      * GET /candidates/{id}
@@ -84,18 +100,4 @@ public class CandidateController {
         return new ApiResponseDTO<>(true, "Candidate fetched successfully", response);
     }
 
-
-    /**
-     * 
-     * candidate get their own profile
-     * GET /candidates/my-profile
-     */
-    @GetMapping("/my-profile")
-    @PreAuthorize("hasRole('CANDIDATE')")
-    public ApiResponseDTO<CandidateResponseDTO> getMyProfile() {
-        
-       CandidateResponseDTO response = candidateService.getMyProfile();
-
-    return new ApiResponseDTO<>(true, "Profile fetched successfully", response); 
-    }
 }
