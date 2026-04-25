@@ -152,4 +152,46 @@ public class InterviewServiceImpl implements InterviewService {
 
         return interviewMapper.toResponseDTO(interview);
     }
+    /**
+     * Fetching all interviews
+     */
+
+    @Override
+public List<InterviewResponseDTO> getAllInterviews() {
+
+    logger.info("Fetching all interviews");
+
+    List<Interview> interviews = interviewRepository.findAll();
+
+    if (interviews.isEmpty()) {
+        logger.warn("No interviews found");
+        throw new ResourceNotFoundException("No interviews found");
+    }
+
+    return interviews.stream()
+            .map(interviewMapper::toResponseDTO)
+            .toList();
+    }
+
+
+     /**
+     * get interviews by Candidate.
+     */
+
+    @Override
+    public List<InterviewResponseDTO> getInterviewsByCandidate(Long candidateId) {
+
+    logger.info("Fetching interviews for candidateId: {}", candidateId);
+
+    List<Interview> interviews = interviewRepository.findByCandidateId(candidateId);
+
+    if (interviews.isEmpty()) {
+        logger.warn("No interviews found for candidateId: {}", candidateId);
+        throw new ResourceNotFoundException("No interviews found for this candidate");
+    }
+
+    return interviews.stream()
+            .map(interviewMapper::toResponseDTO)
+            .toList();
+    }
 }
