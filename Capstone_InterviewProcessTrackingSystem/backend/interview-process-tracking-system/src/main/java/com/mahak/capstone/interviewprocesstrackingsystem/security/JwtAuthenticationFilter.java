@@ -66,7 +66,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     // Create authentication object with role
                     UsernamePasswordAuthenticationToken auth =
                             new UsernamePasswordAuthenticationToken(
-                                    email,
+                                   user,
                                     null,
                                     List.of(new SimpleGrantedAuthority("ROLE_" + role))
                             );
@@ -74,7 +74,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     // Set authentication in Spring Security context
                     SecurityContextHolder.getContext().setAuthentication(auth);
 
-                    log.info("User authenticated: {} with role: {}", email, role);
+                    log.info("User authenticated: {} with role: {}", user.getEmail() ,role);
                 }
 
          } catch (Exception e) {

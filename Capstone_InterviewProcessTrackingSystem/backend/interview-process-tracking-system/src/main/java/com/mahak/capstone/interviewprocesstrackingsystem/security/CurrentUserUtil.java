@@ -3,6 +3,7 @@ package com.mahak.capstone.interviewprocesstrackingsystem.security;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.mahak.capstone.interviewprocesstrackingsystem.entity.User;
 public class CurrentUserUtil {
 
     public static String getCurrentUserEmail() {
@@ -12,6 +13,12 @@ public class CurrentUserUtil {
             return null;
         }
 
-        return auth.getName(); 
+       Object principal = auth.getPrincipal();
+
+    if (principal instanceof User user) {
+        return user.getEmail();
     }
+
+    return null;
+}
 }
