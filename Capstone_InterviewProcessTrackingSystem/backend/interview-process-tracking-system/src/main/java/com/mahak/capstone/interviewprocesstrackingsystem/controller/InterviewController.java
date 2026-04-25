@@ -1,4 +1,5 @@
 package com.mahak.capstone.interviewprocesstrackingsystem.controller;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,6 +85,32 @@ public class InterviewController {
         logger.info("Fetching interview details for id: {}", id);
 
         InterviewResponseDTO response = interviewService.getInterviewById(id);
+
+        return ResponseEntity.ok(response);
+    }
+
+
+    @GetMapping
+    @PreAuthorize("hasRole('HR')")
+    public ResponseEntity<List<InterviewResponseDTO>> getAllInterviews() {
+
+        logger.info("HR fetching all interviews");
+
+        List<InterviewResponseDTO> response = interviewService.getAllInterviews();
+
+        return ResponseEntity.ok(response);
+    }
+
+
+    @GetMapping("/candidate/{candidateId}")
+    @PreAuthorize("hasAnyRole('HR','CANDIDATE')")
+    public ResponseEntity<List<InterviewResponseDTO>> getInterviewsByCandidate(
+            @PathVariable Long candidateId) {
+
+        logger.info("Fetching interviews for candidateId: {}", candidateId);
+
+        List<InterviewResponseDTO> response =
+                interviewService.getInterviewsByCandidate(candidateId);
 
         return ResponseEntity.ok(response);
     }

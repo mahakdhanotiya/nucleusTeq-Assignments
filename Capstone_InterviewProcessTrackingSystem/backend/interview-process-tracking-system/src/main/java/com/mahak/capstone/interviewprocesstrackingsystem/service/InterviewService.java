@@ -1,9 +1,10 @@
 package com.mahak.capstone.interviewprocesstrackingsystem.service;
 
+import java.util.List;
+
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.InterviewRequestDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.InterviewResponseDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.PanelAssignmentRequestDTO;
-
 /**
  * Service interface for managing interview operations.
  */
@@ -23,4 +24,14 @@ public interface InterviewService {
      * Fetch interview by ID.
      */
     InterviewResponseDTO getInterviewById(Long id);
+
+    /**
+     * Fetch all interviews
+     */
+    List<InterviewResponseDTO> getAllInterviews();
+    /**
+     * get interviews by Candidate.
+     */
+
+    List<InterviewResponseDTO> getInterviewsByCandidate(Long candidateId);
 }
