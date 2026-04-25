@@ -85,6 +85,7 @@ public class PanelProfileServiceImpl implements PanelProfileService {
         PanelProfile panel = panelMapper.toEntity(dto, user);
 
         // save
+        
         panel = panelRepository.save(panel);
 
         logger.info("Panel created successfully with id: {}", panel.getId());

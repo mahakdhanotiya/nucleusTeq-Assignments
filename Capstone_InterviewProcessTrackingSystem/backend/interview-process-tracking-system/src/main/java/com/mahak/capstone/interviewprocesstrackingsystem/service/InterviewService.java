@@ -29,6 +29,7 @@ public interface InterviewService {
      * Fetch all interviews
      */
     List<InterviewResponseDTO> getAllInterviews();
+    
     /**
      * get interviews by Candidate.
      */

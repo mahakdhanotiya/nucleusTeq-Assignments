@@ -38,7 +38,7 @@ public class Interview {
     /**
      * Date and time of the interview
      */
-    @Column(nullable = false)
+    @Column(name = "interview_date_time",nullable = false)
     private LocalDateTime interviewDateTime;
 
     /**
@@ -76,14 +76,15 @@ public class Interview {
     private JobDescription jobDescription;
 
     /**
-     * Auto timestamp when record is created
+     * Created timestamp
      */
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     /**
-     * Auto timestamp when record is updated
+     * Updated timestamp
      */
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     

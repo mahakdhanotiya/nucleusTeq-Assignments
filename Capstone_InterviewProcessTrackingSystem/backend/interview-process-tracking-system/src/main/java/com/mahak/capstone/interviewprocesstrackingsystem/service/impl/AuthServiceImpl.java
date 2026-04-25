@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.mahak.capstone.interviewprocesstrackingsystem.constants.ErrorConstants;
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.LoginRequestDTO;
+import com.mahak.capstone.interviewprocesstrackingsystem.dto.LoginResponseDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.RegisterRequestDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.entity.User;
 import com.mahak.capstone.interviewprocesstrackingsystem.enums.Role;
@@ -59,7 +60,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String login(LoginRequestDTO dto) {
+    public LoginResponseDTO login(LoginRequestDTO dto) {
 
         logger.info("Login attempt for email: {}", dto.getEmail());
 
@@ -75,7 +76,11 @@ public class AuthServiceImpl implements AuthService {
         }
 
         logger.info("Login successful for email: {}", user.getEmail());
+        String role = user.getRole().name();
+         // generate token
+        String token = jwtUtil.generateToken(user.getEmail(), role);
+    
 
-        return jwtUtil.generateToken(user.getEmail(), user.getRole().name());
+        return new LoginResponseDTO(token, role);
     }
 }
