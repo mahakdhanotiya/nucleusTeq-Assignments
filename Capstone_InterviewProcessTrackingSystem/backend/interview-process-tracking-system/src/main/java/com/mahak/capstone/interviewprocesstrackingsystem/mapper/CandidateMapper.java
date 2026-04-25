@@ -19,7 +19,7 @@ public class CandidateMapper {
         CandidateProfile c = new CandidateProfile();
 
         c.setMobileNumber(dto.getMobileNumber());
-        c.setResumePath(dto.getResumePath());
+        c.setResumeUrl(dto.getResumeUrl());
         c.setCurrentCompany(dto.getCurrentCompany());
 
         c.setTotalExperience(dto.getTotalExperience());
@@ -32,8 +32,7 @@ public class CandidateMapper {
         c.setPreferredLocation(dto.getPreferredLocation());
 
         c.setSource(dto.getSource());
-        c.setCurrentStage(dto.getCurrentStage());
-        c.setApplicationStatus(dto.getApplicationStatus());
+    
 
         // relations
         c.setUser(user);
@@ -52,7 +51,7 @@ public class CandidateMapper {
         dto.setId(c.getId());
 
         dto.setMobileNumber(c.getMobileNumber());
-        dto.setResumePath(c.getResumePath());
+        dto.setResumeUrl(c.getResumeUrl());
         dto.setCurrentCompany(c.getCurrentCompany());
 
         dto.setTotalExperience(c.getTotalExperience());
@@ -67,6 +66,8 @@ public class CandidateMapper {
         dto.setSource(c.getSource());
         dto.setCurrentStage(c.getCurrentStage());
         dto.setApplicationStatus(c.getApplicationStatus());
+        
+        dto.setCreatedAt(c.getCreatedAt());
         
         // relations → IDs
         dto.setUserId(c.getUser().getId());
