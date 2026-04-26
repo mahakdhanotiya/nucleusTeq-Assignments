@@ -18,8 +18,15 @@ public interface JobDescriptionService {
      */
     JobResponseDTO createJob(JobRequestDTO dto);
 
+    /**
+     * Fetches all active jobs.
+     */
     List<JobResponseDTO> getAllJobs();
 
+
+    /**
+     * Deactivates a job by ID.
+     */
    void deactivateJob(Long id);
 
 }
