@@ -1,9 +1,9 @@
 package com.mahak.capstone.interviewprocesstrackingsystem.controller;
+
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,20 +12,26 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mahak.capstone.interviewprocesstrackingsystem.constants.ApiConstants;
+import com.mahak.capstone.interviewprocesstrackingsystem.dto.ApiResponseDTO;
+import com.mahak.capstone.interviewprocesstrackingsystem.dto.CandidateResponseDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.InterviewRequestDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.InterviewResponseDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.PanelAssignmentRequestDTO;
+import com.mahak.capstone.interviewprocesstrackingsystem.dto.StageProgressionRequestDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.service.InterviewService;
 
+import jakarta.validation.Valid;
+
 /**
- * REST Controller for Interview operations
- * 
+ * REST Controller for Interview operations.
+ *
  * Role Access:
- * - HR → schedule + assign panel
- * - Candidate → view interview
+ * - HR → schedule, assign panel, view all
+ * - Candidate → view own interviews
  */
 @RestController
-@RequestMapping("/api/interviews")
+@RequestMapping(ApiConstants.INTERVIEWS)
 public class InterviewController {
 
     private static final Logger logger = LoggerFactory.getLogger(InterviewController.class);
@@ -37,82 +43,91 @@ public class InterviewController {
     }
 
     /**
-     * HR: Schedule interview
+     * HR: Schedule interview.
+     * POST /api/interviews
      */
     @PostMapping
     @PreAuthorize("hasRole('HR')")
-    public ResponseEntity<InterviewResponseDTO> scheduleInterview(
+    public ApiResponseDTO<InterviewResponseDTO> scheduleInterview(
             @RequestBody InterviewRequestDTO dto) {
 
-                System.out.println("==== DEBUG START ====");
-    System.out.println("DTO: " + dto);
-    System.out.println("candidateId: " + dto.getCandidateId());
-    System.out.println("jdId: " + dto.getJobDescriptionId());
-    System.out.println("date: " + dto.getInterviewDateTime());
-    System.out.println("==== DEBUG END ====");
-
-
-        logger.info("HR scheduling interview");
-
+        logger.info("Schedule interview request received for candidateId: {}", dto.getCandidateId());
         InterviewResponseDTO response = interviewService.scheduleInterview(dto);
-
-        return ResponseEntity.ok(response);
+        logger.info("Interview scheduled successfully with id: {}", response.getId());
+        return new ApiResponseDTO<>(true, ApiConstants.INTERVIEW_SCHEDULED, response);
     }
 
     /**
-     * HR: Assign panel
+     * HR: Assign panel to interview.
+     * POST /api/interviews/assign-panel
      */
-    @PostMapping("/assign-panel")
+    @PostMapping(ApiConstants.ASSIGN_PANEL)
     @PreAuthorize("hasRole('HR')")
-    public ResponseEntity<String> assignPanel(
+    public ApiResponseDTO<Void> assignPanel(
             @RequestBody PanelAssignmentRequestDTO dto) {
 
-        logger.info("HR assigning panel");
-
+        logger.info("Assign panel request: interviewId={}, panelId={}", dto.getInterviewId(), dto.getPanelId());
         interviewService.assignPanel(dto);
-
-        return ResponseEntity.ok("Panel assigned successfully");
+        logger.info("Panel assigned successfully to interviewId: {}", dto.getInterviewId());
+        return new ApiResponseDTO<>(true, ApiConstants.PANEL_ASSIGNED, null);
     }
 
     /**
-     * Candidate / Panel / HR: View interview
+     * View interview by ID.
+     * GET /api/interviews/{id}
      */
-    @GetMapping("/{id}")
+    @GetMapping(ApiConstants.BY_ID)
     @PreAuthorize("hasAnyRole('HR','PANEL','CANDIDATE')")
-    public ResponseEntity<InterviewResponseDTO> getInterviewById(
+    public ApiResponseDTO<InterviewResponseDTO> getInterviewById(
             @PathVariable Long id) {
 
-        logger.info("Fetching interview details for id: {}", id);
-
+        logger.info("Fetching interview with id: {}", id);
         InterviewResponseDTO response = interviewService.getInterviewById(id);
-
-        return ResponseEntity.ok(response);
+        logger.info("Interview fetched: {}", id);
+        return new ApiResponseDTO<>(true, ApiConstants.INTERVIEW_FETCHED, response);
     }
 
-
+    /**
+     * HR: Get all interviews.
+     * GET /api/interviews
+     */
     @GetMapping
     @PreAuthorize("hasRole('HR')")
-    public ResponseEntity<List<InterviewResponseDTO>> getAllInterviews() {
+    public ApiResponseDTO<List<InterviewResponseDTO>> getAllInterviews() {
 
-        logger.info("HR fetching all interviews");
-
+        logger.info("Fetching all interviews");
         List<InterviewResponseDTO> response = interviewService.getAllInterviews();
-
-        return ResponseEntity.ok(response);
+        logger.info("Fetched {} interviews", response.size());
+        return new ApiResponseDTO<>(true, ApiConstants.INTERVIEWS_FETCHED, response);
     }
 
-
-    @GetMapping("/candidate/{candidateId}")
+    /**
+     * Get interviews for a candidate.
+     * GET /api/interviews/candidate/{candidateId}
+     */
+    @GetMapping(ApiConstants.BY_CANDIDATE)
     @PreAuthorize("hasAnyRole('HR','CANDIDATE')")
-    public ResponseEntity<List<InterviewResponseDTO>> getInterviewsByCandidate(
+    public ApiResponseDTO<List<InterviewResponseDTO>> getInterviewsByCandidate(
             @PathVariable Long candidateId) {
 
         logger.info("Fetching interviews for candidateId: {}", candidateId);
+        List<InterviewResponseDTO> response = interviewService.getInterviewsByCandidate(candidateId);
+        logger.info("Fetched {} interviews for candidateId: {}", response.size(), candidateId);
+        return new ApiResponseDTO<>(true, ApiConstants.INTERVIEWS_FETCHED, response);
+    }
 
-        List<InterviewResponseDTO> response =
-                interviewService.getInterviewsByCandidate(candidateId);
+    /**
+     * HR: Advance candidate to next stage or reject.
+     * POST /api/interviews/stage-progression
+     */
+    @PostMapping(ApiConstants.STAGE_PROGRESSION)
+    @PreAuthorize("hasRole('HR')")
+    public ApiResponseDTO<CandidateResponseDTO> progressStage(
+            @Valid @RequestBody StageProgressionRequestDTO dto) {
 
-        return ResponseEntity.ok(response);
+        logger.info("Stage progression request: candidateId={}, newStage={}", dto.getCandidateId(), dto.getNewStage());
+        CandidateResponseDTO response = interviewService.progressCandidateStage(dto);
+        logger.info("Stage updated for candidateId: {}", dto.getCandidateId());
+        return new ApiResponseDTO<>(true, ApiConstants.STAGE_UPDATED, response);
     }
 }
-
