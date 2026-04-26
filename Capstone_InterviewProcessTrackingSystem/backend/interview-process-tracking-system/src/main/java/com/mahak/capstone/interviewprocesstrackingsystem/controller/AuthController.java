@@ -16,51 +16,43 @@ import com.mahak.capstone.interviewprocesstrackingsystem.service.AuthService;
 
 import jakarta.validation.Valid;
 
-
+/**
+ * REST Controller for Authentication operations.
+ * Handles user registration and login.
+ */
 @RestController
 @RequestMapping(ApiConstants.AUTH)
 public class AuthController {
 
-    private final AuthService authService;
-
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
-    // constructor injection
+    private final AuthService authService;
+
     public AuthController(AuthService authService) {
         this.authService = authService;
     }
-    
-        /**
-     * Handles user registration request.
-     *
-     * @param dto RegisterRequestDTO containing user details
-     * @return ApiResponseDTO with success message
-     */
 
+    /**
+     * Handles user registration.
+     * POST /auth/register
+     */
     @PostMapping(ApiConstants.REGISTER)
     public ApiResponseDTO<Void> register(@Valid @RequestBody RegisterRequestDTO dto) {
-        logger.info("Received register request for email: {}", dto.getEmail());
+        logger.info("Register request received for email: {}", dto.getEmail());
         authService.register(dto);
-        logger.info("Register API completed for email: {}", dto.getEmail());
-
-        return new ApiResponseDTO<>(true, "User registered successfully", null);
+        logger.info("User registered successfully: {}", dto.getEmail());
+        return new ApiResponseDTO<>(true, ApiConstants.REGISTER_SUCCESS, null);
     }
 
-
-        /**
-     * Handles user login request.
-     *
-     * @param dto LoginRequestDTO containing user details
-     * @return ApiResponseDTO with success message
+    /**
+     * Handles user login.
+     * POST /auth/login
      */
-
     @PostMapping(ApiConstants.LOGIN)
     public ApiResponseDTO<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO dto) {
-        logger.info("Received login request for email: {}", dto.getEmail());
+        logger.info("Login request received for email: {}", dto.getEmail());
         LoginResponseDTO response = authService.login(dto);
-        logger.info("Login API completed for email: {}", dto.getEmail());
-        
-
-        return new ApiResponseDTO<>(true, "Login successful", response);
+        logger.info("Login successful for email: {}", dto.getEmail());
+        return new ApiResponseDTO<>(true, ApiConstants.LOGIN_SUCCESS, response);
     }
 }
