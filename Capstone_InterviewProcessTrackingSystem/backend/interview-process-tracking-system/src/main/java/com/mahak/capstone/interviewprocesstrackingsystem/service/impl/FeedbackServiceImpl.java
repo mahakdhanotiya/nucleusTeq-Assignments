@@ -1,10 +1,13 @@
 package com.mahak.capstone.interviewprocesstrackingsystem.service.impl;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.mahak.capstone.interviewprocesstrackingsystem.constants.ErrorConstants;
+import com.mahak.capstone.interviewprocesstrackingsystem.dto.FeedbackDetailResponseDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.FeedbackRequestDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.FeedbackResponseDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.entity.Feedback;
@@ -106,4 +109,21 @@ public class FeedbackServiceImpl implements FeedbackService {
 
         return mapper.toResponseDTO(feedback);
     }
+
+
+    @Override
+    public List<FeedbackDetailResponseDTO> getFeedbackByInterview(Long interviewId) {
+
+        // validate interview exists 
+        interviewRepository.findById(interviewId)
+                .orElseThrow(() -> new RuntimeException("Interview not found"));
+
+        //fetch feedbacks
+        List<Feedback> feedbackList = feedbackRepository.findByInterviewId(interviewId);
+
+        //convert to DTO
+        return feedbackList.stream()
+                .map(mapper::toDetailDTO)
+                .toList();
+        }
 }

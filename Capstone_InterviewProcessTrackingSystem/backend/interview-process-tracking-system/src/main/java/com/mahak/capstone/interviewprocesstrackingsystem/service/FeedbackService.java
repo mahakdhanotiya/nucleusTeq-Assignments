@@ -1,5 +1,7 @@
 package com.mahak.capstone.interviewprocesstrackingsystem.service;
+import java.util.List;
 
+import com.mahak.capstone.interviewprocesstrackingsystem.dto.FeedbackDetailResponseDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.FeedbackRequestDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.FeedbackResponseDTO;
 
@@ -23,4 +25,6 @@ public interface FeedbackService {
      * @return FeedbackResponseDTO
      */
     FeedbackResponseDTO getFeedbackById(Long id);
+
+    List<FeedbackDetailResponseDTO> getFeedbackByInterview(Long interviewId);
 }
