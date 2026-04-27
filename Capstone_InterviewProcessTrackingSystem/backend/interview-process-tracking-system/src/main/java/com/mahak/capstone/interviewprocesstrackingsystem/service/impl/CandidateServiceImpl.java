@@ -137,6 +137,10 @@ public class CandidateServiceImpl implements CandidateService {
     }
 
     
+    /**
+     * Fetches profile of the currently logged-in candidate
+     * using authenticated user details.
+     */
 
     @Override
     public CandidateResponseDTO getMyProfile() {
@@ -160,5 +164,79 @@ public class CandidateServiceImpl implements CandidateService {
         logger.info("Profile fetched successfully for user: {}", user.getId());
 
         return CandidateMapper.toDTO(candidate);
+    }
+
+    /**
+     * Search/filter candidates by JD, stage, and/or status.
+     */
+    @Override
+    public List<CandidateResponseDTO> searchCandidates(
+            Long jdId,
+            com.mahak.capstone.interviewprocesstrackingsystem.enums.InterviewStage stage,
+            ApplicationStatus status) {
+
+        logger.info("Searching candidates with jdId={}, stage={}, status={}", jdId, stage, status);
+
+        List<CandidateProfile> candidates = candidateRepository.findByFilters(jdId, stage, status);
+
+        logger.info("Found {} candidates matching filters", candidates.size());
+
+        return candidates.stream()
+                .map(CandidateMapper::toDTO)
+                .toList();
+    }
+
+    /**
+     * Updates profile details of the logged-in candidate.
+     * Only non-null fields from request are updated.
+     */
+
+    @Override
+    public CandidateResponseDTO updateMyProfile(CandidateRequestDTO dto) {
+
+        logger.info("Candidate updating their profile");
+
+        String email = CurrentUserUtil.getCurrentUserEmail();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorConstants.USER_NOT_FOUND));
+
+        CandidateProfile candidate = candidateRepository.findByUser(user)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorConstants.CANDIDATE_NOT_FOUND));
+
+
+        if (dto.getMobileNumber() != null) candidate.setMobileNumber(dto.getMobileNumber());
+        if (dto.getResumeUrl() != null) candidate.setResumeUrl(dto.getResumeUrl());
+        if (dto.getCurrentCompany() != null) candidate.setCurrentCompany(dto.getCurrentCompany());
+        if (dto.getTotalExperience() != null) candidate.setTotalExperience(dto.getTotalExperience());
+        if (dto.getRelevantExperience() != null) candidate.setRelevantExperience(dto.getRelevantExperience());
+        if (dto.getCurrentCTC() != null) candidate.setCurrentCTC(dto.getCurrentCTC());
+        if (dto.getExpectedCTC() != null) candidate.setExpectedCTC(dto.getExpectedCTC());
+        if (dto.getNoticePeriod() != null) candidate.setNoticePeriod(dto.getNoticePeriod());
+        if (dto.getPreferredLocation() != null) candidate.setPreferredLocation(dto.getPreferredLocation());
+    
+
+        CandidateProfile saved = candidateRepository.save(candidate);
+
+        logger.info("Profile updated successfully for user: {}", user.getId());
+
+        return CandidateMapper.toDTO(saved);
+    }
+
+    /**
+     * Deletes a candidate record by ID.
+     * Throws exception if candidate does not exist.
+     */
+
+    @Override
+    public void deleteCandidate(Long id) {
+        logger.info("Deleting candidate with id: {}", id);
+        CandidateProfile candidate = candidateRepository.findById(id)
+                .orElseThrow(() -> {
+                    logger.error(ErrorConstants.CANDIDATE_NOT_FOUND + " with id: {}", id);
+                    return new ResourceNotFoundException(ErrorConstants.CANDIDATE_NOT_FOUND);
+                });
+        candidateRepository.delete(candidate);
+        logger.info("Candidate deleted successfully: {}", id);
     }
 }

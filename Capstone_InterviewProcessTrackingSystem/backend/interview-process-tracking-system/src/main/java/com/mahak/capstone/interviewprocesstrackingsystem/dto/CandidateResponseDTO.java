@@ -32,6 +32,9 @@ public class CandidateResponseDTO {
 
     private Long userId;
     private Long jobId;
+    private String fullName;
+    private String email;
+    private String jobTitle;
     private LocalDateTime createdAt;
 
     public CandidateResponseDTO() {}
@@ -162,5 +165,30 @@ public class CandidateResponseDTO {
 
     public void setCreatedAt(LocalDateTime createdAt) {
     this.createdAt = createdAt;
+    }
+
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getJobTitle() {
+        return jobTitle;
+    }
+
+    public void setJobTitle(String jobTitle) {
+        this.jobTitle = jobTitle;
     }
 }
