@@ -1,5 +1,6 @@
 package com.mahak.capstone.interviewprocesstrackingsystem.service.impl;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 
@@ -8,9 +9,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.mahak.capstone.interviewprocesstrackingsystem.constants.ErrorConstants;
+import com.mahak.capstone.interviewprocesstrackingsystem.dto.CandidateResponseDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.InterviewRequestDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.InterviewResponseDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.PanelAssignmentRequestDTO;
+import com.mahak.capstone.interviewprocesstrackingsystem.dto.StageProgressionRequestDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.entity.CandidateProfile;
 import com.mahak.capstone.interviewprocesstrackingsystem.entity.Interview;
 import com.mahak.capstone.interviewprocesstrackingsystem.entity.InterviewPanelAssignment;
@@ -25,6 +28,7 @@ import com.mahak.capstone.interviewprocesstrackingsystem.repository.InterviewPan
 import com.mahak.capstone.interviewprocesstrackingsystem.repository.InterviewRepository;
 import com.mahak.capstone.interviewprocesstrackingsystem.repository.JobDescriptionRepository;
 import com.mahak.capstone.interviewprocesstrackingsystem.repository.PanelProfileRepository;
+import com.mahak.capstone.interviewprocesstrackingsystem.service.EmailService;
 import com.mahak.capstone.interviewprocesstrackingsystem.service.InterviewService;
 import com.mahak.capstone.interviewprocesstrackingsystem.validation.InterviewValidation;
 
@@ -35,6 +39,7 @@ import com.mahak.capstone.interviewprocesstrackingsystem.validation.InterviewVal
 public class InterviewServiceImpl implements InterviewService {
 
     private static final Logger logger = LoggerFactory.getLogger(InterviewServiceImpl.class);
+    private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a");
 
     private final InterviewRepository interviewRepository;
     private final CandidateRepository candidateRepository;
@@ -45,6 +50,7 @@ public class InterviewServiceImpl implements InterviewService {
     private final InterviewMapper interviewMapper;
     private final InterviewPanelAssignmentMapper assignmentMapper;
     private final InterviewValidation interviewValidation;
+    private final EmailService emailService;
 
     public InterviewServiceImpl(
             InterviewRepository interviewRepository,
@@ -54,7 +60,8 @@ public class InterviewServiceImpl implements InterviewService {
             InterviewPanelAssignmentRepository assignmentRepository,
             InterviewMapper interviewMapper,
             InterviewPanelAssignmentMapper assignmentMapper,
-            InterviewValidation interviewValidation) {
+            InterviewValidation interviewValidation,
+            EmailService emailService) {
 
         this.interviewRepository = interviewRepository;
         this.candidateRepository = candidateRepository;
@@ -64,6 +71,7 @@ public class InterviewServiceImpl implements InterviewService {
         this.interviewMapper = interviewMapper;
         this.assignmentMapper = assignmentMapper;
         this.interviewValidation = interviewValidation;
+        this.emailService = emailService;
     }
 
     /**
@@ -93,6 +101,16 @@ public class InterviewServiceImpl implements InterviewService {
         interview = interviewRepository.save(interview);
 
         logger.info("Interview scheduled successfully with id: {}", interview.getId());
+
+        // Send email notification to candidate
+        emailService.sendInterviewScheduleToCandidate(
+                candidate.getUser().getEmail(),
+                candidate.getUser().getFullName(),
+                jd.getTitle(),
+                interview.getStage().name(),
+                interview.getInterviewDateTime().format(DATE_FMT),
+                interview.getFocusArea()
+        );
 
         return interviewMapper.toResponseDTO(interview);
     }
@@ -137,6 +155,17 @@ public class InterviewServiceImpl implements InterviewService {
         assignmentRepository.save(assignment);
 
         logger.info("Panel assigned successfully");
+
+        // Send email notification to the panel interviewer
+        emailService.sendPanelAssignmentEmail(
+                panel.getUser().getEmail(),
+                panel.getUser().getFullName(),
+                interview.getCandidate().getUser().getFullName(),
+                interview.getJobDescription() != null ? interview.getJobDescription().getTitle() : "N/A",
+                interview.getStage().name(),
+                interview.getInterviewDateTime().format(DATE_FMT),
+                interview.getFocusArea()
+        );
     }
 
     /**
@@ -193,5 +222,35 @@ public List<InterviewResponseDTO> getAllInterviews() {
     return interviews.stream()
             .map(interviewMapper::toResponseDTO)
             .toList();
+    }
+
+    /**
+     * Progress candidate to next stage after interview.
+     */
+
+    @Override
+    public CandidateResponseDTO progressCandidateStage(StageProgressionRequestDTO dto) {
+        logger.info("Progressing stage for candidateId: {} to new stage: {}", dto.getCandidateId(), dto.getNewStage());
+        
+        CandidateProfile candidate = candidateRepository.findById(dto.getCandidateId())
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorConstants.CANDIDATE_NOT_FOUND));
+
+        if ("SELECTED".equalsIgnoreCase(dto.getNewStage())) {
+            candidate.setApplicationStatus(com.mahak.capstone.interviewprocesstrackingsystem.enums.ApplicationStatus.SELECTED);
+        } else if ("REJECTED".equalsIgnoreCase(dto.getNewStage())) {
+            candidate.setApplicationStatus(com.mahak.capstone.interviewprocesstrackingsystem.enums.ApplicationStatus.REJECTED);
+        } else {
+            try {
+                com.mahak.capstone.interviewprocesstrackingsystem.enums.InterviewStage newStage = 
+                    com.mahak.capstone.interviewprocesstrackingsystem.enums.InterviewStage.valueOf(dto.getNewStage().toUpperCase());
+                candidate.setCurrentStage(newStage);
+            } catch (IllegalArgumentException e) {
+                throw new InvalidRequestException("Invalid stage: " + dto.getNewStage());
+            }
+        }
+        
+        candidate = candidateRepository.save(candidate);
+        
+        return com.mahak.capstone.interviewprocesstrackingsystem.mapper.CandidateMapper.toDTO(candidate);
     }
 }

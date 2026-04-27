@@ -12,7 +12,7 @@ public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
     // Get all feedback for an interview
     List<Feedback> findByInterviewId(Long interviewId);
 
-    // Check if feedback already exists (important rule)
+    // Check if feedback already exists 
     Optional<Feedback> findByInterviewIdAndPanelId(Long interviewId, Long panelId);
 
     boolean existsByInterviewIdAndPanelId(Long interviewId, Long panelId);

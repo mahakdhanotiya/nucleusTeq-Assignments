@@ -28,6 +28,10 @@ public class JobDescriptionServiceImpl implements JobDescriptionService {
         this.jobRepository = jobRepository;
     }
 
+    /**
+     * Creates a new job with provided details.
+     * Validates input and saves job to database.
+     */
 
     @Override
     public JobResponseDTO createJob(JobRequestDTO dto) {
@@ -50,6 +54,10 @@ public class JobDescriptionServiceImpl implements JobDescriptionService {
     }
 
 
+    /**
+     * Fetches all active jobs from the system.
+     * Returns list of job response DTOs.
+     */
     @Override
     public List<JobResponseDTO> getAllJobs() {
 
@@ -65,6 +73,10 @@ public class JobDescriptionServiceImpl implements JobDescriptionService {
         return jobs;
     }
 
+    /**
+     * Deactivates a job by its ID.
+     * Marks job as inactive if it exists.
+     */
     
      @Override
     public void deactivateJob(Long id) {

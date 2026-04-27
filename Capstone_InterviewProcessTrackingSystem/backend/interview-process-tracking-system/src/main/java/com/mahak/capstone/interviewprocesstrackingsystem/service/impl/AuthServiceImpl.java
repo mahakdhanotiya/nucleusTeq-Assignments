@@ -38,6 +38,13 @@ public class AuthServiceImpl implements AuthService {
         this.jwtUtil = jwtUtil;
     }
 
+    /**
+     * Registers a new user with role-based validation.
+     *
+     * @param dto user registration request data
+     * @throws InvalidRequestException if user already exists or invalid role
+     */
+
     @Override
     public void register(RegisterRequestDTO dto) {
 
@@ -52,13 +59,33 @@ public class AuthServiceImpl implements AuthService {
         user.setFullName(dto.getFullName().trim());
         user.setEmail(dto.getEmail().trim());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
-        user.setRole(Role.CANDIDATE);
+
+        // Determine role: only emails with ".hr@" pattern can be HR
+        String email = dto.getEmail().trim().toLowerCase();
+        Role role;
+        if (email.contains(".hr@")) {
+            role = Role.HR;
+        } else if (dto.getRole() != null && dto.getRole() == Role.HR) {
+            logger.error("HR registration denied for non-HR email: {}", email);
+            throw new InvalidRequestException("Only emails with '.hr@' pattern can register as HR");
+        } else {
+            role = (dto.getRole() != null) ? dto.getRole() : Role.CANDIDATE;
+        }
+        user.setRole(role);
 
         userRepository.save(user);
 
         logger.info("User registered successfully: {}", dto.getEmail());
     }
 
+    /**
+     * Authenticates a user and generates a JWT token.
+     *
+     * @param dto login request data
+     * @return LoginResponseDTO containing the generated token and user details
+     * @throws ResourceNotFoundException if user is not found
+     * @throws InvalidRequestException if credentials are invalid
+     */
     @Override
     public LoginResponseDTO login(LoginRequestDTO dto) {
 
@@ -81,6 +108,6 @@ public class AuthServiceImpl implements AuthService {
         String token = jwtUtil.generateToken(user.getEmail(), role);
     
 
-        return new LoginResponseDTO(token, role);
+        return new LoginResponseDTO(token, role, user.getId());
     }
 }

@@ -8,7 +8,13 @@ import com.mahak.capstone.interviewprocesstrackingsystem.dto.RegisterRequestDTO;
  */
 public interface AuthService {
 
+    /**
+     * Registers a new user in the system.
+     */
     void register(RegisterRequestDTO registerRequestDTO);
 
+    /**
+     * Authenticates user and returns login response.
+     */
     LoginResponseDTO login(LoginRequestDTO loginRequestDTO);
 }

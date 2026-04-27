@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mahak.capstone.interviewprocesstrackingsystem.constants.ApiConstants;
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.ApiResponseDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.JobRequestDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.JobResponseDTO;
@@ -24,7 +25,7 @@ import jakarta.validation.Valid;
  * Controller for Job Description APIs.
  */
 @RestController
-@RequestMapping("/jobs")
+@RequestMapping(ApiConstants.JOBS)
 public class JobDescriptionController {
 
     private static final Logger logger = LoggerFactory.getLogger(JobDescriptionController.class);
@@ -36,59 +37,44 @@ public class JobDescriptionController {
     }
 
     /**
-     * Creates a new job.
-     * Accessible only by HR role.
-     *
-     * @param dto JobRequestDTO containing job details
-     * @return ApiResponseDTO with created job data
+     * Creates a new job. HR only.
+     * POST /jobs
      */
-
     @PostMapping
     @PreAuthorize("hasRole('HR')")
     public ApiResponseDTO<JobResponseDTO> createJob(
             @Valid @RequestBody JobRequestDTO dto) {
 
-        logger.info("Received request to create job: {}", dto.getTitle());
-
+        logger.info("Create job request received: {}", dto.getTitle());
         JobResponseDTO response = jobService.createJob(dto);
-
-        logger.info("Job created successfully: {}", response.getId());
-
-        return new ApiResponseDTO<>(true, "Job created successfully", response);
+        logger.info("Job created successfully with id: {}", response.getId());
+        return new ApiResponseDTO<>(true, ApiConstants.JOB_CREATED, response);
     }
-    
 
     /**
      * Fetches all active jobs.
-     *
-     * @return list of active jobs
+     * GET /jobs
      */
-
     @GetMapping
     public ApiResponseDTO<List<JobResponseDTO>> getAllJobs() {
 
-        logger.info("Fetching all jobs");
-
+        logger.info("Fetching all active jobs");
         List<JobResponseDTO> jobs = jobService.getAllJobs();
-
-        return new ApiResponseDTO<>(true, "Jobs fetched successfully", jobs);
+        logger.info("Fetched {} jobs", jobs.size());
+        return new ApiResponseDTO<>(true, ApiConstants.JOBS_FETCHED, jobs);
     }
 
-
     /**
-     * Deactivates a job by ID.
-     *
-     * @param id job id
-     * @return success response
+     * Deactivates a job by ID. HR only.
+     * PUT /jobs/{id}/deactivate
      */
-    @PutMapping("/{id}/deactivate")
+    @PutMapping(ApiConstants.DEACTIVATE)
     @PreAuthorize("hasRole('HR')")
     public ApiResponseDTO<Void> deactivateJob(@PathVariable Long id) {
 
-        logger.info("Received request to deactivate job: {}", id);
-
+        logger.info("Deactivate job request received for id: {}", id);
         jobService.deactivateJob(id);
-
-        return new ApiResponseDTO<>(true, "Job deactivated successfully", null);
+        logger.info("Job deactivated successfully: {}", id);
+        return new ApiResponseDTO<>(true, ApiConstants.JOB_DEACTIVATED, null);
     }
 }
