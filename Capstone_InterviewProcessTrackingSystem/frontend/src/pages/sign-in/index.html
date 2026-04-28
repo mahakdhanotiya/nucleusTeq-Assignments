@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <link rel="stylesheet" href="../../styles/global.css">
+  <link rel="stylesheet" href="../../styles/components.css">
+</head>
+<body>
+  <div class="page-wrapper">
+    <div class="left-panel">
+      <h1>InterviewHub</h1>
+      <p>Your smart interview tracking platform</p>
+    </div>
+    <div class="right-panel">
+      <div class="auth-box">
+        <h2>Welcome Back</h2>
+        <p class="subtitle">Sign in to your account</p>
+        <form id="loginForm">
+          <div class="form-group">
+            <label>Email</label>
+            <div class="input-icon-wrapper">
+              <svg class="input-icon" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+              <input type="email" id="email" placeholder="you@example.com" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <div class="input-icon-wrapper">
+              <svg class="input-icon" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2z"/></svg>
+              <input type="password" id="password" placeholder="Enter password" required>
+              <span class="toggle-pw" onclick="togglePassword('password', this)">
+                <svg class="eye-icon" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+              </span>
+            </div>
+          </div>
+          <div class="msg" id="loginMsg" style="display:none"></div>
+          <button type="submit" class="btn btn-primary btn-full" style="margin-top:8px">Sign In</button>
+        </form>
+        <div class="auth-footer">Don't have an account? <a href="../sign-up/index.html">Sign Up</a></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="../../scripts/pages/sign-in.js"></script>
+  <script>
+    function togglePassword(id, el) {
+      const input = document.getElementById(id);
+      input.type = input.type === "password" ? "text" : "password";
+    }
+  </script>
+</body>
+</html>
