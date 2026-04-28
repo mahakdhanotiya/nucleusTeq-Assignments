@@ -1,0 +1,20 @@
+.jobs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.job-detail-icon { width: 16px; height: 16px; fill: var(--text-secondary); flex-shrink: 0; }
+
+.edit-panel-emails { display: flex; flex-direction: column; gap: 8px; }
+.edit-panel-emails .email-row { display: flex; gap: 8px; }
+.edit-panel-emails .email-row input { flex: 1; }
+.edit-panel-emails .email-row button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+.btn-remove-email { background: #fee2e2; color: #dc2626; }
+.btn-add-email { background: #e0e7ff; color: var(--primary); padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
