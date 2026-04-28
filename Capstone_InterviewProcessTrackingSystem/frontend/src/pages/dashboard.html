@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InterviewHub - Dashboard</title>
+  <link rel="stylesheet" href="../styles/global.css">
+  <link rel="stylesheet" href="../styles/components.css">
+</head>
+<body>
+<div class="layout">
+<div class="sidebar">
+  <div class="sidebar-brand"> InterviewHub</div>
+  <div class="sidebar-subtitle">Candidate Portal</div>
+  <ul class="sidebar-nav">
+    <li><a href="#" class="active" onclick="showSection('dashboard',this)"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg> Dashboard</a></li>
+    <li><a href="#" onclick="showSection('interviews',this)"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg> My Interviews</a></li>
+    <li><a href="#" onclick="showSection('feedback',this)"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg> My Feedback</a></li>
+    <li><a href="index.html"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg> Browse Jobs</a></li>
+  </ul>
+  <div class="sidebar-footer">
+    <a href="#" onclick="logout()"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg> Logout</a>
+  </div>
+</div>
+
+<main class="main-content">
+  <!-- DASHBOARD SECTION -->
+  <div id="sec-dashboard">
+    <div class="page-header" style="display:flex; justify-content:space-between; align-items:center;">
+      <h1>Welcome Back</h1>
+      <button class="btn btn-primary" onclick="openEditProfileModal()">Edit Profile</button>
+    </div>
+    
+    <!-- PIPELINE TRACKER -->
+    <div class="card" style="margin-bottom:24px;">
+      <h3 style="margin-bottom:16px;">Application Pipeline</h3>
+      <div class="pipeline-container" id="pipelineArea">
+        <p class="empty-state">Loading pipeline...</p>
+      </div>
+    </div>
+
+    <div id="profileArea" class="card" style="margin-bottom:24px">
+      <p class="empty-state">Loading profile...</p>
+    </div>
+    <div class="stats-grid" id="statsGrid"></div>
+  </div>
+
+  <!-- INTERVIEWS SECTION -->
+  <div id="sec-interviews" style="display:none">
+    <div class="page-header"><h1>My Interviews</h1></div>
+    <div class="card" style="overflow-x:auto">
+      <table class="data-table">
+        <thead><tr><th>ID</th><th>Job</th><th>Stage</th><th>Date & Time</th><th>Focus Area</th><th>Status</th></tr></thead>
+        <tbody id="interviewsBody"><tr><td colspan="6" class="empty-state">Loading...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- FEEDBACK SECTION -->
+  <div id="sec-feedback" style="display:none">
+    <div class="page-header"><h1>Interview Feedback</h1></div>
+    <div id="feedbackArea"><p class="empty-state">Loading feedback...</p></div>
+  </div>
+</main>
+</div>
+
+<!-- EDIT PROFILE MODAL -->
+<div class="modal-backdrop" id="editProfileModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Edit Profile</h2>
+      <button class="btn btn-outline btn-sm" onclick="closeModal('editProfileModal')">✕</button>
+    </div>
+    <form id="editProfileForm" onsubmit="handleEditProfile(event)">
+      <div class="form-group">
+        <label>Mobile Number <span style="color:red">*</span></label>
+        <input type="text" id="epMobile" class="form-input" required pattern="^[0-9]{10}$">
+      </div>
+      <div class="form-group">
+        <label>Total Experience (Years) <span style="color:red">*</span></label>
+        <input type="number" id="epExperience" class="form-input" required min="0" step="1">
+      </div>
+      <div class="form-group">
+        <label>Current Company</label>
+        <input type="text" id="epCompany" class="form-input">
+      </div>
+      <div class="form-group">
+        <label>Resume URL <span style="color:red">*</span></label>
+        <input type="url" id="epResume" class="form-input" required pattern=".*\.pdf$" title="Resume URL must end with .pdf">
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div class="form-group">
+          <label>Current CTC</label>
+          <input type="number" id="epCurrentCTC" class="form-input" min="0" step="0.1">
+        </div>
+        <div class="form-group">
+          <label>Expected CTC</label>
+          <input type="number" id="epExpectedCTC" class="form-input" min="0" step="0.1">
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div class="form-group">
+          <label>Notice Period (Days)</label>
+          <input type="number" id="epNotice" class="form-input" min="0" step="1">
+        </div>
+        <div class="form-group">
+          <label>Preferred Location</label>
+          <input type="text" id="epLocation" class="form-input">
+        </div>
+      </div>
+      <p id="epMsg" class="msg"></p>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closeModal('editProfileModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script type="module" src="../scripts/pages/home.js"></script>
+</body>
+</html>

@@ -67,4 +67,21 @@ public class GlobalExceptionHandler {
                 HttpStatus.INTERNAL_SERVER_ERROR
         );
     } 
+
+    @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
+public ResponseEntity<ApiResponseDTO<Void>> handleValidationErrors(
+        org.springframework.web.bind.MethodArgumentNotValidException ex) {
+
+    String message = ex.getBindingResult().getFieldErrors()
+            .stream()
+            .map(e -> e.getField() + ": " + e.getDefaultMessage())
+            .collect(java.util.stream.Collectors.joining(", "));
+
+    logger.error("Validation failed: {}", message);
+    return new ResponseEntity<>(
+            new ApiResponseDTO<>(false, message, null),
+            HttpStatus.BAD_REQUEST
+    );
+}
+
 }

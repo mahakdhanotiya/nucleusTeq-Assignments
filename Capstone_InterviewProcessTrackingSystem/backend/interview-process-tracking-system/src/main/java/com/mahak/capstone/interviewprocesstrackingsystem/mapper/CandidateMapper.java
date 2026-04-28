@@ -32,7 +32,7 @@ public class CandidateMapper {
         c.setPreferredLocation(dto.getPreferredLocation());
 
         c.setSource(dto.getSource());
-    
+        
 
         // relations
         c.setUser(user);
@@ -69,10 +69,12 @@ public class CandidateMapper {
         
         dto.setCreatedAt(c.getCreatedAt());
         
-        // relations → IDs
+        // relations → IDs + names
         dto.setUserId(c.getUser().getId());
         dto.setJobId(c.getJobDescription().getId());
-
+        dto.setFullName(c.getUser().getFullName());
+        dto.setEmail(c.getUser().getEmail());
+        dto.setJobTitle(c.getJobDescription().getTitle());
         return dto;
     }
 }

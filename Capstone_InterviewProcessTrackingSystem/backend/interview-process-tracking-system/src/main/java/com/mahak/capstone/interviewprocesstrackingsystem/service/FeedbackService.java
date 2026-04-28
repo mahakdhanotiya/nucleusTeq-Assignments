@@ -26,5 +26,11 @@ public interface FeedbackService {
      */
     FeedbackResponseDTO getFeedbackById(Long id);
 
+    /**
+     * Fetch all feedback for a given interview ID.
+     *
+     * @param interviewId interview ka ID
+     * @return list of feedback details
+     */
     List<FeedbackDetailResponseDTO> getFeedbackByInterview(Long interviewId);
 }

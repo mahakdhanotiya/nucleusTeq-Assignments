@@ -39,6 +39,7 @@ public class CandidateRequestDTO {
     private Integer noticePeriod;
 
     private String preferredLocation;
+
     
     @NotNull(message = "Application source is required")
     private ApplicationSource source;

@@ -110,13 +110,16 @@ public class FeedbackServiceImpl implements FeedbackService {
         return mapper.toResponseDTO(feedback);
     }
 
+    /**
+     * Fetch all feedback for a given interview ID.
+     */
 
     @Override
     public List<FeedbackDetailResponseDTO> getFeedbackByInterview(Long interviewId) {
 
         // validate interview exists 
         interviewRepository.findById(interviewId)
-                .orElseThrow(() -> new RuntimeException("Interview not found"));
+                .orElseThrow(() -> new RuntimeException(ErrorConstants.INTERVIEW_NOT_FOUND));
 
         //fetch feedbacks
         List<Feedback> feedbackList = feedbackRepository.findByInterviewId(interviewId);
