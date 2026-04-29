@@ -59,8 +59,22 @@ public class JobDescriptionController {
     public ApiResponseDTO<List<JobResponseDTO>> getAllJobs() {
 
         logger.info("Fetching all active jobs");
-        List<JobResponseDTO> jobs = jobService.getAllJobs();
+        List<JobResponseDTO> jobs = jobService.getAllActiveJobs();
         logger.info("Fetched {} jobs", jobs.size());
+        return new ApiResponseDTO<>(true, ApiConstants.JOBS_FETCHED, jobs);
+    }
+
+    /**
+     * Fetches all jobs (including inactive) for HR dashboard.
+     * GET /jobs/all
+     */
+    @GetMapping("/all")
+    @PreAuthorize("hasRole('HR')")
+    public ApiResponseDTO<List<JobResponseDTO>> getAllJobsForHR() {
+
+        logger.info("Fetching all jobs for HR (including inactive)");
+        List<JobResponseDTO> jobs = jobService.getAllJobs();
+        logger.info("Fetched {} total jobs", jobs.size());
         return new ApiResponseDTO<>(true, ApiConstants.JOBS_FETCHED, jobs);
     }
 
@@ -76,5 +90,35 @@ public class JobDescriptionController {
         jobService.deactivateJob(id);
         logger.info("Job deactivated successfully: {}", id);
         return new ApiResponseDTO<>(true, ApiConstants.JOB_DEACTIVATED, null);
+    }
+
+    /**
+     * Activates a job by ID. HR only.
+     * PUT /jobs/{id}/activate
+     */
+    @PutMapping("/{id}/activate")
+    @PreAuthorize("hasRole('HR')")
+    public ApiResponseDTO<Void> activateJob(@PathVariable Long id) {
+
+        logger.info("Activate job request received for id: {}", id);
+        jobService.activateJob(id);
+        logger.info("Job activated successfully: {}", id);
+        return new ApiResponseDTO<>(true, "Job activated successfully", null);
+    }
+
+    /**
+     * Updates an existing job by ID. HR only.
+     * PUT /jobs/{id}
+     */
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('HR')")
+    public ApiResponseDTO<JobResponseDTO> updateJob(
+            @PathVariable Long id,
+            @RequestBody JobRequestDTO dto) {
+
+        logger.info("Update job request received for id: {}", id);
+        JobResponseDTO response = jobService.updateJob(id, dto);
+        logger.info("Job updated successfully: {}", id);
+        return new ApiResponseDTO<>(true, "Job updated successfully", response);
     }
 }
