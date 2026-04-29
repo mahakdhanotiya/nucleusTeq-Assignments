@@ -9,59 +9,64 @@
   <link rel="stylesheet" href="../styles/pages/candidate-profile.css">
 </head>
 <body>
-  <div class="apply-container">
-    <a href="index.html" class="back-link">
-      <svg viewBox="0 0 24 24" width="18" height="18"><path fill="#4f46e5" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-      Back to Jobs
-    </a>
-    <div class="apply-card">
-      <h1 id="applyTitle">Apply for Job</h1>
-      <p class="subtitle" id="applySubtitle">Fill out your details below</p>
-
-      <form id="applyForm">
-        <h3 class="section-title">Personal Information</h3>
-        <div class="form-row">
-          <div class="form-group"><label>Full Name *</label><input id="apFullName" required></div>
-          <div class="form-group"><label>Email *</label><input id="apEmail" type="email" required></div>
-        </div>
-        <div class="form-row">
-          <div class="form-group"><label>Mobile *</label><input id="apMobile" maxlength="10" pattern="[0-9]{10}" required></div>
-          <div class="form-group"><label>Date of Birth</label><input id="apDob" type="date"></div>
-        </div>
-        <div class="form-group"><label>Address</label><input id="apAddress"></div>
-
-        <h3 class="section-title">Professional Details</h3>
-        <div class="form-row">
-          <div class="form-group"><label>Total Experience (years) *</label><input id="apExp" type="number" min="0" required></div>
-          <div class="form-group"><label>Current Company</label><input id="apCompany"></div>
-        </div>
-        <div class="form-row">
-          <div class="form-group"><label>Current CTC (LPA)</label><input id="apCurrentCtc" type="number" step="0.1" min="0"></div>
-          <div class="form-group"><label>Expected CTC (LPA)</label><input id="apExpectedCtc" type="number" step="0.1" min="0"></div>
-        </div>
-        <div class="form-group"><label>Notice Period (days)</label><input id="apNotice" type="number" min="0"></div>
-
-        <h3 class="section-title">Education</h3>
-        <div class="form-row">
-          <div class="form-group"><label>Degree *</label><input id="apDegree" placeholder="e.g. B.Tech" required></div>
-          <div class="form-group"><label>University *</label><input id="apUniv" required></div>
-        </div>
-        <div class="form-row">
-          <div class="form-group"><label>Year of Passing *</label><input id="apYop" type="number" min="1990" max="2030" required></div>
-          <div class="form-group"><label>Percentage/CGPA</label><input id="apPerc"></div>
-        </div>
-
-        <h3 class="section-title">Skills</h3>
-        <div class="form-group"><label>Skills (comma separated) *</label><input id="apSkills" placeholder="Java, Spring Boot, React" required></div>
-
-        <div class="msg" id="apMsg" style="display:none"></div>
-        <button type="submit" class="btn btn-primary btn-full" style="margin-top:16px">Submit Application</button>
-      </form>
+<body>
+  <div class="layout">
+    <div class="sidebar">
+      <div class="sidebar-brand"> InterviewHub</div>
+      <div class="sidebar-subtitle">Candidate Portal</div>
+      <ul class="sidebar-nav">
+        <li><a href="dashboard.html"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg> Dashboard</a></li>
+        <li><a href="dashboard.html"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg> My Interviews</a></li>
+        <li><a href="dashboard.html" class="active"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg> Browse Jobs</a></li>
+      </ul>
+      <div class="sidebar-footer">
+        <a href="#" onclick="logout()"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg> Logout</a>
+      </div>
     </div>
+
+    <main class="main-content">
+      <div class="apply-container" style="max-width: 800px; margin: 0 auto;">
+        <div class="apply-card">
+          <h1 id="applyTitle">Apply for Job</h1>
+          <p class="subtitle" id="applySubtitle">Fill out your details below</p>
+
+          <form id="applyForm">
+            <h3 class="section-title">Personal Information</h3>
+            <div class="form-row">
+              <div class="form-group"><label>Full Name *</label><input id="apFullName" required></div>
+              <div class="form-group"><label>Email *</label><input id="apEmail" type="email" required></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>Mobile *</label><input id="apMobile" maxlength="10" pattern="[0-9]{10}" required></div>
+              <div class="form-group"><label>Resume (PDF only) *</label><input type="file" id="apResumeFile" accept=".pdf" required></div>
+            </div>
+
+            <h3 class="section-title">Professional Details</h3>
+            <div class="form-row">
+              <div class="form-group"><label>Total Experience (years) *</label><input id="apExp" type="number" min="0" required></div>
+              <div class="form-group"><label>Relevant Experience (years)</label><input id="apRelExp" type="number" min="0"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>Current Company</label><input id="apCompany"></div>
+              <div class="form-group"><label>Preferred Location</label><input id="apLocation"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>Current CTC (LPA)</label><input id="apCurrentCtc" type="number" step="0.1" min="0"></div>
+              <div class="form-group"><label>Expected CTC (LPA)</label><input id="apExpectedCtc" type="number" step="0.1" min="0"></div>
+            </div>
+            <div class="form-group"><label>Notice Period (days)</label><input id="apNotice" type="number" min="0"></div>
+
+            <div class="msg" id="apMsg" style="display:none"></div>
+            <button type="submit" class="btn btn-primary btn-full" style="margin-top:16px">Submit Application</button>
+          </form>
+        </div>
+      </div>
+    </main>
   </div>
 
   <script type="module">
-    import { SITE_CONFIG } from "../scripts/config/site-config.js";
+    import { getMe } from "../scripts/actions/auth.js";
+    import { createCandidate, uploadFile, getMyProfile } from "../scripts/actions/candidate.js";
 
     const params = new URLSearchParams(window.location.search);
     const jobId = params.get("jobId");
@@ -77,44 +82,104 @@
       window.location.href = "sign-in/index.html";
     }
 
+    window.logout = function() {
+      localStorage.clear();
+      window.location.href = "sign-in/index.html";
+    };
+
+    // Pre-fill User Info and Check if profile already exists
+    async function init() {
+      try {
+        // 1. Check if they already applied
+        const profileRes = await getMyProfile();
+        if (profileRes.success && profileRes.data) {
+          // Disable form and show message
+          const btn = document.querySelector('button[type="submit"]');
+          btn.disabled = true;
+          btn.textContent = "Application Already Exists";
+          btn.style.opacity = "0.5";
+          btn.style.cursor = "not-allowed";
+          
+          const msgEl = document.getElementById("apMsg");
+          msgEl.className = "msg info";
+          msgEl.textContent = "You already have an active application. Please visit your Dashboard to see the status.";
+          msgEl.style.display = "block";
+          return;
+        }
+
+        // 2. Not applied yet, fetch user details to pre-fill
+        const userData = await getMe();
+        if (userData.success && userData.data) {
+          const user = userData.data;
+          document.getElementById("apFullName").value = user.fullName || "";
+          document.getElementById("apEmail").value = user.email || "";
+          document.getElementById("apMobile").value = user.mobileNumber || "";
+          
+          document.getElementById("apFullName").readOnly = true;
+          document.getElementById("apEmail").readOnly = true;
+          document.getElementById("apFullName").style.backgroundColor = "#f3f4f6";
+          document.getElementById("apEmail").style.backgroundColor = "#f3f4f6";
+        }
+      } catch (err) {
+        console.error("Init failed", err);
+      }
+    }
+    init();
+
     document.getElementById("applyForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const msgEl = document.getElementById("apMsg");
       msgEl.style.display = "none";
 
-      const skills = document.getElementById("apSkills").value;
-      const body = {
-        fullName: document.getElementById("apFullName").value,
-        email: document.getElementById("apEmail").value,
-        mobileNumber: document.getElementById("apMobile").value,
-        dateOfBirth: document.getElementById("apDob").value || null,
-        address: document.getElementById("apAddress").value,
-        totalExperience: parseInt(document.getElementById("apExp").value || "0"),
-        currentCompany: document.getElementById("apCompany").value,
-        currentCtc: parseFloat(document.getElementById("apCurrentCtc").value || "0"),
-        expectedCtc: parseFloat(document.getElementById("apExpectedCtc").value || "0"),
-        noticePeriod: parseInt(document.getElementById("apNotice").value || "0"),
-        degree: document.getElementById("apDegree").value,
-        university: document.getElementById("apUniv").value,
-        yearOfPassing: parseInt(document.getElementById("apYop").value || "0"),
-        percentage: document.getElementById("apPerc").value,
-        skills: skills ? skills.split(",").map(s => s.trim()) : [],
-        jobDescriptionId: jobId ? parseInt(jobId) : null
-      };
+      const totalExp = parseInt(document.getElementById("apExp").value || "0");
+      const relExp = parseInt(document.getElementById("apRelExp").value || "0");
+
+      // Frontend Validation: Relevant <= Total
+      if (relExp > totalExp) {
+        msgEl.className = "msg error";
+        msgEl.textContent = "Relevant experience cannot be greater than total experience.";
+        msgEl.style.display = "block";
+        return;
+      }
 
       try {
-        const res = await fetch(SITE_CONFIG.apiUrl + "/candidates", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + token
-          },
-          body: JSON.stringify(body)
-        });
-        const data = await res.json();
+        // 1. Upload Resume
+        const fileInput = document.getElementById("apResumeFile");
+        const file = fileInput.files[0];
+        if (!file) {
+          msgEl.className = "msg error"; msgEl.textContent = "Please upload a resume."; msgEl.style.display = "block"; return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", file);
+        
+        msgEl.className = "msg info"; msgEl.textContent = "Uploading resume..."; msgEl.style.display = "block";
+        const uploadData = await uploadFile(formData);
+        
+        if (!uploadData.success) {
+          msgEl.className = "msg error"; msgEl.textContent = uploadData.message || "Failed to upload resume"; msgEl.style.display = "block"; return;
+        }
+
+        // 2. Submit Application
+        const body = {
+          userId: parseInt(localStorage.getItem("userId") || "0"),
+          jobId: jobId ? parseInt(jobId) : null,
+          source: "CAREER_PORTAL",
+          resumeUrl: uploadData.data.url,
+          mobileNumber: document.getElementById("apMobile").value.trim(),
+          totalExperience: totalExp,
+          relevantExperience: relExp,
+          currentCompany: document.getElementById("apCompany").value.trim(),
+          preferredLocation: document.getElementById("apLocation").value.trim(),
+          currentCTC: parseFloat(document.getElementById("apCurrentCtc").value || "0"),
+          expectedCTC: parseFloat(document.getElementById("apExpectedCtc").value || "0"),
+          noticePeriod: parseInt(document.getElementById("apNotice").value || "0")
+        };
+
+        const data = await createCandidate(body);
         if (data.success) {
           msgEl.className = "msg success";
-          msgEl.textContent = "Application submitted successfully! Redirecting...";
+          msgEl.textContent = "Application submitted successfully! Redirecting to dashboard...";
           msgEl.style.display = "block";
           setTimeout(() => window.location.href = "dashboard.html", 1500);
         } else {
@@ -124,7 +189,7 @@
         }
       } catch (err) {
         msgEl.className = "msg error";
-        msgEl.textContent = "Server error. Please try again.";
+        msgEl.textContent = "Server error. Please check your network or try again later.";
         msgEl.style.display = "block";
       }
     });
