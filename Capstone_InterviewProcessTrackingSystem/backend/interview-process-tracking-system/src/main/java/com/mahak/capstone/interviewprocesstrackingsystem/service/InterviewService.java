@@ -42,4 +42,14 @@ public interface InterviewService {
      * Progress candidate to next stage after interview.
      */
     CandidateResponseDTO progressCandidateStage(StageProgressionRequestDTO dto);
+
+    /**
+     * Delete interview by ID.
+     */
+    void deleteInterview(Long id);
+
+    /**
+     * Update interview status (HR only).
+     */
+    void updateInterviewStatus(Long id, com.mahak.capstone.interviewprocesstrackingsystem.enums.InterviewStatus status);
 }

@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.mahak.capstone.interviewprocesstrackingsystem.constants.ErrorConstants;
+import org.springframework.transaction.annotation.Transactional;
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.CandidateResponseDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.InterviewRequestDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.InterviewResponseDTO;
@@ -78,6 +79,7 @@ public class InterviewServiceImpl implements InterviewService {
      * Schedule interview
      */
     @Override
+    @Transactional
     public InterviewResponseDTO scheduleInterview(InterviewRequestDTO dto) {
 
         logger.info("Scheduling interview for candidateId: {}", dto.getCandidateId());
@@ -119,6 +121,7 @@ public class InterviewServiceImpl implements InterviewService {
      * Assign panel to interview
      */
     @Override
+    @Transactional
     public void assignPanel(PanelAssignmentRequestDTO dto) {
 
         logger.info("Assigning panel {} to interview {}", dto.getPanelId(), dto.getInterviewId());
@@ -252,5 +255,37 @@ public List<InterviewResponseDTO> getAllInterviews() {
         candidate = candidateRepository.save(candidate);
         
         return com.mahak.capstone.interviewprocesstrackingsystem.mapper.CandidateMapper.toDTO(candidate);
+    }
+
+    /**
+     * Delete interview by ID.
+     */
+    @Override
+    @Transactional
+    public void deleteInterview(Long id) {
+        logger.info("Deleting interview with id: {}", id);
+        Interview interview = interviewRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorConstants.INTERVIEW_NOT_FOUND));
+        
+        // Delete associated panel assignments first
+        List<InterviewPanelAssignment> assignments = assignmentRepository.findByInterviewId(id);
+        if (!assignments.isEmpty()) {
+            assignmentRepository.deleteAll(assignments);
+        }
+        
+        interviewRepository.delete(interview);
+        logger.info("Interview deleted successfully: {}", id);
+    }
+
+    @Override
+    @Transactional
+    public void updateInterviewStatus(Long id, com.mahak.capstone.interviewprocesstrackingsystem.enums.InterviewStatus status) {
+        logger.info("Updating status for interviewId: {} to {}", id, status);
+        Interview interview = interviewRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorConstants.INTERVIEW_NOT_FOUND));
+        
+        interview.setStatus(status);
+        interviewRepository.save(interview);
+        logger.info("Status updated successfully for interviewId: {}", id);
     }
 }
