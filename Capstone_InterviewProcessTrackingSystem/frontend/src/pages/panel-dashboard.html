@@ -6,6 +6,7 @@
   <title>InterviewHub - Panel Dashboard</title>
   <link rel="stylesheet" href="../styles/global.css">
   <link rel="stylesheet" href="../styles/components.css">
+  <link rel="stylesheet" href="../styles/pages/panel-dashboard.css">
 </head>
 <body>
 <div class="layout">
@@ -36,14 +37,18 @@
     <div class="page-header"><h1>Submit Feedback</h1></div>
     <div class="card">
       <form id="feedbackForm" onsubmit="submitFeedback(event)">
-        <div class="form-group"><label>Interview ID *</label><input id="fbIntId" type="number" required></div>
-        <div class="form-group"><label>Rating (1-5) *</label><input id="fbRating" type="number" min="1" max="5" required></div>
-        <div class="form-group"><label>Decision *</label><select id="fbStatus" required><option value="SELECTED">Selected</option><option value="REJECTED">Rejected</option></select></div>
-        <div class="form-group"><label>Comments *</label><textarea id="fbComments" rows="3" required></textarea></div>
-        <div class="form-group"><label>Strengths</label><textarea id="fbStrengths" rows="2"></textarea></div>
-        <div class="form-group"><label>Weaknesses</label><textarea id="fbWeaknesses" rows="2"></textarea></div>
-        <div class="form-group"><label>Areas Covered</label><input id="fbAreas"></div>
-        <button type="submit" class="btn btn-primary btn-full">Submit Feedback</button>
+        <div class="form-row">
+          <div class="form-group"><label>Interview ID *</label><input id="fbIntId" type="number" readonly class="readonly-input" required></div>
+          <div class="form-group"><label>Decision *</label><select id="fbStatus" required><option value="SELECTED">Selected</option><option value="REJECTED">Rejected</option></select></div>
+        </div>
+        <div class="form-group"><label>Rating (1-5) *</label><input id="fbRating" type="number" min="1" max="5" required placeholder="Enter rating 1-5"></div>
+        <div class="form-group"><label>Comments *</label><textarea id="fbComments" rows="3" required placeholder="Overall interview feedback"></textarea></div>
+        <div class="form-row">
+          <div class="form-group"><label>Strengths</label><textarea id="fbStrengths" rows="2" placeholder="Key strengths identified"></textarea></div>
+          <div class="form-group"><label>Weaknesses</label><textarea id="fbWeaknesses" rows="2" placeholder="Areas for improvement"></textarea></div>
+        </div>
+        <div class="form-group"><label>Areas Covered</label><input id="fbAreas" placeholder="e.g. Core Java, System Design"></div>
+        <button type="submit" class="btn btn-primary btn-full submit-btn">Submit Feedback</button>
         <div class="msg" id="fbMsg" style="display:none"></div>
       </form>
     </div>
@@ -51,66 +56,6 @@
 </main>
 </div>
 <div class="toast-container" id="toastContainer"></div>
-
-<script>
-const API = "http://localhost:8080";
-const token = localStorage.getItem("token");
-if (!token || localStorage.getItem("role") !== "PANEL") window.location.href = "sign-in/index.html";
-const headers = { "Content-Type":"application/json", "Authorization":"Bearer "+token };
-
-function toast(msg,type="success"){const c=document.getElementById("toastContainer");const t=document.createElement("div");t.className="toast "+type;t.textContent=msg;c.appendChild(t);setTimeout(()=>t.remove(),3000)}
-function logout(){localStorage.clear();window.location.href="sign-in/index.html"}
-
-function showSec(name,el){
-  ["assigned","feedback"].forEach(s=>document.getElementById("sec-"+s).style.display=s===name?"block":"none");
-  document.querySelectorAll(".sidebar-nav a").forEach(a=>a.classList.remove("active"));
-  if(el)el.classList.add("active");
-}
-
-async function loadAssigned(){
-  try {
-    const res = await fetch(API+"/api/interviews", { headers });
-    const data = await res.json();
-    const list = data.data || [];
-    const body = document.getElementById("assignedBody");
-    if(!list.length){body.innerHTML='<tr><td colspan="7" class="empty-state">No interviews assigned.</td></tr>';return}
-    body.innerHTML = list.map(i=>`<tr>
-      <td><strong>I-${i.id}</strong></td><td>${i.candidateName||'N/A'}</td><td>${i.jobTitle||'N/A'}</td>
-      <td><span class="badge badge-info">${i.stage||'N/A'}</span></td>
-      <td>${i.interviewDateTime?new Date(i.interviewDateTime).toLocaleString():'TBD'}</td>
-      <td>${i.focusArea||'--'}</td>
-      <td><button class="btn btn-sm btn-primary" onclick="prefillFeedback(${i.id})">Give Feedback</button></td>
-    </tr>`).join("");
-  } catch(e){document.getElementById("assignedBody").innerHTML='<tr><td colspan="7" class="empty-state">Error loading.</td></tr>'}
-}
-
-function prefillFeedback(id){
-  document.getElementById("fbIntId").value=id;
-  showSec("feedback",document.querySelectorAll(".sidebar-nav a")[1]);
-}
-
-async function submitFeedback(e){
-  e.preventDefault();
-  const msgEl=document.getElementById("fbMsg"); msgEl.style.display="none";
-  const body={
-    interviewId:parseInt(document.getElementById("fbIntId").value),
-    panelId:null,
-    rating:parseInt(document.getElementById("fbRating").value),
-    status:document.getElementById("fbStatus").value,
-    comments:document.getElementById("fbComments").value,
-    strengths:document.getElementById("fbStrengths").value,
-    weaknesses:document.getElementById("fbWeaknesses").value,
-    areasCovered:document.getElementById("fbAreas").value
-  };
-  try{
-    const res=await fetch(API+"/api/feedback",{method:"POST",headers,body:JSON.stringify(body)});
-    const data=await res.json();
-    if(data.success){toast("Feedback submitted!");document.getElementById("feedbackForm").reset();showSec("assigned",document.querySelectorAll(".sidebar-nav a")[0])}
-    else{msgEl.className="msg error";msgEl.textContent=data.message||"Failed";msgEl.style.display="block"}
-  }catch(e){msgEl.className="msg error";msgEl.textContent="Server error";msgEl.style.display="block"}
-}
-
-loadAssigned();
-</script>
+<script type="module" src="../scripts/pages/panel-dashboard.js"></script>
 </body>
 </html>
