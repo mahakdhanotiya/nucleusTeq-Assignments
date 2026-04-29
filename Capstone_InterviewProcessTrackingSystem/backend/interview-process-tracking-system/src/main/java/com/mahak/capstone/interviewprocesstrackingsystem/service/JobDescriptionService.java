@@ -23,10 +23,25 @@ public interface JobDescriptionService {
      */
     List<JobResponseDTO> getAllJobs();
 
+    /**
+     * Fetches only active jobs (for public/candidate use).
+     */
+    List<JobResponseDTO> getAllActiveJobs();
+
 
     /**
      * Deactivates a job by ID.
      */
    void deactivateJob(Long id);
+
+    /**
+     * Activates a job by ID.
+     */
+   void activateJob(Long id);
+
+   /**
+    * Updates an existing job by ID.
+    */
+   JobResponseDTO updateJob(Long id, JobRequestDTO dto);
 
 }

@@ -29,4 +29,11 @@ public interface EmailService {
         String panelName,
         String loginUrl
     );
+
+    /** Send password setup link email after registration */
+    void sendPasswordSetupEmail(
+        String toEmail,
+        String fullName,
+        String setupUrl
+    );
 }

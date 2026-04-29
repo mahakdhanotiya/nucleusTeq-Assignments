@@ -52,6 +52,7 @@ public class JobDescriptionMapper {
         dto.setMaxSalary(job.getMaxSalary());
         dto.setLocation(job.getLocation());
         dto.setJobType(job.getJobType());
+        dto.setIsActive(job.getIsActive());
 
         return dto;
     }

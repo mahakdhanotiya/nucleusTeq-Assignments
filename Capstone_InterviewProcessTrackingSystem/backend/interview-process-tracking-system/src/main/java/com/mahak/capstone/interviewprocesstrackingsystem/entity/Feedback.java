@@ -71,8 +71,8 @@ public class Feedback {
     /**
      * Panel who submitted feedback
      */
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "panel_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "panel_id", nullable = true)
     private PanelProfile panel;
 
     /**

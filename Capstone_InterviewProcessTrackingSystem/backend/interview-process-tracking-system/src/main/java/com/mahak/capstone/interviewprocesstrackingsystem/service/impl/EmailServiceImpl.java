@@ -125,4 +125,35 @@ public class EmailServiceImpl implements EmailService {
             logger.error("Failed to send onboarding email to {}: {}", toEmail, e.getMessage());
         }
     }
+
+    /**
+     * Sends a password setup link to a newly registered user.
+     * The link contains a unique token that allows them to set their password.
+     */
+    @Override
+    public void sendPasswordSetupEmail(String toEmail, String fullName, String setupUrl) {
+
+        logger.info("Sending password setup email to: {}", toEmail);
+
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(fromEmail);
+            message.setTo(toEmail);
+            message.setSubject(appName + " - Set Your Password");
+            message.setText(
+                "Dear " + fullName + ",\n\n" +
+                "Welcome to " + appName + "! Your account has been created successfully.\n\n" +
+                "Please click the link below to set your password:\n" +
+                setupUrl + "\n\n" +
+                "This link will expire in 24 hours.\n\n" +
+                "If you didn't create this account, please ignore this email.\n\n" +
+                "Best regards,\n" + appName + " Team"
+            );
+            mailSender.send(message);
+            logger.info("Password setup email sent to: {}", toEmail);
+
+        } catch (Exception e) {
+            logger.error("Failed to send password setup email to {}: {}", toEmail, e.getMessage());
+        }
+    }
 }

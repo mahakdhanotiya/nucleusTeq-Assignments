@@ -32,10 +32,7 @@ public class FeedbackValidation {
             throw new InvalidRequestException(ErrorConstants.INVALID_INTERVIEW_ID);
         }
 
-        if (Objects.isNull(dto.getPanelId())) {
-            logger.error("Panel ID is null");
-            throw new InvalidRequestException(ErrorConstants.INVALID_PANEL_ID);
-        }
+
 
         if (Objects.isNull(dto.getRating()) || dto.getRating() < 1 || dto.getRating() > 5) {
             logger.error("Invalid rating: {}", dto.getRating());

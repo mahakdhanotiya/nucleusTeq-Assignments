@@ -19,8 +19,17 @@ public class JobResponseDTO {
     private Double maxSalary;
     private String location;
     private JobType jobType;
+    private Boolean isActive;
 
     // Getters and Setters
+
+    public Boolean getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
+    }
 
     public Long getId() {
         return id;

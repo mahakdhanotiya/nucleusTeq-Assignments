@@ -2,6 +2,7 @@ package com.mahak.capstone.interviewprocesstrackingsystem.service.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -9,13 +10,20 @@ import com.mahak.capstone.interviewprocesstrackingsystem.constants.ErrorConstant
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.LoginRequestDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.LoginResponseDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.RegisterRequestDTO;
+import com.mahak.capstone.interviewprocesstrackingsystem.dto.SetPasswordRequestDTO;
+import com.mahak.capstone.interviewprocesstrackingsystem.entity.PasswordToken;
 import com.mahak.capstone.interviewprocesstrackingsystem.entity.User;
 import com.mahak.capstone.interviewprocesstrackingsystem.enums.Role;
 import com.mahak.capstone.interviewprocesstrackingsystem.exception.InvalidRequestException;
 import com.mahak.capstone.interviewprocesstrackingsystem.exception.ResourceNotFoundException;
+import com.mahak.capstone.interviewprocesstrackingsystem.repository.PasswordTokenRepository;
 import com.mahak.capstone.interviewprocesstrackingsystem.repository.UserRepository;
 import com.mahak.capstone.interviewprocesstrackingsystem.security.JwtUtil;
 import com.mahak.capstone.interviewprocesstrackingsystem.service.AuthService;
+import com.mahak.capstone.interviewprocesstrackingsystem.service.EmailService;
+
+import java.time.LocalDate;
+import java.util.UUID;
 
 /**
  * Implementation of AuthService containing authentication logic.
@@ -26,22 +34,32 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final PasswordTokenRepository passwordTokenRepository;
+    private final EmailService emailService;
+
+    @Value("${app.frontend.url:http://127.0.0.1:5500/frontend/src/pages}")
+    private String frontendUrl;
 
     private static final Logger logger = LoggerFactory.getLogger(AuthServiceImpl.class);
 
     public AuthServiceImpl(UserRepository userRepository,
                            PasswordEncoder passwordEncoder,
-                           JwtUtil jwtUtil) {
+                           JwtUtil jwtUtil,
+                           PasswordTokenRepository passwordTokenRepository,
+                           EmailService emailService) {
 
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
+        this.passwordTokenRepository = passwordTokenRepository;
+        this.emailService = emailService;
     }
 
     /**
-     * Registers a new user with role-based validation.
+     * Registers a new user without password.
+     * Generates a token and sends a "set password" link via email.
      *
-     * @param dto user registration request data
+     * @param dto user registration request data (no password)
      * @throws InvalidRequestException if user already exists or invalid role
      */
 
@@ -58,7 +76,16 @@ public class AuthServiceImpl implements AuthService {
         User user = new User();
         user.setFullName(dto.getFullName().trim());
         user.setEmail(dto.getEmail().trim());
-        user.setPassword(passwordEncoder.encode(dto.getPassword()));
+
+        // Set a temporary random password (user will set real one via email link)
+        user.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+
+        // Set new fields
+        if (dto.getDateOfBirth() != null && !dto.getDateOfBirth().isEmpty()) {
+            user.setDateOfBirth(LocalDate.parse(dto.getDateOfBirth()));
+        }
+        user.setGender(dto.getGender());
+        user.setMobileNumber(dto.getMobileNumber());
 
         // Determine role: only emails with ".hr@" pattern can be HR
         String email = dto.getEmail().trim().toLowerCase();
@@ -75,7 +102,51 @@ public class AuthServiceImpl implements AuthService {
 
         userRepository.save(user);
 
-        logger.info("User registered successfully: {}", dto.getEmail());
+        // Generate password setup token and send email
+        PasswordToken token = new PasswordToken(dto.getEmail().trim());
+        passwordTokenRepository.save(token);
+
+        String setupUrl = frontendUrl + "/set-password.html?token=" + token.getToken();
+        emailService.sendPasswordSetupEmail(dto.getEmail().trim(), dto.getFullName().trim(), setupUrl);
+
+        logger.info("User registered successfully (password pending): {}", dto.getEmail());
+    }
+
+    /**
+     * Sets the user's password using a valid token from the email link.
+     *
+     * @param dto contains the token and new password
+     * @throws InvalidRequestException if token is invalid or expired
+     */
+    @Override
+    public void setPassword(SetPasswordRequestDTO dto) {
+
+        logger.info("Set password request with token");
+
+        PasswordToken token = passwordTokenRepository.findByToken(dto.getToken())
+                .orElseThrow(() -> {
+                    logger.error("Invalid password token");
+                    return new InvalidRequestException("Invalid or expired token");
+                });
+
+        if (token.isUsed()) {
+            throw new InvalidRequestException("This link has already been used");
+        }
+
+        if (token.isExpired()) {
+            throw new InvalidRequestException("This link has expired. Please register again.");
+        }
+
+        User user = userRepository.findByEmail(token.getEmail())
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorConstants.USER_NOT_FOUND));
+
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        userRepository.save(user);
+
+        token.setUsed(true);
+        passwordTokenRepository.save(token);
+
+        logger.info("Password set successfully for: {}", token.getEmail());
     }
 
     /**
@@ -109,5 +180,12 @@ public class AuthServiceImpl implements AuthService {
     
 
         return new LoginResponseDTO(token, role, user.getId());
+    }
+
+    @Override
+    public User getMe() {
+        String email = com.mahak.capstone.interviewprocesstrackingsystem.security.CurrentUserUtil.getCurrentUserEmail();
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorConstants.USER_NOT_FOUND));
     }
 }

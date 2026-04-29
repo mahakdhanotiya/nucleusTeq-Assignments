@@ -5,6 +5,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -129,5 +130,33 @@ public class InterviewController {
         CandidateResponseDTO response = interviewService.progressCandidateStage(dto);
         logger.info("Stage updated for candidateId: {}", dto.getCandidateId());
         return new ApiResponseDTO<>(true, ApiConstants.STAGE_UPDATED, response);
+    }
+
+    /**
+     * HR: Update interview status (CANCELLED, NO_SHOW, etc.)
+     * PUT /api/interviews/{id}/status
+     */
+    @org.springframework.web.bind.annotation.PutMapping("/{id}/status")
+    @PreAuthorize("hasRole('HR')")
+    public ApiResponseDTO<Void> updateStatus(
+            @PathVariable Long id,
+            @org.springframework.web.bind.annotation.RequestParam com.mahak.capstone.interviewprocesstrackingsystem.enums.InterviewStatus status) {
+
+        logger.info("Update status request: interviewId={}, status={}", id, status);
+        interviewService.updateInterviewStatus(id, status);
+        return new ApiResponseDTO<>(true, "Interview status updated successfully", null);
+    }
+
+    /**
+     * HR: Delete interview by ID.
+     */
+    @DeleteMapping(ApiConstants.BY_ID)
+    @PreAuthorize("hasRole('HR')")
+    public ApiResponseDTO<Void> deleteInterview(@PathVariable Long id) {
+
+        logger.info("Delete interview request for id: {}", id);
+        interviewService.deleteInterview(id);
+        logger.info("Interview deleted: {}", id);
+        return new ApiResponseDTO<>(true, "Interview deleted successfully", null);
     }
 }

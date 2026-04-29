@@ -14,7 +14,6 @@ public class FeedbackRequestDTO {
     @NotNull(message = "Interview ID is required")
     private Long interviewId;
 
-    @NotNull(message = "Panel ID is required")
     private Long panelId;
 
     @NotNull(message = "Rating is required")

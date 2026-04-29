@@ -32,7 +32,7 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable()) // disable csrf for testing
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**", "/uploads/**").permitAll()
+                .requestMatchers("/auth/**", "/uploads/**", "/jobs", "/set-password.html").permitAll()
                .anyRequest().authenticated()   
             )
 

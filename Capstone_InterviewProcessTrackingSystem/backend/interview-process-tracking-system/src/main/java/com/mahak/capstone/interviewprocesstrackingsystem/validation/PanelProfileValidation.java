@@ -25,9 +25,14 @@ public class PanelProfileValidation {
 
         logger.debug("Validating panel profile request");
 
-        if (Objects.isNull(dto.getUserId())) {
-            logger.error("User ID is null");
-            throw new InvalidRequestException(ErrorConstants.USER_ID_REQUIRED);
+        if (Objects.isNull(dto.getFullName()) || dto.getFullName().isBlank()) {
+            logger.error("Full name is invalid");
+            throw new InvalidRequestException("Full name is required");
+        }
+
+        if (Objects.isNull(dto.getEmail()) || dto.getEmail().isBlank()) {
+            logger.error("Email is invalid");
+            throw new InvalidRequestException("Email is required");
         }
 
         if (Objects.isNull(dto.getOrganization()) || dto.getOrganization().isBlank()) {

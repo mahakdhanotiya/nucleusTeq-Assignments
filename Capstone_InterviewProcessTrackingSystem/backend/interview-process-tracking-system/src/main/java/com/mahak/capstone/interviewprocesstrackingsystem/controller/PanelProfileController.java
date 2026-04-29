@@ -5,6 +5,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -92,5 +93,19 @@ public class PanelProfileController {
         PanelProfileResponseDTO response = panelService.updatePanel(id, dto);
         logger.info("Panel updated successfully: {}", id);
         return new ApiResponseDTO<>(true, ApiConstants.PANEL_UPDATED, response);
+    }
+
+    /**
+     * HR: Delete panel member by ID.
+     * DELETE /api/panels/{id}
+     */
+    @DeleteMapping(ApiConstants.BY_ID)
+    @PreAuthorize("hasRole('HR')")
+    public ApiResponseDTO<Void> deletePanel(@PathVariable Long id) {
+
+        logger.info("Delete panel request for id: {}", id);
+        panelService.deletePanel(id);
+        logger.info("Panel deleted: {}", id);
+        return new ApiResponseDTO<>(true, ApiConstants.PANEL_DELETED, null);
     }
 }

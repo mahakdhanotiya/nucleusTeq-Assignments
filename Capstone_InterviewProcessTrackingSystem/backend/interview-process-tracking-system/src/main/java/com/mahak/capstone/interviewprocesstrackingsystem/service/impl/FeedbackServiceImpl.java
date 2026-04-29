@@ -26,6 +26,7 @@ import com.mahak.capstone.interviewprocesstrackingsystem.validation.FeedbackVali
  * Implementation of FeedbackService containing business logic.
  */
 @Service
+@org.springframework.transaction.annotation.Transactional
 public class FeedbackServiceImpl implements FeedbackService {
 
     private static final Logger logger = LoggerFactory.getLogger(FeedbackServiceImpl.class);
@@ -35,19 +36,32 @@ public class FeedbackServiceImpl implements FeedbackService {
     private final PanelProfileRepository panelRepository;
     private final FeedbackMapper mapper;
     private final FeedbackValidation validation;
+    private final org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
 
     public FeedbackServiceImpl(
             FeedbackRepository feedbackRepository,
             InterviewRepository interviewRepository,
             PanelProfileRepository panelRepository,
             FeedbackMapper mapper,
-            FeedbackValidation validation) {
+            FeedbackValidation validation,
+            org.springframework.jdbc.core.JdbcTemplate jdbcTemplate) {
 
         this.feedbackRepository = feedbackRepository;
         this.interviewRepository = interviewRepository;
         this.panelRepository = panelRepository;
         this.mapper = mapper;
         this.validation = validation;
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
+    @jakarta.annotation.PostConstruct
+    public void initDb() {
+        try {
+            jdbcTemplate.execute("ALTER TABLE feedbacks ALTER COLUMN panel_id DROP NOT NULL");
+            logger.info("Successfully dropped NOT NULL constraint on panel_id in feedbacks table.");
+        } catch (Exception e) {
+            logger.warn("Could not alter feedbacks table panel_id constraint. It might already be dropped or table doesn't exist. {}", e.getMessage());
+        }
     }
 
     /**
@@ -68,28 +82,35 @@ public class FeedbackServiceImpl implements FeedbackService {
                     return new ResourceNotFoundException(ErrorConstants.INTERVIEW_NOT_FOUND);
                 });
 
-        PanelProfile panel = panelRepository.findById(dto.getPanelId())
-                .orElseThrow(() -> {
-                    logger.error("Panel not found: {}", dto.getPanelId());
-                    return new ResourceNotFoundException(ErrorConstants.PANEL_NOT_FOUND);
-                });
+        PanelProfile panel = null;
+        if (dto.getPanelId() != null) {
+            panel = panelRepository.findById(dto.getPanelId())
+                    .orElseThrow(() -> {
+                        logger.error("Panel not found: {}", dto.getPanelId());
+                        return new ResourceNotFoundException(ErrorConstants.PANEL_NOT_FOUND);
+                    });
+        }
 
         // SRS Rule: One feedback per panel per interview
-        boolean exists = feedbackRepository
-                .existsByInterviewIdAndPanelId(dto.getInterviewId(), dto.getPanelId());
+        if (dto.getPanelId() != null) {
+            boolean exists = feedbackRepository
+                    .existsByInterviewIdAndPanelId(dto.getInterviewId(), dto.getPanelId());
 
-        if (exists) {
-            logger.error("Duplicate feedback attempt for interviewId: {}, panelId: {}", 
-                    dto.getInterviewId(), dto.getPanelId());
-            throw new InvalidRequestException(ErrorConstants.FEEDBACK_ALREADY_EXISTS);
+            if (exists) {
+                logger.error("Duplicate feedback attempt for interviewId: {}, panelId: {}", 
+                        dto.getInterviewId(), dto.getPanelId());
+                throw new InvalidRequestException(ErrorConstants.FEEDBACK_ALREADY_EXISTS);
+            }
         }
 
         Feedback feedback = mapper.toEntity(dto, interview, panel);
-
         feedback = feedbackRepository.save(feedback);
 
-        logger.info("Feedback submitted successfully with id: {}", feedback.getId());
+        // SRS Rule: Automatically mark interview as COMPLETED after feedback
+        interview.setStatus(com.mahak.capstone.interviewprocesstrackingsystem.enums.InterviewStatus.COMPLETED);
+        interviewRepository.save(interview);
 
+        logger.info("Feedback submitted successfully with id: {}, Interview marked COMPLETED", feedback.getId());
         return mapper.toResponseDTO(feedback);
     }
 

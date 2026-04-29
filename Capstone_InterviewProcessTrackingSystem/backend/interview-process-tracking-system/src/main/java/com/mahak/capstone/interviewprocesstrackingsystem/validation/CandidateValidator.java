@@ -34,7 +34,7 @@ public class CandidateValidator {
             logger.error("Validation failed: Relevant experience exceeds total experience");
 
             throw new InvalidRequestException(
-                    ErrorConstants.INVALID_EXPERIENCE_RANGE
+                    ErrorConstants.CANDIDATE_INVALID_EXPERIENCE_RANGE
             );
         }
     }
