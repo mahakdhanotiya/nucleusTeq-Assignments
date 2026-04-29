@@ -18,3 +18,83 @@
 }
 .btn-remove-email { background: #fee2e2; color: #dc2626; }
 .btn-add-email { background: #e0e7ff; color: var(--primary); padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
+
+/* ACTION DROPDOWN */
+.actions-cell {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  overflow: visible !important;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+  z-index: 100;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  background-color: #ffffff;
+  min-width: 180px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.15);
+  z-index: 1000 !important;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  margin-top: 4px;
+}
+
+.dropdown-content a, .dropdown-content button {
+  color: var(--text);
+  padding: 10px 16px;
+  text-decoration: none;
+  display: block;
+  font-size: 0.85rem;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.dropdown-content a:hover, .dropdown-content button:hover {
+  background-color: #f1f5f9;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: 0.2s;
+}
+
+.btn-icon:hover {
+  background: #f1f5f9;
+}
+
+/* INACTIVE JOB STYLING */
+.job-inactive {
+  opacity: 0.7;
+  background: #f8fafc;
+  border-style: dashed;
+}
+
+.job-id-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

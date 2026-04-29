@@ -30,9 +30,11 @@
 <div id="tab-candidates">
   <div class="page-header"><h1>Candidates</h1></div>
   <div class="stats-grid" id="candStats"></div>
-  <div class="card" style="overflow-x:auto">
-    <table class="data-table"><thead><tr><th>ID</th><th>Name</th><th>Job</th><th>Stage</th><th>Status</th><th>Actions</th></tr></thead>
-    <tbody id="candBody"><tr><td colspan="6" class="empty-state">Loading...</td></tr></tbody></table>
+  <div class="card">
+    <div class="table-wrapper" style="overflow: visible; padding-bottom: 100px;">
+      <table class="data-table"><thead><tr><th>ID</th><th>Name</th><th>Job</th><th>Stage</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody id="candBody"><tr><td colspan="6" class="empty-state">Loading...</td></tr></tbody></table>
+    </div>
   </div>
 </div>
 
@@ -47,18 +49,22 @@
 <div id="tab-interviews" style="display:none">
   <div class="page-header"><h1>Interviews</h1><button class="btn btn-primary" onclick="openScheduleModal()">+ Schedule Interview</button></div>
   <div class="stats-grid" id="intStats"></div>
-  <div class="card" style="overflow-x:auto">
-    <table class="data-table"><thead><tr><th>ID</th><th>Candidate</th><th>Stage</th><th>Date/Time</th><th>Focus Area</th><th>Actions</th></tr></thead>
-    <tbody id="intBody"><tr><td colspan="6" class="empty-state">Loading...</td></tr></tbody></table>
+  <div class="card">
+    <div class="table-wrapper" style="overflow: visible; padding-bottom: 100px;">
+      <table class="data-table"><thead><tr><th>ID</th><th>Candidate</th><th>Stage</th><th>Date/Time</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody id="intBody"><tr><td colspan="6" class="empty-state">Loading...</td></tr></tbody></table>
+    </div>
   </div>
 </div>
 
 <!-- PANELS TAB -->
 <div id="tab-panels" style="display:none">
   <div class="page-header"><h1>Panel Members</h1><button class="btn btn-primary" onclick="openModal('panelModal')">+ Add Panel</button></div>
-  <div class="card" style="overflow-x:auto">
-    <table class="data-table"><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Org</th><th>Designation</th><th>Mobile</th><th>Actions</th></tr></thead>
-    <tbody id="panelsBody"><tr><td colspan="7" class="empty-state">Loading...</td></tr></tbody></table>
+  <div class="card">
+    <div class="table-wrapper" style="overflow: visible; padding-bottom: 100px;">
+      <table class="data-table"><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Org</th><th>Designation</th><th>Mobile</th><th>Actions</th></tr></thead>
+      <tbody id="panelsBody"><tr><td colspan="7" class="empty-state">Loading...</td></tr></tbody></table>
+    </div>
   </div>
 </div>
 
@@ -128,9 +134,19 @@
   <div class="modal-header"><h2>Assign Panel</h2><button class="modal-close" onclick="closeModal('assignPanelModal')">x</button></div>
   <form id="assignPanelForm" onsubmit="assignPanel(event)">
     <input type="hidden" id="apInterviewId">
-    <div class="form-group"><label>Panel Member *</label><select id="apPanelId" required></select></div>
-    <div class="form-group"><label>Focus Area *</label><textarea id="apFocus" rows="2" placeholder="e.g., Coding skills" required></textarea></div>
-    <button type="submit" class="btn btn-primary btn-full">Assign</button>
+    <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid var(--border);">
+      <h4 style="margin-bottom: 10px; color: var(--text);">Panel 1 (Required)</h4>
+      <div class="form-group"><label>Panel Member *</label><select id="apPanelId" required></select></div>
+      <div class="form-group"><label>Focus Area *</label><textarea id="apFocus" rows="2" placeholder="e.g., Coding skills" required></textarea></div>
+    </div>
+    
+    <div style="margin-bottom: 20px;">
+      <h4 style="margin-bottom: 10px; color: var(--text);">Panel 2 (Optional)</h4>
+      <div class="form-group"><label>Panel Member</label><select id="apPanelId2"><option value="">-- Select Second Panel --</option></select></div>
+      <div class="form-group"><label>Focus Area</label><textarea id="apFocus2" rows="2" placeholder="e.g., System Design"></textarea></div>
+    </div>
+    
+    <button type="submit" class="btn btn-primary btn-full">Assign Panel(s)</button>
     <div class="msg" id="apMsg"></div>
   </form>
 </div></div>
@@ -149,6 +165,25 @@
 <div class="modal-overlay" id="feedbackModal"><div class="modal">
   <div class="modal-header"><h2>View Feedback</h2><button class="modal-close" onclick="closeModal('feedbackModal')">x</button></div>
   <div id="feedbackContent"><p class="empty-state">Loading...</p></div>
+</div></div>
+
+<!-- Update Status Modal -->
+<div class="modal-overlay" id="updateStatusModal"><div class="modal">
+  <div class="modal-header"><h2>Update Interview Status</h2><button class="modal-close" onclick="closeModal('updateStatusModal')">x</button></div>
+  <form id="updateStatusForm" onsubmit="handleUpdateStatus(event)">
+    <input type="hidden" id="usIntId">
+    <div class="form-group">
+      <label>New Status *</label>
+      <select id="usStatus" required>
+        <option value="SCHEDULED">Scheduled</option>
+        <option value="COMPLETED">Completed</option>
+        <option value="CANCELLED">Cancelled</option>
+        <option value="NO_SHOW">No Show</option>
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary btn-full">Update Status</button>
+    <div class="msg" id="usMsg" style="display:none"></div>
+  </form>
 </div></div>
 
 <!-- Give Feedback Modal -->
@@ -198,6 +233,6 @@
 
 
 <div class="toast-container" id="toastContainer"></div>
-<script src="../scripts/pages/hr-dashboard.js"></script>
+<script type="module" src="../scripts/pages/hr-dashboard.js"></script>
 </body>
 </html>
