@@ -59,11 +59,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponseDTO<Void>> handleGeneric(Exception ex) {
-
         logger.error("Unexpected error: ", ex);
-
        return new ResponseEntity<>(
-                new ApiResponseDTO<>(false, "Something went wrong", null),
+                new ApiResponseDTO<>(false, "Server Error: " + ex.getMessage(), null),
                 HttpStatus.INTERNAL_SERVER_ERROR
         );
     } 
