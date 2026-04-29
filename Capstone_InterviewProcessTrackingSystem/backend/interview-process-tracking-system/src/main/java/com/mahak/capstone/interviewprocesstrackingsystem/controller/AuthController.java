@@ -12,13 +12,15 @@ import com.mahak.capstone.interviewprocesstrackingsystem.dto.ApiResponseDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.LoginRequestDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.LoginResponseDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.RegisterRequestDTO;
+import com.mahak.capstone.interviewprocesstrackingsystem.dto.SetPasswordRequestDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.service.AuthService;
+import com.mahak.capstone.interviewprocesstrackingsystem.entity.User;
 
 import jakarta.validation.Valid;
 
 /**
  * REST Controller for Authentication operations.
- * Handles user registration and login.
+ * Handles user registration, login, and password setup.
  */
 @RestController
 @RequestMapping(ApiConstants.AUTH)
@@ -33,7 +35,8 @@ public class AuthController {
     }
 
     /**
-     * Handles user registration.
+     * Handles user registration (without password).
+     * Sends a password setup link via email.
      * POST /auth/register
      */
     @PostMapping(ApiConstants.REGISTER)
@@ -41,7 +44,7 @@ public class AuthController {
         logger.info("Register request received for email: {}", dto.getEmail());
         authService.register(dto);
         logger.info("User registered successfully: {}", dto.getEmail());
-        return new ApiResponseDTO<>(true, ApiConstants.REGISTER_SUCCESS, null);
+        return new ApiResponseDTO<>(true, "Registration successful! Please check your email to set your password.", null);
     }
 
     /**
@@ -54,5 +57,29 @@ public class AuthController {
         LoginResponseDTO response = authService.login(dto);
         logger.info("Login successful for email: {}", dto.getEmail());
         return new ApiResponseDTO<>(true, ApiConstants.LOGIN_SUCCESS, response);
+    }
+
+    /**
+     * Sets user password using a token from the email link.
+     * POST /auth/set-password
+     */
+    @PostMapping("/set-password")
+    public ApiResponseDTO<Void> setPassword(@Valid @RequestBody SetPasswordRequestDTO dto) {
+        logger.info("Set password request received");
+        authService.setPassword(dto);
+        return new ApiResponseDTO<>(true, "Password set successfully! You can now login.", null);
+    }
+
+    /**
+     * Fetches details of the currently authenticated user.
+     * GET /auth/me
+     */
+    @org.springframework.web.bind.annotation.GetMapping("/me")
+    public ApiResponseDTO<User> getMe() {
+        logger.info("Get current user details request received");
+        User user = authService.getMe();
+        // Hide password for security
+        user.setPassword("PROTECTED");
+        return new ApiResponseDTO<>(true, "User details fetched", user);
     }
 }

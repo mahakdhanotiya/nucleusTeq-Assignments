@@ -24,6 +24,7 @@ public final class ErrorConstants {
     public static final String ACTIVE_APPLICATION_EXISTS = "User already has an active application";
     public static final String INVALID_RESUME_FORMAT = "Only PDF resumes are allowed";
     public static final String INVALID_REQUEST = "Request body cannot be null";
+    public static final String CANDIDATE_INVALID_EXPERIENCE_RANGE = "Relevant experience cannot be greater than total experience";
 
     // INTERVIEW 
     public static final String JD_NOT_FOUND = "Job description not found";
