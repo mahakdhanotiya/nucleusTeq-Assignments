@@ -42,7 +42,7 @@ public class FeedbackController {
      * POST /api/feedback
      */
     @PostMapping
-    @PreAuthorize("hasRole('PANEL')")
+    @PreAuthorize("hasAnyRole('PANEL','HR')")
     public ApiResponseDTO<FeedbackResponseDTO> submitFeedback(
             @Valid @RequestBody FeedbackRequestDTO dto) {
 
