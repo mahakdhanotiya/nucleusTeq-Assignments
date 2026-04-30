@@ -140,6 +140,6 @@ public class CandidateController {
         logger.info("Delete candidate request for id: {}", id);
         candidateService.deleteCandidate(id);
         logger.info("Candidate deleted: {}", id);
-        return new ApiResponseDTO<>(true, "Candidate deleted successfully", null);
+        return new ApiResponseDTO<>(true, ApiConstants.CANDIDATE_DELETED, null);
     }
 }

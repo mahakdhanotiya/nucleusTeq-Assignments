@@ -22,6 +22,7 @@ public interface CandidateRepository extends JpaRepository<CandidateProfile, Lon
     boolean existsByUserAndApplicationStatusNot(User user, ApplicationStatus status);
 
     Optional<CandidateProfile> findByUser(User user);
+    Optional<CandidateProfile> findByUserEmail(String email);
 
     /**
      * Filter candidates by JD, stage, and/or status.
