@@ -12,6 +12,8 @@ public final class ErrorConstants {
     public static final String USER_ALREADY_EXISTS = "User already exists";
     public static final String INVALID_CREDENTIALS = "Invalid credentials";
     public static final String HR_EMAIL_REQUIRED = "Only emails with '.hr@' pattern can register as HR";
+    public static final String INVALID_TOKEN = "Invalid or expired token";
+    public static final String TOKEN_EXPIRED_USED = "Token invalid, used or expired";
 
     // JOB 
     public static final String JOB_NOT_FOUND = "Job not found";
@@ -50,6 +52,9 @@ public final class ErrorConstants {
     public static final String INVALID_COMMENTS = "Comments are required";
     public static final String FEEDBACK_ALREADY_EXISTS = "Feedback already submitted";
     public static final String FEEDBACK_NOT_FOUND = "Feedback not found";
+    public static final String FEEDBACK_BEFORE_START = "Feedback can only be submitted after the interview has started.";
+    public static final String HR_FEEDBACK_ONLY_IN_HR_STAGE = "HR feedback can only be submitted during the HR Round.";
+    public static final String PANEL_NOT_ASSIGNED_TO_INTERVIEW = "You are not assigned to this interview.";
 
     // FILE 
     public static final String INVALID_FILE_TYPE = "Only PDF files are allowed";
