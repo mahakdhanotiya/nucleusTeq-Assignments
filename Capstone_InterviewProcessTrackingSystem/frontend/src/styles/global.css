@@ -54,7 +54,57 @@ a { text-decoration: none; color: var(--primary); }
   font-size: 0.7rem;
   font-weight: 400;
   opacity: 0.7;
-  border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+
+/* User Profile Section */
+.user-profile {
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.avatar-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #fff;
+  flex-shrink: 0;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.user-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.role-badge-pill {
+  font-size: 0.65rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 2px 8px;
+  border-radius: 10px;
+  width: fit-content;
+  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
 .sidebar-nav {
@@ -113,7 +163,7 @@ a { text-decoration: none; color: var(--primary); }
 }
 
 .sidebar-footer {
-  padding: 16px 24px;
+  padding: 8px 0;
   border-top: 1px solid rgba(255,255,255,0.15);
 }
 
@@ -122,7 +172,36 @@ a { text-decoration: none; color: var(--primary); }
   font-size: 0.85rem;
   display: flex;
   align-items: center;
+  padding: 10px 24px;
   gap: 8px;
+  transition: 0.2s;
+}
+
+.sidebar-footer a:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+
+.sidebar-bottom-nav {
+  margin-top: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 8px 0;
+}
+
+.sidebar-bottom-nav a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 24px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+.sidebar-bottom-nav a:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .main-content {
@@ -406,3 +485,21 @@ a { text-decoration: none; color: var(--primary); }
 
 .msg.error { background: #fee2e2; color: #dc2626; }
 .msg.success { background: #d1fae5; color: #059669; }
+
+/* ========== VALIDATION ========== */
+.error-text {
+  color: var(--danger);
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-top: 4px;
+  display: block;
+}
+
+.input-error {
+  border-color: var(--danger) !important;
+  background-color: #fffafb !important;
+}
+
+.input-error:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
