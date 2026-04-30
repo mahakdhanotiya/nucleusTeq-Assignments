@@ -2,6 +2,7 @@ package com.mahak.capstone.interviewprocesstrackingsystem.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,10 +42,10 @@ public class AuthController {
      */
     @PostMapping(ApiConstants.REGISTER)
     public ApiResponseDTO<Void> register(@Valid @RequestBody RegisterRequestDTO dto) {
-        logger.info("Register request received for email: {}", dto.getEmail());
+        logger.info(ApiConstants.LOG_REQUEST_RECEIVED, "POST", ApiConstants.AUTH + ApiConstants.REGISTER);
         authService.register(dto);
         logger.info("User registered successfully: {}", dto.getEmail());
-        return new ApiResponseDTO<>(true, "Registration successful! Please check your email to set your password.", null);
+        return new ApiResponseDTO<>(true, ApiConstants.REGISTRATION_SUCCESS_EMAIL, null);
     }
 
     /**
@@ -53,7 +54,7 @@ public class AuthController {
      */
     @PostMapping(ApiConstants.LOGIN)
     public ApiResponseDTO<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO dto) {
-        logger.info("Login request received for email: {}", dto.getEmail());
+        logger.info(ApiConstants.LOG_REQUEST_RECEIVED, "POST", ApiConstants.AUTH + ApiConstants.LOGIN);
         LoginResponseDTO response = authService.login(dto);
         logger.info("Login successful for email: {}", dto.getEmail());
         return new ApiResponseDTO<>(true, ApiConstants.LOGIN_SUCCESS, response);
@@ -63,23 +64,23 @@ public class AuthController {
      * Sets user password using a token from the email link.
      * POST /auth/set-password
      */
-    @PostMapping("/set-password")
+    @PostMapping(ApiConstants.SET_PASSWORD)
     public ApiResponseDTO<Void> setPassword(@Valid @RequestBody SetPasswordRequestDTO dto) {
-        logger.info("Set password request received");
+        logger.info(ApiConstants.LOG_REQUEST_RECEIVED, "POST", ApiConstants.AUTH + ApiConstants.SET_PASSWORD);
         authService.setPassword(dto);
-        return new ApiResponseDTO<>(true, "Password set successfully! You can now login.", null);
+        return new ApiResponseDTO<>(true, ApiConstants.PASSWORD_SET_SUCCESS, null);
     }
 
     /**
      * Fetches details of the currently authenticated user.
      * GET /auth/me
      */
-    @org.springframework.web.bind.annotation.GetMapping("/me")
+    @GetMapping(ApiConstants.ME)
     public ApiResponseDTO<User> getMe() {
-        logger.info("Get current user details request received");
+        logger.info(ApiConstants.LOG_REQUEST_RECEIVED, "GET", ApiConstants.AUTH + ApiConstants.ME);
         User user = authService.getMe();
         // Hide password for security
         user.setPassword("PROTECTED");
-        return new ApiResponseDTO<>(true, "User details fetched", user);
+        return new ApiResponseDTO<>(true, ApiConstants.PROFILE_FETCHED, user);
     }
 }
