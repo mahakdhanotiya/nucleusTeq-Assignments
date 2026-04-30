@@ -3,11 +3,14 @@ package com.mahak.capstone.interviewprocesstrackingsystem.service.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.scheduling.annotation.Async;
 
 import com.mahak.capstone.interviewprocesstrackingsystem.service.EmailService;
+
+import jakarta.mail.internet.MimeMessage;
 
 @Service
 public class EmailServiceImpl implements EmailService {
@@ -26,134 +29,158 @@ public class EmailServiceImpl implements EmailService {
         this.mailSender = mailSender;
     }
 
-    /**
-     * Sends interview schedule details to the candidate.
-     * Includes date, time, stage and focus area.
-     */
+    private String buildHtml(String title, String content) {
+        return "<div style='font-family: \"Segoe UI\", Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: auto; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;'>" +
+               "  <div style='background: linear-gradient(135deg, #4f46e5, #7c3aed); padding: 30px; text-align: center; color: white;'>" +
+               "    <h1 style='margin: 0; font-size: 24px;'>" + title + "</h1>" +
+               "  </div>" +
+               "  <div style='padding: 30px; color: #1e293b; line-height: 1.6;'>" +
+               content +
+               "    <p style='margin-top: 30px;'>Best Regards,<br><strong>" + appName + " Team</strong></p>" +
+               "  </div>" +
+               "  <div style='background: #f8fafc; padding: 20px; text-align: center; color: #64748b; font-size: 12px; border-top: 1px solid #e2e8f0;'>" +
+               "    This is an automated message. Please do not reply directly to this email." +
+               "  </div>" +
+               "</div>";
+    }
+
     @Override
+    @Async
     public void sendInterviewScheduleToCandidate(
             String toEmail, String candidateName, String jobTitle,
             String stage, String dateTime, String focusArea) {
 
-        logger.info("Sending interview schedule email to candidate: {}", toEmail);
-
         try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom(fromEmail);
-            message.setTo(toEmail);
-            message.setSubject(appName + " - Interview Scheduled: " + stage + " Round");
-            message.setText(
-                "Dear " + candidateName + ",\n\n" +
-                "Your interview has been scheduled. Here are the details:\n\n" +
-                "Position: " + jobTitle + "\n" +
-                "Round: " + stage + "\n" +
-                "Date & Time: " + dateTime + "\n" +
-                "Focus Areas: " + focusArea + "\n\n" +
-                "Please be available at the scheduled time.\n\n" +
-                "Best regards,\n" + appName + " Team"
-            );
-            mailSender.send(message);
-            logger.info("Interview schedule email sent to: {}", toEmail);
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            
+            helper.setFrom(fromEmail);
+            helper.setTo(toEmail);
+            helper.setSubject(appName + " | Interview Invitation: " + stage + " Round");
 
+            String content = "<p>Dear <strong>" + candidateName + "</strong>,</p>" +
+                    "<p>We are excited to move forward with your application for the <strong>" + jobTitle + "</strong> position! You have been scheduled for an interview round.</p>" +
+                    "<div style='background: #f1f5f9; padding: 20px; border-radius: 8px; margin: 20px 0;'>" +
+                    "  <p style='margin: 5px 0;'><strong>Round:</strong> " + stage + "</p>" +
+                    "  <p style='margin: 5px 0;'><strong>Date & Time:</strong> " + dateTime + "</p>" +
+                    "  <p style='margin: 5px 0;'><strong>Focus Area:</strong> " + focusArea + "</p>" +
+                    "</div>" +
+                    "<p>Please ensure you are available at the specified time. We look forward to speaking with you!</p>";
+
+            helper.setText(buildHtml("Interview Scheduled", content), true);
+            mailSender.send(mimeMessage);
+            logger.info("Interview schedule email sent to: {}", toEmail);
         } catch (Exception e) {
-            logger.error("Failed to send email to {}: {}", toEmail, e.getMessage());
-            // Don't throw — email failure should not break interview scheduling
+            logger.error("Failed to send interview email to {}: {}", toEmail, e.getMessage());
         }
     }
 
-    /**
-     * Sends interview assignment details to the panel member.
-     * Contains candidate info, role, stage and schedule.
-     */
     @Override
+    @Async
     public void sendPanelAssignmentEmail(
             String toEmail, String panelName, String candidateName, String jobTitle,
             String stage, String dateTime, String focusArea) {
 
-        logger.info("Sending panel assignment email to: {}", toEmail);
-
         try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom(fromEmail);
-            message.setTo(toEmail);
-            message.setSubject(appName + " - You Have Been Assigned to Interview");
-            message.setText(
-                "Dear " + panelName + ",\n\n" +
-                "You have been assigned to conduct an interview. Details:\n\n" +
-                "Candidate: " + candidateName + "\n" +
-                "Position: " + jobTitle + "\n" +
-                "Round: " + stage + "\n" +
-                "Date & Time: " + dateTime + "\n" +
-                "Your Focus Area: " + focusArea + "\n\n" +
-                "Please review candidate profile before the interview.\n\n" +
-                "Best regards,\n" + appName + " Team"
-            );
-            mailSender.send(message);
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            
+            helper.setFrom(fromEmail);
+            helper.setTo(toEmail);
+            helper.setSubject(appName + " | New Interview Assignment");
+
+            String content = "<p>Hello <strong>" + panelName + "</strong>,</p>" +
+                    "<p>You have been assigned to conduct an interview for the following candidate:</p>" +
+                    "<div style='background: #f1f5f9; padding: 20px; border-radius: 8px; margin: 20px 0;'>" +
+                    "  <p style='margin: 5px 0;'><strong>Candidate:</strong> " + candidateName + "</p>" +
+                    "  <p style='margin: 5px 0;'><strong>Position:</strong> " + jobTitle + "</p>" +
+                    "  <p style='margin: 5px 0;'><strong>Round:</strong> " + stage + "</p>" +
+                    "  <p style='margin: 5px 0;'><strong>Date & Time:</strong> " + dateTime + "</p>" +
+                    "  <p style='margin: 5px 0;'><strong>Focus Area:</strong> " + focusArea + "</p>" +
+                    "</div>" +
+                    "<p>Please log in to your dashboard to view the candidate details and prepare for the evaluation.</p>";
+
+            helper.setText(buildHtml("New Interview Assignment", content), true);
+            mailSender.send(mimeMessage);
             logger.info("Panel assignment email sent to: {}", toEmail);
-
         } catch (Exception e) {
-            logger.error("Failed to send panel assignment email to {}: {}", toEmail, e.getMessage());
+            logger.error("Failed to send panel email: {}", e.getMessage());
         }
     }
 
-    /**
-     * Sends onboarding email to newly created panel.
-     * Includes login details and access information.
-     */
     @Override
+    @Async
+    public void sendPanelAssignedToCandidateEmail(
+            String toEmail, String candidateName, String panelName, String stage, String dateTime) {
+
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            
+            helper.setFrom(fromEmail);
+            helper.setTo(toEmail);
+            helper.setSubject(appName + " | Interviewer Assigned");
+
+            String content = "<p>Dear <strong>" + candidateName + "</strong>,</p>" +
+                    "<p>Your interviewer has been assigned for the upcoming <strong>" + stage + "</strong> round.</p>" +
+                    "<p style='font-size: 1.1rem; color: #4f46e5;'><strong>Interviewer:</strong> " + panelName + "</p>" +
+                    "<p>Please be prepared for the discussion at <strong>" + dateTime + "</strong>.</p>";
+
+            helper.setText(buildHtml("Interviewer Assigned", content), true);
+            mailSender.send(mimeMessage);
+        } catch (Exception e) {
+            logger.error("Failed to notify candidate: {}", e.getMessage());
+        }
+    }
+
+    @Override
+    @Async
     public void sendPanelOnboardingEmail(String toEmail, String panelName, String loginUrl) {
-
-        logger.info("Sending panel onboarding email to: {}", toEmail);
-
         try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom(fromEmail);
-            message.setTo(toEmail);
-            message.setSubject(appName + " - You Have Been Added as an Interviewer");
-            message.setText(
-                "Dear " + panelName + ",\n\n" +
-                "You have been added as a panel interviewer in " + appName + ".\n\n" +
-                "Please set your password and log in using the link below:\n" +
-                loginUrl + "\n\n" +
-                "Your registered email: " + toEmail + "\n\n" +
-                "Best regards,\n" + appName + " Team"
-            );
-            mailSender.send(message);
-            logger.info("Panel onboarding email sent to: {}", toEmail);
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            
+            helper.setFrom(fromEmail);
+            helper.setTo(toEmail);
+            helper.setSubject(appName + " | Your Interviewer Account");
 
+            String content = "<p>Hello <strong>" + panelName + "</strong>,</p>" +
+                    "<p>Welcome to the <strong>" + appName + "</strong> panel! An account has been created for you to manage your interview assignments and submit feedback.</p>" +
+                    "<p>Please click the button below to set up your password and access your dashboard:</p>" +
+                    "<div style='text-align: center; margin: 30px 0;'>" +
+                    "  <a href='" + loginUrl + "' style='background: #4f46e5; color: white; padding: 12px 25px; text-decoration: none; border-radius: 6px; font-weight: bold;'>Set Up Password</a>" +
+                    "</div>" +
+                    "<p>If the button doesn't work, copy and paste this link: <br>" + loginUrl + "</p>";
+
+            helper.setText(buildHtml("Account Onboarding", content), true);
+            mailSender.send(mimeMessage);
         } catch (Exception e) {
-            logger.error("Failed to send onboarding email to {}: {}", toEmail, e.getMessage());
+            logger.error("Failed to send onboarding email: {}", e.getMessage());
         }
     }
 
-    /**
-     * Sends a password setup link to a newly registered user.
-     * The link contains a unique token that allows them to set their password.
-     */
     @Override
+    @Async
     public void sendPasswordSetupEmail(String toEmail, String fullName, String setupUrl) {
-
-        logger.info("Sending password setup email to: {}", toEmail);
-
         try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom(fromEmail);
-            message.setTo(toEmail);
-            message.setSubject(appName + " - Set Your Password");
-            message.setText(
-                "Dear " + fullName + ",\n\n" +
-                "Welcome to " + appName + "! Your account has been created successfully.\n\n" +
-                "Please click the link below to set your password:\n" +
-                setupUrl + "\n\n" +
-                "This link will expire in 24 hours.\n\n" +
-                "If you didn't create this account, please ignore this email.\n\n" +
-                "Best regards,\n" + appName + " Team"
-            );
-            mailSender.send(message);
-            logger.info("Password setup email sent to: {}", toEmail);
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            
+            helper.setFrom(fromEmail);
+            helper.setTo(toEmail);
+            helper.setSubject(appName + " | Complete Your Registration");
 
+            String content = "<p>Dear <strong>" + fullName + "</strong>,</p>" +
+                    "<p>Welcome to <strong>" + appName + "</strong>! We are excited to have you on board.</p>" +
+                    "<p>To complete your registration and secure your account, please set your password by clicking the button below:</p>" +
+                    "<div style='text-align: center; margin: 30px 0;'>" +
+                    "  <a href='" + setupUrl + "' style='background: #4f46e5; color: white; padding: 12px 25px; text-decoration: none; border-radius: 6px; font-weight: bold;'>Set Password</a>" +
+                    "</div>";
+
+            helper.setText(buildHtml("Password Setup", content), true);
+            mailSender.send(mimeMessage);
         } catch (Exception e) {
-            logger.error("Failed to send password setup email to {}: {}", toEmail, e.getMessage());
+            logger.error("Failed to send setup email: {}", e.getMessage());
         }
     }
 }
