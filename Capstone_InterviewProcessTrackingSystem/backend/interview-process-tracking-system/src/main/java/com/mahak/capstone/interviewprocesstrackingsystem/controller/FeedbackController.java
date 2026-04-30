@@ -5,11 +5,14 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mahak.capstone.interviewprocesstrackingsystem.constants.ApiConstants;
@@ -38,8 +41,7 @@ public class FeedbackController {
     }
 
     /**
-     * PANEL: Submit feedback for an interview.
-     * POST /api/feedback
+     * Submit feedback for an interview.
      */
     @PostMapping
     @PreAuthorize("hasAnyRole('PANEL','HR')")
@@ -53,31 +55,52 @@ public class FeedbackController {
     }
 
     /**
-     * HR: Get all feedback for an interview.
-     * GET /api/feedback/interview/{interviewId}
+     * Get feedback for an interview (HR sees all, Panelists see only their own).
      */
     @GetMapping(ApiConstants.BY_INTERVIEW)
-    @PreAuthorize("hasRole('HR')")
+    @PreAuthorize("hasAnyRole('HR','PANEL')")
     public ApiResponseDTO<List<FeedbackDetailResponseDTO>> getFeedbackByInterview(
-            @PathVariable Long interviewId) {
+            @PathVariable Long interviewId,
+            @RequestParam(required = false) Long requesterPanelId) {
 
         logger.info("Fetching feedback for interviewId: {}", interviewId);
-        List<FeedbackDetailResponseDTO> list = feedbackService.getFeedbackByInterview(interviewId);
-        logger.info("Fetched {} feedback entries for interviewId: {}", list.size(), interviewId);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String role = auth.getAuthorities().stream().findFirst().get().getAuthority();
+        
+        List<FeedbackDetailResponseDTO> list = feedbackService.getFeedbackByInterview(interviewId, role, requesterPanelId);
         return new ApiResponseDTO<>(true, ApiConstants.FEEDBACK_FETCHED, list);
     }
 
     /**
-     * HR/PANEL: Get feedback by ID.
-     * GET /api/feedback/{id}
+     * HR: Get all feedback for a candidate across all interviews.
+     */
+    @GetMapping(ApiConstants.BY_CANDIDATE)
+    @PreAuthorize("hasRole('HR')")
+    public ApiResponseDTO<List<FeedbackDetailResponseDTO>> getFeedbackByCandidate(@PathVariable Long candidateId) {
+        logger.info("Fetching feedback history for candidateId: {}", candidateId);
+        List<FeedbackDetailResponseDTO> list = feedbackService.getFeedbackByCandidate(candidateId);
+        return new ApiResponseDTO<>(true, ApiConstants.FEEDBACK_FETCHED, list);
+    }
+
+    /**
+     * Get feedback by ID.
      */
     @GetMapping(ApiConstants.BY_ID)
     @PreAuthorize("hasAnyRole('HR', 'PANEL')")
     public ApiResponseDTO<FeedbackResponseDTO> getFeedbackById(@PathVariable Long id) {
-
         logger.info("Fetching feedback with id: {}", id);
         FeedbackResponseDTO response = feedbackService.getFeedbackById(id);
-        logger.info("Feedback fetched: {}", id);
         return new ApiResponseDTO<>(true, ApiConstants.FEEDBACK_FETCHED, response);
+    }
+
+    /**
+     * HR: Get all feedback in the system.
+     */
+    @GetMapping(ApiConstants.ALL)
+    @PreAuthorize("hasRole('HR')")
+    public ApiResponseDTO<List<FeedbackResponseDTO>> getAllFeedback() {
+        logger.info("Fetching all feedback entries");
+        List<FeedbackResponseDTO> list = feedbackService.getAllFeedback();
+        return new ApiResponseDTO<>(true, ApiConstants.FEEDBACK_FETCHED, list);
     }
 }

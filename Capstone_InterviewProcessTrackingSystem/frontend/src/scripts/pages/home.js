@@ -1,4 +1,7 @@
 import { getMyProfile, getInterviews, getJobs } from "../actions/user.js";
+import { fetchHandler } from "../lib/handlers/fetch.js";
+import { SITE_CONFIG } from "../config/site-config.js";
+import { renderSidebarProfile, initFormCleanup } from "../lib/utils/ui.js";
 
 const token = localStorage.getItem("token");
 const userId = localStorage.getItem("userId");
@@ -9,12 +12,23 @@ if (!token) {
 }
 
 let cachedProfile = null;
+let cachedJobs = [];
+let cachedInterviews = [];
 
+/**
+ * Formats a snake_case string to Capitalized Words.
+ * @param {string} str - String to format.
+ * @returns {string} Formatted string.
+ */
 function formatStatus(str) {
   if (!str) return 'N/A';
   return str.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
 }
 
+/**
+ * Opens a resume URL in a new browser tab.
+ * @param {string} url - The URL of the resume.
+ */
 window.viewResume = function(url) {
   if (!url) {
     toast('No resume available', 'error');
@@ -23,6 +37,11 @@ window.viewResume = function(url) {
   window.open(url, '_blank');
 };
 
+/**
+ * Switches the dashboard to a specific section.
+ * @param {string} n - Section ID suffix.
+ * @param {HTMLElement} el - Clicked sidebar element.
+ */
 window.showSection = function(n, el) {
   ["dashboard","interviews","browse-jobs"].forEach(s => {
     document.getElementById("sec-"+s).style.display = s === n ? "block" : "none";
@@ -33,11 +52,17 @@ window.showSection = function(n, el) {
   if (n === "browse-jobs") loadBrowseJobsSection();
 };
 
+/**
+ * Logs out the user and clears local storage.
+ */
 window.logout = function() {
   localStorage.clear();
   window.location.href = "sign-in/index.html";
 };
 
+/**
+ * Fetches the logged-in candidate's profile and renders the dashboard view.
+ */
 async function loadProfile() {
   try {
     const data = await getMyProfile();
@@ -67,7 +92,7 @@ async function loadProfile() {
         <div class="stat-card"><div class="stat-icon" style="background:#d1fae5"><svg class="stat-svg" viewBox="0 0 24 24"><path fill="#10b981" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div><div><div class="stat-value">${formatStatus(p.applicationStatus)}</div><div class="stat-label">Status</div></div></div>
         <div class="stat-card"><div class="stat-icon" style="background:#fef3c7"><svg class="stat-svg" viewBox="0 0 24 24"><path fill="#f59e0b" d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-2 .89-2 2v11c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg></div><div><div class="stat-value">${p.totalExperience||0} yrs</div><div class="stat-label">Experience</div></div></div>`;
         
-      renderPipeline(p.currentStage);
+      renderPipeline(p.currentStage, p.applicationStatus);
       // Show Edit Profile button only when profile exists
       document.getElementById("editProfileBtn").style.display = "inline-flex";
     } else {
@@ -84,23 +109,41 @@ async function loadProfile() {
   }
 }
 
-function renderPipeline(currentStage) {
+/**
+ * Renders the visual pipeline (progress bar) for the candidate's application.
+ * @param {string} currentStage - The current stage of the interview.
+ * @param {string} status - The current application status.
+ */
+function renderPipeline(currentStage, status) {
   const stages = ['PROFILING', 'SCREENING', 'L1', 'L2', 'HR'];
   let currentIndex = stages.indexOf(currentStage);
-  if (currentIndex === -1) currentIndex = 0; // Default to first if unknown
+  if (currentIndex === -1) currentIndex = 0;
 
-  // Calculate width for fill line. (currentIndex) / (stages.length - 1)
-  const fillPercentage = stages.length > 1 ? (currentIndex / (stages.length - 1)) * 100 : 0;
+  const isRejected = status === 'REJECTED';
+
+  // Calculate width for fill line relative to the 80% span (10% to 90%)
+  const rawPercentage = stages.length > 1 ? (currentIndex / (stages.length - 1)) : 0;
+  const fillWidth = rawPercentage * 80;
 
   const stepsHtml = stages.map((stage, index) => {
     let stateClass = '';
     let icon = index + 1;
+    
     if (index < currentIndex) {
       stateClass = 'completed';
       icon = '✓';
     } else if (index === currentIndex) {
-      stateClass = 'current';
+      if (isRejected) {
+        stateClass = 'rejected';
+        icon = '✕';
+      } else if (status === 'SELECTED' && index === stages.length - 1) {
+        stateClass = 'completed';
+        icon = '✓';
+      } else {
+        stateClass = 'current';
+      }
     }
+    
     return `
       <div class="pipeline-step ${stateClass}">
         <div class="pipeline-circle">${icon}</div>
@@ -111,7 +154,7 @@ function renderPipeline(currentStage) {
 
   document.getElementById("pipelineArea").innerHTML = `
     <div class="pipeline-line"></div>
-    <div class="pipeline-line-fill" style="width: ${fillPercentage}%; background: #10b981;"></div>
+    <div class="pipeline-line-fill" style="width: ${fillWidth}%; ${isRejected ? 'background: #ef4444;' : ''}"></div>
     ${stepsHtml}
   `;
 }
@@ -171,12 +214,12 @@ window.handleEditProfile = async function(e) {
     try {
       const formData = new FormData();
       formData.append('file', file);
-      const uploadRes = await fetch("http://localhost:8080/api/files/upload", {
+      const uploadData = await fetchHandler("/api/files/upload", {
         method: "POST",
-        headers: { "Authorization": "Bearer " + token },
-        body: formData
+        body: formData,
+        requireAuth: true,
+        isFormData: true
       });
-      const uploadData = await uploadRes.json();
       if (uploadData.success && uploadData.data) {
         resumeUrl = uploadData.data.url;
       } else {
@@ -208,15 +251,11 @@ window.handleEditProfile = async function(e) {
   };
 
   try {
-    const res = await fetch("http://localhost:8080/candidates/update", {
+    const data = await fetchHandler("/candidates/update", {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + localStorage.getItem("token")
-      },
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
+      requireAuth: true
     });
-    const data = await res.json();
     if (data.success) {
       toast("Profile updated successfully!");
       closeModal("editProfileModal");
@@ -248,9 +287,14 @@ async function loadInterviewsSection() {
   if (!cachedProfile) return;
   try {
     const data = await getInterviews(cachedProfile.id);
-    const list = data.data || [];
+    cachedInterviews = data.data || [];
+    renderInterviews(cachedInterviews);
+  } catch (e) { document.getElementById("interviewsBody").innerHTML = '<tr><td colspan="6" class="empty-state">Error loading interviews.</td></tr>'; }
+}
+
+function renderInterviews(list) {
     const body = document.getElementById("interviewsBody");
-    if (!list.length) { body.innerHTML = '<tr><td colspan="6" class="empty-state">No interviews scheduled yet.</td></tr>'; return; }
+    if (!list.length) { body.innerHTML = '<tr><td colspan="6" class="empty-state">No interviews found.</td></tr>'; return; }
     body.innerHTML = list.map(i => `<tr>
       <td><strong>I-${i.id}</strong></td>
       <td>${i.jobTitle || 'N/A'}</td>
@@ -259,23 +303,33 @@ async function loadInterviewsSection() {
       <td>${i.focusArea || '--'}</td>
       <td><span class="badge badge-warning">${i.status || 'SCHEDULED'}</span></td>
     </tr>`).join("");
-  } catch (e) { document.getElementById("interviewsBody").innerHTML = '<tr><td colspan="6" class="empty-state">Error loading interviews.</td></tr>'; }
 }
 
 async function loadBrowseJobsSection() {
-  const grid = document.getElementById("browseJobsGrid");
   try {
     const data = await getJobs();
-    const jobs = data.data || [];
-    if (!jobs.length) {
+    cachedJobs = data.data || [];
+    renderJobs(cachedJobs);
+  } catch (e) {
+    document.getElementById("browseJobsGrid").innerHTML = `
+      <div class="empty-state" style="grid-column: 1 / -1;">
+        <svg class="empty-svg" viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+        <p>Unable to load jobs. Please make sure the backend server is running.</p>
+      </div>`;
+  }
+}
+
+function renderJobs(list) {
+    const grid = document.getElementById("browseJobsGrid");
+    if (!list.length) {
       grid.innerHTML = `
         <div class="empty-state" style="grid-column: 1 / -1;">
           <svg class="empty-svg" viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-2 .89-2 2v11c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg>
-          <p>No active jobs available right now. Check back later!</p>
+          <p>No jobs found matching your search.</p>
         </div>`;
       return;
     }
-    grid.innerHTML = jobs.map(j => `
+    grid.innerHTML = list.map(j => `
       <div class="job-card">
         <div class="job-header">
           <h3 class="job-title">${j.title}</h3>
@@ -296,13 +350,30 @@ async function loadBrowseJobsSection() {
         <button onclick="window.location.href='candidate-profile.html?jobId=${j.id}&jobTitle=${encodeURIComponent(j.title)}'" class="btn btn-primary btn-sm" style="margin-top:auto;width:100%;justify-content:center;">Apply Now</button>
       </div>
     `).join("");
-  } catch (e) {
-    grid.innerHTML = `
-      <div class="empty-state" style="grid-column: 1 / -1;">
-        <svg class="empty-svg" viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
-        <p>Unable to load jobs. Please make sure the backend server is running.</p>
-      </div>`;
-  }
 }
 
+// Search Listeners
+document.getElementById("searchJobs")?.addEventListener("input", (e) => {
+    const q = e.target.value.toLowerCase();
+    const filtered = cachedJobs.filter(j => 
+        j.title.toLowerCase().includes(q) || 
+        (j.location || '').toLowerCase().includes(q) ||
+        (j.description || '').toLowerCase().includes(q) ||
+        (j.skills || []).some(s => s.toLowerCase().includes(q))
+    );
+    renderJobs(filtered);
+});
+
+document.getElementById("searchInterviews")?.addEventListener("input", (e) => {
+    const q = e.target.value.toLowerCase();
+    const filtered = cachedInterviews.filter(i => 
+        (i.jobTitle || '').toLowerCase().includes(q) || 
+        (i.stage || '').toLowerCase().includes(q) ||
+        (i.status || '').toLowerCase().includes(q)
+    );
+    renderInterviews(filtered);
+});
+
+renderSidebarProfile();
 loadProfile();
+initFormCleanup("editProfileForm");

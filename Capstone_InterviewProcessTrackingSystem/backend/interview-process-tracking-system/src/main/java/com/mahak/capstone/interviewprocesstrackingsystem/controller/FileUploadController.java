@@ -59,7 +59,7 @@ public class FileUploadController {
 
         logger.info("File uploaded successfully: {}", fileName);
 
-        String fileUrl = "http://localhost:8080/uploads/" + fileName;
+        String fileUrl = "/uploads/" + fileName;
 
         return new ApiResponseDTO<>(true, ApiConstants.FILE_UPLOADED,
                 java.util.Map.of("url", fileUrl, "fileName", originalName));

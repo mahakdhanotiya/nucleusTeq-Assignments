@@ -23,13 +23,12 @@ export async function getJobs() {
 }
 
 export async function uploadFile(formData) {
-  const token = localStorage.getItem("token");
-  const res = await fetch("http://localhost:8080/uploads", {
+  return fetchHandler("/api/files/upload", {
     method: "POST",
-    headers: { "Authorization": "Bearer " + token },
-    body: formData
+    body: formData,
+    requireAuth: true,
+    isFormData: true
   });
-  return await res.json();
 }
 
 export async function applyJob(body) {

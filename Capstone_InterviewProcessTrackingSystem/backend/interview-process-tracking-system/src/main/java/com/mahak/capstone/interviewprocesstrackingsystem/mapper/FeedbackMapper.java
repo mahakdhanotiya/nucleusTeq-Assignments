@@ -17,8 +17,8 @@ public class FeedbackMapper {
      * RequestDTO → Entity
      */
     public Feedback toEntity(FeedbackRequestDTO dto,
-                             Interview interview,
-                             PanelProfile panel) {
+            Interview interview,
+            PanelProfile panel) {
 
         Feedback feedback = new Feedback();
 
@@ -44,14 +44,37 @@ public class FeedbackMapper {
         dto.setId(feedback.getId());
         dto.setRating(feedback.getRating());
         dto.setStatus(feedback.getStatus().name());
+        dto.setComments(feedback.getComments());
+        dto.setStrengths(feedback.getStrengths());
+        dto.setWeaknesses(feedback.getWeaknesses());
+        dto.setAreasCovered(feedback.getAreasCovered());
 
-        // panel name
-        if (feedback.getPanel() != null &&
-            feedback.getPanel().getUser() != null) {
+        // Interview & Candidate Context
+        if (feedback.getInterview() != null) {
+            dto.setInterviewId(feedback.getInterview().getId());
+            dto.setInterviewStage(feedback.getInterview().getStage().name());
 
-            dto.setPanelName(
-                feedback.getPanel().getUser().getFullName()
-            );
+            if (feedback.getInterview().getCandidate() != null) {
+                dto.setCandidateId(feedback.getInterview().getCandidate().getId());
+                if (feedback.getInterview().getCandidate().getUser() != null) {
+                    dto.setCandidateName(feedback.getInterview().getCandidate().getUser().getFullName());
+                }
+            }
+        }
+
+        // Panel Context
+        if (feedback.getPanel() != null) {
+            dto.setPanelId(feedback.getPanel().getId());
+            if (feedback.getPanel().getUser() != null) {
+                dto.setPanelName(feedback.getPanel().getUser().getFullName());
+            }
+        } else {
+            // Smart Labeling for Legacy/HR Data
+            if (feedback.getInterview() != null && "HR".equals(feedback.getInterview().getStage().name())) {
+                dto.setPanelName("HR Manager");
+            } else {
+                dto.setPanelName("Panelist Evaluation");
+            }
         }
 
         return dto;
@@ -75,11 +98,16 @@ public class FeedbackMapper {
 
         // panel name
         if (feedback.getPanel() != null &&
-            feedback.getPanel().getUser() != null) {
+                feedback.getPanel().getUser() != null) {
 
             dto.setPanelName(
-                feedback.getPanel().getUser().getFullName()
-            );
+                    feedback.getPanel().getUser().getFullName());
+        } else {
+            if (feedback.getInterview() != null && "HR".equals(feedback.getInterview().getStage().name())) {
+                dto.setPanelName("HR Manager");
+            } else {
+                dto.setPanelName("Panelist Evaluation");
+            }
         }
 
         return dto;

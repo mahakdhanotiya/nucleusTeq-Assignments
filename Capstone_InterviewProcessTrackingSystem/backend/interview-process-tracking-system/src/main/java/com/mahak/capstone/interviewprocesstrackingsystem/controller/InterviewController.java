@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mahak.capstone.interviewprocesstrackingsystem.constants.ApiConstants;
@@ -18,8 +20,10 @@ import com.mahak.capstone.interviewprocesstrackingsystem.dto.ApiResponseDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.CandidateResponseDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.InterviewRequestDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.InterviewResponseDTO;
+import com.mahak.capstone.interviewprocesstrackingsystem.dto.InterviewUpdateDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.PanelAssignmentRequestDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.StageProgressionRequestDTO;
+import com.mahak.capstone.interviewprocesstrackingsystem.enums.InterviewStatus;
 import com.mahak.capstone.interviewprocesstrackingsystem.service.InterviewService;
 
 import jakarta.validation.Valid;
@@ -89,11 +93,11 @@ public class InterviewController {
     }
 
     /**
-     * HR: Get all interviews.
+     * HR & PANEL: Get all interviews.
      * GET /api/interviews
      */
     @GetMapping
-    @PreAuthorize("hasRole('HR')")
+    @PreAuthorize("hasAnyRole('HR','PANEL')")
     public ApiResponseDTO<List<InterviewResponseDTO>> getAllInterviews() {
 
         logger.info("Fetching all interviews");
@@ -136,15 +140,30 @@ public class InterviewController {
      * HR: Update interview status (CANCELLED, NO_SHOW, etc.)
      * PUT /api/interviews/{id}/status
      */
-    @org.springframework.web.bind.annotation.PutMapping("/{id}/status")
+    @PutMapping(ApiConstants.STATUS)
     @PreAuthorize("hasRole('HR')")
     public ApiResponseDTO<Void> updateStatus(
             @PathVariable Long id,
-            @org.springframework.web.bind.annotation.RequestParam com.mahak.capstone.interviewprocesstrackingsystem.enums.InterviewStatus status) {
+            @RequestParam InterviewStatus status) {
 
         logger.info("Update status request: interviewId={}, status={}", id, status);
         interviewService.updateInterviewStatus(id, status);
-        return new ApiResponseDTO<>(true, "Interview status updated successfully", null);
+        return new ApiResponseDTO<>(true, ApiConstants.INTERVIEW_STATUS_UPDATED, null);
+    }
+
+    /**
+     * HR: Update interview details.
+     * PUT /api/interviews/{id}
+     */
+    @PutMapping(ApiConstants.BY_ID)
+    @PreAuthorize("hasRole('HR')")
+    public ApiResponseDTO<InterviewResponseDTO> updateInterview(
+            @PathVariable Long id,
+            @Valid @RequestBody InterviewUpdateDTO dto) {
+
+        logger.info("Update interview request for id: {}", id);
+        InterviewResponseDTO response = interviewService.updateInterview(id, dto);
+        return new ApiResponseDTO<>(true, ApiConstants.INTERVIEW_UPDATED, response);
     }
 
     /**
@@ -157,6 +176,6 @@ public class InterviewController {
         logger.info("Delete interview request for id: {}", id);
         interviewService.deleteInterview(id);
         logger.info("Interview deleted: {}", id);
-        return new ApiResponseDTO<>(true, "Interview deleted successfully", null);
+        return new ApiResponseDTO<>(true, ApiConstants.INTERVIEW_DELETED, null);
     }
 }

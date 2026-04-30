@@ -13,8 +13,27 @@ export async function submitFeedback(body) {
   });
 }
 
-export async function getFeedbackByInterview(interviewId) {
-  return fetchHandler("/api/feedback/interview/" + interviewId, {
+/**
+ * Fetch feedback for a specific interview.
+ * @param {number} interviewId 
+ * @param {number} panelId - Optional, used to filter for specific panelist view
+ */
+export async function getFeedbackByInterview(interviewId, panelId = null) {
+  let url = "/api/feedback/interview/" + interviewId;
+  if (panelId) url += "?requesterPanelId=" + panelId;
+  
+  return fetchHandler(url, {
+    method: "GET",
+    requireAuth: true
+  });
+}
+
+/**
+ * Fetch all feedback for a candidate (HR only).
+ * @param {number} candidateId 
+ */
+export async function getFeedbackByCandidate(candidateId) {
+  return fetchHandler("/api/feedback/candidate/" + candidateId, {
     method: "GET",
     requireAuth: true
   });

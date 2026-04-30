@@ -18,6 +18,10 @@ form.addEventListener("submit", async (e) => {
             localStorage.setItem("token", data.data.token);
             localStorage.setItem("role", data.data.role);
             localStorage.setItem("userId", data.data.userId);
+            localStorage.setItem("userName", data.data.fullName);
+            if (data.data.profileId) {
+                localStorage.setItem("profileId", data.data.profileId);
+            }
 
             const role = data.data.role;
             const redirect = localStorage.getItem('redirectAfterLogin');
@@ -43,3 +47,9 @@ form.addEventListener("submit", async (e) => {
         msgEl.style.display = "block";
     }
 });
+window.togglePassword = function(id, el) {
+    const input = document.getElementById(id);
+    if (input) {
+        input.type = input.type === "password" ? "text" : "password";
+    }
+};

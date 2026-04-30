@@ -12,7 +12,6 @@ public interface EmailService {
         String focusArea
     );
 
-    /** Send panel assignment email with candidate details */
     void sendPanelAssignmentEmail(
         String toEmail,
         String panelName,
@@ -23,6 +22,15 @@ public interface EmailService {
         String focusArea
     );
 
+    /** Notify candidate that a panel has been assigned to their round */
+    void sendPanelAssignedToCandidateEmail(
+        String toEmail,
+        String candidateName,
+        String panelName,
+        String stage,
+        String dateTime
+    );
+
     /** Send panel onboarding email with login link */
     void sendPanelOnboardingEmail(
         String toEmail,
@@ -31,9 +39,5 @@ public interface EmailService {
     );
 
     /** Send password setup link email after registration */
-    void sendPasswordSetupEmail(
-        String toEmail,
-        String fullName,
-        String setupUrl
-    );
+    void sendPasswordSetupEmail(String toEmail, String fullName, String setupUrl);
 }

@@ -11,10 +11,10 @@ import com.mahak.capstone.interviewprocesstrackingsystem.dto.FeedbackResponseDTO
 public interface FeedbackService {
 
     /**
-     * Submit feedback for an interview by a panel member.
+     * Submit feedback for an interview.
      *
      * @param dto Feedback request data
-     * @return FeedbackResponseDTO containing saved feedback details
+     * @return FeedbackResponseDTO
      */
     FeedbackResponseDTO submitFeedback(FeedbackRequestDTO dto);
 
@@ -27,10 +27,27 @@ public interface FeedbackService {
     FeedbackResponseDTO getFeedbackById(Long id);
 
     /**
-     * Fetch all feedback for a given interview ID.
+     * Fetch feedback for an interview with role-based visibility.
      *
-     * @param interviewId interview ka ID
+     * @param interviewId interview ID
+     * @param role user role
+     * @param requesterPanelId ID of the panelist making the request (null for HR)
      * @return list of feedback details
      */
-    List<FeedbackDetailResponseDTO> getFeedbackByInterview(Long interviewId);
+    List<FeedbackDetailResponseDTO> getFeedbackByInterview(Long interviewId, String role, Long requesterPanelId);
+    
+    /**
+     * Fetch all feedback for a candidate across all rounds.
+     *
+     * @param candidateId candidate ID
+     * @return list of feedback details
+     */
+    List<FeedbackDetailResponseDTO> getFeedbackByCandidate(Long candidateId);
+
+    /**
+     * Fetch all feedback in the system (HR only).
+     *
+     * @return list of feedback summaries
+     */
+    List<FeedbackResponseDTO> getAllFeedback();
 }

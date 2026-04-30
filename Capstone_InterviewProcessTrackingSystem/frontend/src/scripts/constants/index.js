@@ -1,0 +1,32 @@
+/**
+ * Global application constants for the frontend.
+ */
+
+export const APP_ROLES = {
+  HR: 'HR',
+  CANDIDATE: 'CANDIDATE',
+  PANEL: 'PANEL'
+};
+
+export const INTERVIEW_STATUS = {
+  PENDING: 'PENDING',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED',
+  NO_SHOW: 'NO_SHOW'
+};
+
+export const APPLICATION_STATUS = {
+  SELECTED: 'SELECTED',
+  REJECTED: 'REJECTED',
+  EVALUATED: 'EVALUATED',
+  INTERVIEW_SCHEDULED: 'INTERVIEW_SCHEDULED',
+  PROFILING_COMPLETED: 'PROFILING_COMPLETED'
+};
+
+export const INTERVIEW_STAGES = {
+  PROFILING: 'PROFILING',
+  SCREENING: 'SCREENING',
+  L1: 'L1',
+  L2: 'L2',
+  HR: 'HR'
+};

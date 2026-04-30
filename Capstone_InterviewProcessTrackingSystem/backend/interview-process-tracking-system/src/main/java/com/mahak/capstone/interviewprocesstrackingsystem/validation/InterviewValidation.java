@@ -22,9 +22,9 @@ public class InterviewValidation {
     /**
      * Validate interview request
      */
-    public void validateInterviewRequest(InterviewRequestDTO dto) {
+    public void validateInterviewRequest(InterviewRequestDTO dto, com.mahak.capstone.interviewprocesstrackingsystem.enums.InterviewStage candidateCurrentStage) {
 
-        logger.debug("Validating interview request");
+        logger.debug("Validating interview request for stage: {}", dto.getStage());
 
         if (Objects.isNull(dto.getInterviewDateTime())) {
             logger.error("Interview date is null");
@@ -39,6 +39,18 @@ public class InterviewValidation {
         if (Objects.isNull(dto.getFocusArea()) || dto.getFocusArea().isBlank()) {
             logger.error("Focus area is invalid");
             throw new InvalidRequestException(ErrorConstants.INVALID_FOCUS_AREA);
+        }
+
+        // Enforce that scheduled round matches the candidate's current stage
+        try {
+            com.mahak.capstone.interviewprocesstrackingsystem.enums.InterviewStage requestedStage = 
+                com.mahak.capstone.interviewprocesstrackingsystem.enums.InterviewStage.valueOf(dto.getStage().toUpperCase());
+            
+            if (requestedStage != candidateCurrentStage) {
+                throw new InvalidRequestException("Cannot schedule " + requestedStage + " interview because candidate is currently in " + candidateCurrentStage + " stage. Please progress the stage first.");
+            }
+        } catch (IllegalArgumentException e) {
+            throw new InvalidRequestException("Invalid stage name: " + dto.getStage());
         }
     }
 

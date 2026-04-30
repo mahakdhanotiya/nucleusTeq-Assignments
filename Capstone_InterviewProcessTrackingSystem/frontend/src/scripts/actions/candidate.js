@@ -50,3 +50,23 @@ export async function updateMyProfile(body) {
     requireAuth: true
   });
 }
+
+/**
+ * HR: Search/filter candidates by JD, stage, and/or status.
+ */
+export async function searchCandidates(jdId, stage, status) {
+  let query = "";
+  const params = [];
+  if (jdId) params.push(`jdId=${jdId}`);
+  if (stage) params.push(`stage=${stage}`);
+  if (status) params.push(`status=${status}`);
+  
+  if (params.length > 0) {
+    query = "?" + params.join("&");
+  }
+  
+  return fetchHandler("/candidates/search" + query, {
+    method: "GET",
+    requireAuth: true
+  });
+}
