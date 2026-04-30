@@ -49,3 +49,11 @@ export async function updateInterviewStatus(id, status) {
     requireAuth: true
   });
 }
+
+export async function updateInterview(id, body) {
+  return fetchHandler("/api/interviews/" + id, {
+    method: "PUT",
+    body,
+    requireAuth: true
+  });
+}
