@@ -68,7 +68,7 @@ public class JobDescriptionController {
      * Fetches all jobs (including inactive) for HR dashboard.
      * GET /jobs/all
      */
-    @GetMapping("/all")
+    @GetMapping(ApiConstants.ALL)
     @PreAuthorize("hasRole('HR')")
     public ApiResponseDTO<List<JobResponseDTO>> getAllJobsForHR() {
 
@@ -96,21 +96,21 @@ public class JobDescriptionController {
      * Activates a job by ID. HR only.
      * PUT /jobs/{id}/activate
      */
-    @PutMapping("/{id}/activate")
+    @PutMapping(ApiConstants.ACTIVATE)
     @PreAuthorize("hasRole('HR')")
     public ApiResponseDTO<Void> activateJob(@PathVariable Long id) {
 
         logger.info("Activate job request received for id: {}", id);
         jobService.activateJob(id);
         logger.info("Job activated successfully: {}", id);
-        return new ApiResponseDTO<>(true, "Job activated successfully", null);
+        return new ApiResponseDTO<>(true, ApiConstants.JOB_ACTIVATED, null);
     }
 
     /**
      * Updates an existing job by ID. HR only.
      * PUT /jobs/{id}
      */
-    @PutMapping("/{id}")
+    @PutMapping(ApiConstants.BY_ID)
     @PreAuthorize("hasRole('HR')")
     public ApiResponseDTO<JobResponseDTO> updateJob(
             @PathVariable Long id,
@@ -119,6 +119,6 @@ public class JobDescriptionController {
         logger.info("Update job request received for id: {}", id);
         JobResponseDTO response = jobService.updateJob(id, dto);
         logger.info("Job updated successfully: {}", id);
-        return new ApiResponseDTO<>(true, "Job updated successfully", response);
+        return new ApiResponseDTO<>(true, ApiConstants.JOB_UPDATED, response);
     }
 }
