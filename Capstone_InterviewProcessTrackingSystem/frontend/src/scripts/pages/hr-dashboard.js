@@ -5,7 +5,7 @@ import { getAllPanels as fetchPanels, createPanel as createPanelAction, updatePa
 import { submitFeedback as submitFeedbackAction, getFeedbackByInterview, getFeedbackByCandidate } from "../actions/feedback.js";
 import { fetchHandler } from "../lib/handlers/fetch.js";
 import { renderSidebarProfile, showFieldError, clearErrors, getTrimmedValues, initFormCleanup } from "../lib/utils/ui.js";
-import { APPLICATION_STATUS, APP_ROLES } from "../constants/index.js";
+import { APPLICATION_STATUS, APP_ROLES, INTERVIEW_STATUS, INTERVIEW_STAGES } from "../constants/index.js";
 import * as Renderers from "./hr-dashboard-renderers.js";
 
 // --- Global State ---
@@ -483,22 +483,92 @@ async function handleUpdateStatus(e) {
 
 async function openScheduleModal() {
   try {
-    const data = await getAllCandidates();
+    // Refresh interviews and candidates to ensure latest status
+    const [intData, candData, jobData] = await Promise.all([
+      fetchInterviews(),
+      getAllCandidates(),
+      getActiveJobs()
+    ]);
+    
+    cachedInterviews = intData.data || [];
+    const activeCandidates = (candData.data || []).filter(c => 
+      c.applicationStatus !== APPLICATION_STATUS.REJECTED && 
+      c.applicationStatus !== APPLICATION_STATUS.SELECTED
+    );
+
     const candSelect = document.getElementById("siCand");
     const jobSelect = document.getElementById("siJob");
-    const activeCandidates = (data.data || []).filter(c => c.applicationStatus !== APPLICATION_STATUS.REJECTED && c.applicationStatus !== APPLICATION_STATUS.SELECTED);
+    const stageSelect = document.getElementById("siStage");
+    const siMsg = document.getElementById("siMsg");
+    const submitBtn = document.getElementById("siSubmitBtn");
+
+    // Populate Jobs first so auto-select works
+    jobSelect.innerHTML = '<option value="">-- Select Job --</option>' + 
+      (jobData.data || []).map(j => `<option value="${j.id}">${j.title} (J-${j.id})</option>`).join("");
     
     candSelect.innerHTML = '<option value="">-- Select Candidate --</option>' + 
-      activeCandidates.map(c => `<option value="${c.id}" data-stage="${c.currentStage}" data-jobid="${c.jobId}">${c.fullName} (C-${c.id})</option>`).join("");
+      activeCandidates.map(c => `<option value="${c.id}" data-stage="${c.currentStage}" data-jobid="${c.jobId || ''}" data-jobtitle="${c.jobTitle || ''}">${c.fullName} (C-${c.id})</option>`).join("");
     
+    // Reset modal state
+    siMsg.textContent = "";
+    siMsg.style.display = "none";
+    submitBtn.disabled = false;
+    jobSelect.disabled = false;
+
     // Auto-update stage and job when candidate selected
     candSelect.onchange = (e) => {
       const opt = e.target.options[e.target.selectedIndex];
+      
+      // Reset errors and button
+      siMsg.textContent = "";
+      siMsg.style.display = "none";
+      submitBtn.disabled = false;
+      clearErrors("scheduleForm");
+
       if (opt && opt.value) {
-        if (opt.dataset.stage) document.getElementById("siStage").value = opt.dataset.stage;
-        if (opt.dataset.jobid) {
-            jobSelect.value = opt.dataset.jobid;
-            jobSelect.disabled = true; // Lock it to prevent errors
+        const candId = parseInt(opt.value);
+        const jobId = opt.dataset.jobid;
+        const jobTitle = opt.dataset.jobtitle;
+        
+        // 1. Auto-fill Stage and Job
+        if (opt.dataset.stage) stageSelect.value = opt.dataset.stage;
+        
+        if (jobId) {
+            // Check if jobId exists in the current options
+            let exists = false;
+            for (let i = 0; i < jobSelect.options.length; i++) {
+                if (jobSelect.options[i].value === jobId) {
+                    exists = true;
+                    break;
+                }
+            }
+            
+            if (!exists && jobTitle) {
+                // If the job is inactive/not in list, add it dynamically so it's not empty
+                const newOpt = new Option(`${jobTitle} (J-${jobId})`, jobId);
+                jobSelect.add(newOpt);
+            }
+            
+            jobSelect.value = jobId;
+            jobSelect.disabled = true; // Lock it as per requirements
+        } else {
+            jobSelect.disabled = false;
+            jobSelect.value = "";
+        }
+
+        // 2. Constraint: Check for pending feedback or ongoing interviews
+        const pendingInterviews = cachedInterviews.filter(i => 
+          i.candidateId === candId && 
+          i.status !== INTERVIEW_STATUS.COMPLETED && 
+          i.status !== INTERVIEW_STATUS.CANCELLED && 
+          i.status !== INTERVIEW_STATUS.NO_SHOW
+        );
+
+        if (pendingInterviews.length > 0) {
+          siMsg.textContent = "Cannot schedule: Previous round feedback is pending or an interview is already active.";
+          siMsg.className = "msg error";
+          siMsg.style.display = "block";
+          submitBtn.disabled = true;
         }
       } else {
         jobSelect.value = "";
@@ -506,13 +576,11 @@ async function openScheduleModal() {
       }
     };
 
-    const jobs = await getActiveJobs();
-    jobSelect.innerHTML = '<option value="">-- Select Job --</option>' + 
-      (jobs.data || []).map(j => `<option value="${j.id}">${j.title} (J-${j.id})</option>`).join("");
-    
-    jobSelect.disabled = false; // reset
     openModal("scheduleModal");
-  } catch(e) { toast("Error loading data","error"); }
+  } catch(e) { 
+    console.error("Error opening schedule modal:", e);
+    toast("Error loading data", "error"); 
+  }
 }
 
 async function scheduleInterview(e) {
