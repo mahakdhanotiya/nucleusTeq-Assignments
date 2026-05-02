@@ -93,30 +93,33 @@ public class PanelProfileServiceImpl implements PanelProfileService {
         // validation
         panelValidation.validateCreatePanel(dto);
 
-        // Check if user already exists
-        User user = userRepository.findByEmail(dto.getEmail()).orElse(null);
-        if (user == null) {
-            user = new User();
-            user.setFullName(dto.getFullName());
-            user.setEmail(dto.getEmail());
-            // random password because it will be set via email
-            user.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
-            user.setRole(Role.PANEL);
-            user.setMobileNumber(dto.getMobileNumber());
-            user = userRepository.save(user);
-
-            // Generate password setup token and send email
-            PasswordToken token = new PasswordToken(dto.getEmail());
-            passwordTokenRepository.save(token);
-            String setupUrl = frontendUrl + "/set-password.html?token=" + token.getToken();
-            emailService.sendPanelOnboardingEmail(dto.getEmail(), dto.getFullName(), setupUrl);
-        } else {
-             // duplicate check
-             if (panelRepository.existsByUserId(user.getId())) {
-                 logger.error("Panel already exists for userId: {}", user.getId());
-                 throw new InvalidRequestException(ErrorConstants.PANEL_ALREADY_EXISTS);
-             }
+        // Check if email already exists in User table
+        if (userRepository.existsByEmail(dto.getEmail())) {
+            logger.error("User with email already exists: {}", dto.getEmail());
+            throw new InvalidRequestException(ErrorConstants.PANEL_ALREADY_EXISTS);
         }
+
+        // Check if mobile number already exists in PanelProfile
+        if (panelRepository.existsByMobileNumber(dto.getMobileNumber())) {
+            logger.error("Panel mobile number already exists: {}", dto.getMobileNumber());
+            throw new InvalidRequestException(ErrorConstants.MOBILE_ALREADY_EXISTS);
+        }
+
+        // Create new user since email doesn't exist
+        User user = new User();
+        user.setFullName(dto.getFullName());
+        user.setEmail(dto.getEmail());
+        // random password because it will be set via email
+        user.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+        user.setRole(Role.PANEL);
+        user.setMobileNumber(dto.getMobileNumber());
+        user = userRepository.save(user);
+
+        // Generate password setup token and send email
+        PasswordToken token = new PasswordToken(dto.getEmail());
+        passwordTokenRepository.save(token);
+        String setupUrl = frontendUrl + "/set-password.html?token=" + token.getToken();
+        emailService.sendPanelOnboardingEmail(dto.getEmail(), dto.getFullName(), setupUrl);
 
         // map DTO → Entity
         PanelProfile panel = panelMapper.toEntity(dto, user);
