@@ -296,12 +296,18 @@ function toast(msg, type="success") {
 }
 
 async function loadInterviewsSection() {
-  if (!cachedProfile) return;
+  const body = document.getElementById("interviewsBody");
+  if (!cachedProfile) {
+    if (body) body.innerHTML = '<tr><td colspan="6" class="empty-state">No interviews found. Please apply for a job first.</td></tr>';
+    return;
+  }
   try {
     const data = await getInterviews(cachedProfile.id);
     cachedInterviews = data.data || [];
     renderInterviews(cachedInterviews);
-  } catch (e) { document.getElementById("interviewsBody").innerHTML = '<tr><td colspan="6" class="empty-state">Error loading interviews.</td></tr>'; }
+  } catch (e) { 
+    if (body) body.innerHTML = '<tr><td colspan="6" class="empty-state">Error loading interviews.</td></tr>'; 
+  }
 }
 
 function renderInterviews(list) {

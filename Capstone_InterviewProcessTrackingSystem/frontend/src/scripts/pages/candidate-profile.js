@@ -1,5 +1,6 @@
 import { getMe } from "../actions/auth.js";
 import { createCandidate, uploadFile, getMyProfile } from "../actions/candidate.js";
+import { showFieldError, clearErrors } from "../lib/utils/ui.js";
 
 const params = new URLSearchParams(window.location.search);
 const jobId = params.get("jobId");
@@ -21,71 +22,66 @@ window.logout = function() {
   window.location.href = "sign-in/index.html";
 };
 
+let currentUser = null;
+
 // Pre-fill User Info and Check if profile already exists
 async function init() {
+  const fullNameEl = document.getElementById("apFullName");
+  const emailEl = document.getElementById("apEmail");
+  const mobileEl = document.getElementById("apMobile");
+
+  const applyLock = (el, val) => {
+    if (!el || !val) return;
+    el.value = val;
+    el.readOnly = true;
+    el.style.backgroundColor = "#f3f4f6";
+    el.style.color = "#64748b";
+    el.style.cursor = "not-allowed";
+    el.style.pointerEvents = "none";
+    el.classList.add("locked-input");
+  };
+
+  // 1. Instant Lock from LocalStorage
+  const cachedName = localStorage.getItem("userName");
+  const cachedEmail = localStorage.getItem("email");
+  const cachedMobile = localStorage.getItem("mobileNumber");
+  
+  applyLock(fullNameEl, cachedName);
+  applyLock(emailEl, cachedEmail);
+  applyLock(mobileEl, cachedMobile);
+
   try {
-    // 1. Check if they already applied
+    // 2. Sync with Backend
+    const userData = await getMe();
+    if (userData.success && userData.data) {
+      currentUser = userData.data;
+      applyLock(fullNameEl, currentUser.fullName);
+      applyLock(emailEl, currentUser.email);
+      applyLock(mobileEl, currentUser.mobileNumber);
+    }
+
+    // 3. Check if they already applied
     let profileRes = null;
     try {
       profileRes = await getMyProfile();
-    } catch (e) {
-      // Expected if user hasn't applied yet, just continue to auto-fill
-    }
+    } catch (e) { }
 
     if (profileRes && profileRes.success && profileRes.data) {
-      // Disable form and show message
       const btn = document.querySelector('button[type="submit"]');
       if (btn) {
         btn.disabled = true;
         btn.textContent = "Application Already Exists";
         btn.style.opacity = "0.5";
-        btn.style.cursor = "not-allowed";
       }
-      
       const msgEl = document.getElementById("apMsg");
       if (msgEl) {
         msgEl.className = "msg info";
-        msgEl.textContent = "You already have an active application. Please visit your Dashboard to see the status.";
+        msgEl.textContent = "You already have an active application.";
         msgEl.style.display = "block";
-      }
-      return;
-    }
-
-    // 2. Not applied yet, fetch user details to pre-fill
-    const userData = await getMe();
-    if (userData.success && userData.data) {
-      const user = userData.data;
-      const fullNameEl = document.getElementById("apFullName");
-      const emailEl = document.getElementById("apEmail");
-      const mobileEl = document.getElementById("apMobile");
-
-      if (fullNameEl) {
-        fullNameEl.value = user.fullName || "";
-        if (user.fullName) {
-          fullNameEl.readOnly = true;
-          fullNameEl.style.backgroundColor = "#f3f4f6";
-          fullNameEl.style.cursor = "not-allowed";
-        }
-      }
-      if (emailEl) {
-        emailEl.value = user.email || "";
-        if (user.email) {
-          emailEl.readOnly = true;
-          emailEl.style.backgroundColor = "#f3f4f6";
-          emailEl.style.cursor = "not-allowed";
-        }
-      }
-      if (mobileEl) {
-        mobileEl.value = user.mobileNumber || "";
-        if (user.mobileNumber) {
-          mobileEl.readOnly = true;
-          mobileEl.style.backgroundColor = "#f3f4f6";
-          mobileEl.style.cursor = "not-allowed";
-        }
       }
     }
   } catch (err) {
-    console.error("Init failed", err);
+    console.error("Init failed:", err);
   }
 }
 
@@ -96,6 +92,8 @@ document.addEventListener("DOMContentLoaded", () => {
   if (applyForm) {
     applyForm.addEventListener("submit", async (e) => {
       e.preventDefault();
+      clearErrors("applyForm");
+      
       const msgEl = document.getElementById("apMsg");
       if (msgEl) msgEl.style.display = "none";
 
@@ -104,41 +102,34 @@ document.addEventListener("DOMContentLoaded", () => {
       const totalExp = parseInt(totalExpVal);
       const relExp = parseInt(relExpVal);
 
+      let hasError = false;
+
       // Frontend Validation: Relevant <= Total
       if (relExp > totalExp) {
-        if (msgEl) {
-          msgEl.className = "msg error";
-          msgEl.textContent = "Relevant experience cannot be greater than total experience.";
-          msgEl.style.display = "block";
-        }
-        return;
+        showFieldError("apRelExp", "Relevant experience cannot be greater than total experience.");
+        hasError = true;
       }
 
       // Mobile Number Validation: Exactly 10 digits, numbers only
       const mobileNumber = document.getElementById("apMobile")?.value.trim() || "";
       const mobileRegex = /^[0-9]{10}$/;
       if (!mobileRegex.test(mobileNumber)) {
-        if (msgEl) {
-          msgEl.className = "msg error";
-          msgEl.textContent = "Mobile number must be exactly 10 digits and contain only numbers.";
-          msgEl.style.display = "block";
-        }
-        return;
+        showFieldError("apMobile", "Mobile number must be exactly 10 digits.");
+        hasError = true;
       }
+
+      // Check Resume
+      const fileInput = document.getElementById("apResumeFile");
+      const file = fileInput?.files?.[0];
+      if (!file) {
+        showFieldError("apResumeFile", "Please upload a resume (PDF).");
+        hasError = true;
+      }
+
+      if (hasError) return;
 
       try {
         // 1. Upload Resume
-        const fileInput = document.getElementById("apResumeFile");
-        const file = fileInput?.files?.[0];
-        if (!file) {
-          if (msgEl) {
-            msgEl.className = "msg error";
-            msgEl.textContent = "Please upload a resume.";
-            msgEl.style.display = "block";
-          }
-          return;
-        }
-
         const formData = new FormData();
         formData.append("file", file);
         
@@ -161,18 +152,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // 2. Submit Application
         const body = {
-          userId: parseInt(localStorage.getItem("userId") || "0"),
-          jobId: jobId ? parseInt(jobId) : null,
-          source: "CAREER_PORTAL",
-          resumeUrl: uploadData.data.url,
-          mobileNumber: document.getElementById("apMobile")?.value.trim(),
-          totalExperience: totalExp,
-          relevantExperience: relExp,
-          currentCompany: document.getElementById("apCompany")?.value.trim(),
-          preferredLocation: document.getElementById("apLocation")?.value.trim(),
-          currentCTC: parseFloat(document.getElementById("apCurrentCtc")?.value || "0"),
-          expectedCTC: parseFloat(document.getElementById("apExpectedCtc")?.value || "0"),
-          noticePeriod: parseInt(document.getElementById("apNotice")?.value || "0")
+          userId: currentUser.id,
+          jobId: parseInt(jobId),
+          mobileNumber: document.getElementById("apMobile").value.trim(),
+          totalExperience: parseFloat(document.getElementById("apExp").value),
+          relevantExperience: parseFloat(document.getElementById("apRelExp").value) || 0,
+          currentCompany: document.getElementById("apCompany").value.trim(),
+          currentCTC: parseFloat(document.getElementById("apCurrentCtc").value) || 0,
+          expectedCTC: parseFloat(document.getElementById("apExpectedCtc").value) || 0,
+          noticePeriod: parseInt(document.getElementById("apNotice").value) || 0,
+          preferredLocation: document.getElementById("apLocation").value.trim(),
+          resumeUrl: uploadData.data.url
         };
 
         const data = await createCandidate(body);

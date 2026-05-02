@@ -43,3 +43,11 @@ body { background: linear-gradient(135deg, #eef2ff, #dbeafe); }
   padding-bottom: 6px;
   border-bottom: 2px solid #e0e7ff;
 }
+
+.locked-input {
+  background-color: #f3f4f6 !important;
+  color: #64748b !important;
+  cursor: not-allowed !important;
+  border-color: #e5e7eb !important;
+  pointer-events: none;
+}

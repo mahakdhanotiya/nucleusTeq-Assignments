@@ -455,3 +455,21 @@
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 16px;
 }
+/* ========== VALIDATION & ERROR STYLES ========== */
+.field-error {
+  color: #ef4444;
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin-top: 4px;
+  display: block;
+  min-height: 14px;
+}
+
+.error-field {
+  border-color: #ef4444 !important;
+  background-color: #fff1f2 !important;
+}
+
+.error-field:focus {
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
+}

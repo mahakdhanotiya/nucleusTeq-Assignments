@@ -663,7 +663,12 @@ async function scheduleInterview(e) {
   try {
     const data = await scheduleInterviewAction(body);
     if (data.success) { toast("Interview scheduled!"); closeModal("scheduleModal"); loadInterviews(); }
-    else { document.getElementById("siMsg").className="msg error"; document.getElementById("siMsg").textContent=data.message||"Failed"; }
+    else { 
+      const msgEl = document.getElementById("siMsg");
+      msgEl.className = "msg error"; 
+      msgEl.textContent = data.message || "Failed"; 
+      msgEl.style.display = "block";
+    }
   } catch(e) { toast("Server error","error"); }
 }
 
@@ -858,20 +863,36 @@ window.openEditPanelModal = function(id) {
 
 window.handlePanelSubmit = async function(e) {
   e.preventDefault();
+  clearErrors("panelForm");
+  
   const id = document.getElementById("pId").value;
+  const fullName = document.getElementById("pName").value.trim();
+  const mobileNumber = document.getElementById("pMobile").value.trim();
+  
   const body = {
-    fullName: document.getElementById("pName").value.trim(),
+    fullName: fullName,
     email: document.getElementById("pEmail").value.trim(),
     organization: document.getElementById("pOrg").value.trim(),
     designation: document.getElementById("pDesig").value.trim(),
-    mobileNumber: document.getElementById("pMobile").value.trim()
+    mobileNumber: mobileNumber
   };
 
-  const mobileRegex = /^[0-9]{10}$/;
-  if (!mobileRegex.test(body.mobileNumber)) {
-    toast("Mobile number must be exactly 10 digits and contain only numbers.", "error");
-    return;
+  let hasError = false;
+
+  // Name Validation: Only alphabets and spaces
+  const nameRegex = /^[a-zA-Z\s.-]+$/;
+  if (!nameRegex.test(fullName)) {
+    showFieldError("pName", "Name should contain only alphabets and spaces.");
+    hasError = true;
   }
+
+  const mobileRegex = /^[0-9]{10}$/;
+  if (!mobileRegex.test(mobileNumber)) {
+    showFieldError("pMobile", "Mobile number must be exactly 10 digits.");
+    hasError = true;
+  }
+
+  if (hasError) return;
 
   try {
     const data = id ? await updatePanelAction(id, body) : await createPanelAction(body);
