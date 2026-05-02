@@ -32,7 +32,7 @@ public interface CandidateService {
      * Search/filter candidates by JD, stage, and/or status.
      * All parameters are optional.
      */
-    List<CandidateResponseDTO> searchCandidates(Long jdId, InterviewStage stage, ApplicationStatus status);
+    List<CandidateResponseDTO> searchCandidates(Long jdId, InterviewStage stage, ApplicationStatus status, String name);
 
     /**
      * Candidate updates their own profile

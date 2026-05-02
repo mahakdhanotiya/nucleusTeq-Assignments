@@ -173,11 +173,12 @@ public class CandidateServiceImpl implements CandidateService {
     public List<CandidateResponseDTO> searchCandidates(
             Long jdId,
             com.mahak.capstone.interviewprocesstrackingsystem.enums.InterviewStage stage,
-            ApplicationStatus status) {
+            ApplicationStatus status,
+            String name) {
 
-        logger.info("Searching candidates with jdId={}, stage={}, status={}", jdId, stage, status);
+        logger.info("Searching candidates with jdId={}, stage={}, status={}, name={}", jdId, stage, status, name);
 
-        List<CandidateProfile> candidates = candidateRepository.findByFilters(jdId, stage, status);
+        List<CandidateProfile> candidates = candidateRepository.findByFilters(jdId, stage, status, name);
 
         logger.info("Found {} candidates matching filters", candidates.size());
 

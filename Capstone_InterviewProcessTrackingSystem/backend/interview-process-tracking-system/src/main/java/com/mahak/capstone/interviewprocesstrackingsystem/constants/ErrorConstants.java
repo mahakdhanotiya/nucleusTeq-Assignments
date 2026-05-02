@@ -46,6 +46,7 @@ public final class ErrorConstants {
     public static final String ORGANIZATION_REQUIRED = "Organization is required";
     public static final String DESIGNATION_REQUIRED = "Designation is required";
     public static final String MOBILE_REQUIRED = "Mobile number is required";
+    public static final String MOBILE_ALREADY_EXISTS = "Mobile number already exists";
 
     // FEEDBACK 
     public static final String INVALID_RATING = "Rating must be between 1 and 5";
