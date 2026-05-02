@@ -150,12 +150,17 @@
 		<plugin>
 		<groupId>org.jacoco</groupId>
 		<artifactId>jacoco-maven-plugin</artifactId>
-		<version>0.8.11</version>
+		<version>0.8.12</version>
 		<executions>
 			<execution>
 				<goals>
 					<goal>prepare-agent</goal>
 				</goals>
+				<configuration>
+					<includes>
+						<include>com/mahak/capstone/interviewprocesstrackingsystem/**</include>
+					</includes>
+				</configuration>
 			</execution>
 			<execution>
 				<id>report</id>
@@ -163,6 +168,18 @@
 				<goals>
 					<goal>report</goal>
 				</goals>
+				<configuration>
+					<excludes>
+						<exclude>com/mahak/capstone/interviewprocesstrackingsystem/dto/**</exclude>
+						<exclude>com/mahak/capstone/interviewprocesstrackingsystem/entity/**</exclude>
+						<exclude>com/mahak/capstone/interviewprocesstrackingsystem/config/**</exclude>
+						<exclude>com/mahak/capstone/interviewprocesstrackingsystem/exception/**</exclude>
+						<exclude>com/mahak/capstone/interviewprocesstrackingsystem/enums/**</exclude>
+						<exclude>com/mahak/capstone/interviewprocesstrackingsystem/constants/**</exclude>
+						<exclude>com/mahak/capstone/interviewprocesstrackingsystem/security/**</exclude>
+						<exclude>com/mahak/capstone/interviewprocesstrackingsystem/*Application.class</exclude>
+					</excludes>
+				</configuration>
 			</execution>
 		</executions>
 	   </plugin>
