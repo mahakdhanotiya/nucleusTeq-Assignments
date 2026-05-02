@@ -30,10 +30,12 @@ public interface CandidateRepository extends JpaRepository<CandidateProfile, Lon
     @Query("SELECT c FROM CandidateProfile c WHERE "
          + "(:jdId IS NULL OR c.jobDescription.id = :jdId) AND "
          + "(:stage IS NULL OR c.currentStage = :stage) AND "
-         + "(:status IS NULL OR c.applicationStatus = :status)")
+         + "(:status IS NULL OR c.applicationStatus = :status) AND "
+         + "(:name IS NULL OR LOWER(c.user.fullName) LIKE LOWER(CONCAT('%', :name, '%')))")
     List<CandidateProfile> findByFilters(
             @Param("jdId") Long jdId,
             @Param("stage") InterviewStage stage,
-            @Param("status") ApplicationStatus status
+            @Param("status") ApplicationStatus status,
+            @Param("name") String name
     );
 }

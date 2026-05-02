@@ -6,16 +6,26 @@ public class LoginResponseDTO {
     private String role;
     private Long userId;
     private String fullName;
+    private String mobileNumber;
     private Long profileId; // For Candidates or Panels
 
     public LoginResponseDTO() {}
 
-    public LoginResponseDTO(String token, String role, Long userId, Long profileId, String fullName) {
+    public LoginResponseDTO(String token, String role, Long userId, Long profileId, String fullName, String mobileNumber) {
         this.token = token;
         this.role = role;
         this.userId = userId;
         this.profileId = profileId;
         this.fullName = fullName;
+        this.mobileNumber = mobileNumber;
+    }
+
+    public String getMobileNumber() {
+        return mobileNumber;
+    }
+
+    public void setMobileNumber(String mobileNumber) {
+        this.mobileNumber = mobileNumber;
     }
 
     public String getFullName() {

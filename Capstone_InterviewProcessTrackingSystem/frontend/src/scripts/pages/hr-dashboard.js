@@ -43,7 +43,27 @@ function openModal(id) { document.getElementById(id).classList.add("active"); }
  * Closes a modal by removing the 'active' class.
  * @param {string} id - Modal element ID.
  */
-function closeModal(id) { document.getElementById(id).classList.remove("active"); }
+function closeModal(id) { 
+  const modal = document.getElementById(id);
+  if (!modal) return;
+  
+  modal.classList.remove("active"); 
+  
+  // Global Cleanup: Reset any forms inside the modal when it closes
+  const forms = modal.querySelectorAll("form");
+  forms.forEach(form => {
+    form.reset();
+    if (form.id) clearErrors(form.id);
+  });
+
+  // Clear any status messages (.msg elements)
+  const msgs = modal.querySelectorAll(".msg");
+  msgs.forEach(m => {
+    m.textContent = "";
+    m.className = "msg";
+    m.style.display = "none";
+  });
+}
 
 /**
  * Logs out the user and clears local storage.
@@ -222,10 +242,11 @@ async function applyFilters() {
     const jdId = document.getElementById("filterJD").value;
     const stage = document.getElementById("filterStage").value;
     const status = document.getElementById("filterStatus").value;
+    const name = document.getElementById("searchCandidates").value;
     
     try {
         toast("Searching...");
-        const data = await searchCandidates(jdId, stage, status);
+        const data = await searchCandidates(jdId, stage, status, name);
         if (data.success) {
             loadCandidates(data.data);
         } else {
@@ -238,6 +259,7 @@ async function resetFilters() {
     document.getElementById("filterJD").value = "";
     document.getElementById("filterStage").value = "";
     document.getElementById("filterStatus").value = "";
+    document.getElementById("searchCandidates").value = "";
     loadCandidates();
 }
 
@@ -515,66 +537,93 @@ async function openScheduleModal() {
     submitBtn.disabled = false;
     jobSelect.disabled = false;
 
-    // Auto-update stage and job when candidate selected
-    candSelect.onchange = (e) => {
-      const opt = e.target.options[e.target.selectedIndex];
+    // 2. Validation Logic
+    const validateSchedule = () => {
+      const candId = parseInt(candSelect.value);
+      const stage = stageSelect.value;
       
-      // Reset errors and button
       siMsg.textContent = "";
       siMsg.style.display = "none";
       submitBtn.disabled = false;
       clearErrors("scheduleForm");
 
+      if (!candId) return;
+
+      const candInterviews = cachedInterviews.filter(i => i.candidateId == candId);
+      
+      // 1. Check for Active/Pending Rounds
+      const pendingInterviews = candInterviews.filter(i => i.status !== "COMPLETED" && i.status !== "CANCELLED" && i.status !== "REJECTED");
+      if (pendingInterviews.length > 0) {
+        siMsg.textContent = `Cannot schedule: Round '${pendingInterviews[0].stage}' is still ${pendingInterviews[0].status}. Please complete it first.`;
+        siMsg.className = "msg error";
+        siMsg.style.display = "block";
+        submitBtn.disabled = true;
+        return;
+      }
+
+      // 2. Check for Stage Sequence
+      const completedStages = candInterviews.filter(i => i.status === "COMPLETED").map(i => i.stage);
+      
+      if (stage === "L2" && !completedStages.includes("L1")) {
+        siMsg.textContent = "Cannot schedule L2: L1 must be COMPLETED first.";
+        siMsg.className = "msg error";
+        siMsg.style.display = "block";
+        submitBtn.disabled = true;
+        return;
+      }
+      
+      if (stage === "HR" && !completedStages.includes("L2")) {
+        siMsg.textContent = "Cannot schedule HR: L2 must be COMPLETED first.";
+        siMsg.className = "msg error";
+        siMsg.style.display = "block";
+        submitBtn.disabled = true;
+        return;
+      }
+
+      // 3. Prevent duplicate COMPLETED stages
+      if (completedStages.includes(stage)) {
+        siMsg.textContent = `This candidate has already COMPLETED the ${stage} round.`;
+        siMsg.className = "msg error";
+        siMsg.style.display = "block";
+        submitBtn.disabled = true;
+        return;
+      }
+    };
+
+    // Auto-update stage and job when candidate selected
+    candSelect.onchange = (e) => {
+      const opt = e.target.options[e.target.selectedIndex];
+      
       if (opt && opt.value) {
-        const candId = parseInt(opt.value);
         const jobId = opt.dataset.jobid;
         const jobTitle = opt.dataset.jobtitle;
         
-        // 1. Auto-fill Stage and Job
+        // Auto-fill Stage and Job
         if (opt.dataset.stage) stageSelect.value = opt.dataset.stage;
         
         if (jobId) {
-            // Check if jobId exists in the current options
             let exists = false;
             for (let i = 0; i < jobSelect.options.length; i++) {
-                if (jobSelect.options[i].value === jobId) {
-                    exists = true;
-                    break;
-                }
+                if (jobSelect.options[i].value === jobId) { exists = true; break; }
             }
-            
             if (!exists && jobTitle) {
-                // If the job is inactive/not in list, add it dynamically so it's not empty
                 const newOpt = new Option(`${jobTitle} (J-${jobId})`, jobId);
                 jobSelect.add(newOpt);
             }
-            
             jobSelect.value = jobId;
-            jobSelect.disabled = true; // Lock it as per requirements
+            jobSelect.disabled = true;
         } else {
             jobSelect.disabled = false;
             jobSelect.value = "";
-        }
-
-        // 2. Constraint: Check for pending feedback or ongoing interviews
-        const pendingInterviews = cachedInterviews.filter(i => 
-          i.candidateId === candId && 
-          i.status !== INTERVIEW_STATUS.COMPLETED && 
-          i.status !== INTERVIEW_STATUS.CANCELLED && 
-          i.status !== INTERVIEW_STATUS.NO_SHOW
-        );
-
-        if (pendingInterviews.length > 0) {
-          siMsg.textContent = "Cannot schedule: Previous round feedback is pending or an interview is already active.";
-          siMsg.className = "msg error";
-          siMsg.style.display = "block";
-          submitBtn.disabled = true;
         }
       } else {
         jobSelect.value = "";
         jobSelect.disabled = false;
       }
+      validateSchedule();
     };
+
+    stageSelect.onchange = validateSchedule;
 
     openModal("scheduleModal");
   } catch(e) { 
@@ -614,7 +663,12 @@ async function scheduleInterview(e) {
   try {
     const data = await scheduleInterviewAction(body);
     if (data.success) { toast("Interview scheduled!"); closeModal("scheduleModal"); loadInterviews(); }
-    else { document.getElementById("siMsg").className="msg error"; document.getElementById("siMsg").textContent=data.message||"Failed"; }
+    else { 
+      const msgEl = document.getElementById("siMsg");
+      msgEl.className = "msg error"; 
+      msgEl.textContent = data.message || "Failed"; 
+      msgEl.style.display = "block";
+    }
   } catch(e) { toast("Server error","error"); }
 }
 
@@ -710,11 +764,17 @@ window.handleHRFeedback = async function(e) {
   e.preventDefault();
   const intId = parseInt(document.getElementById("hfIntId").value);
   const status = document.getElementById("hfStatus").value;
+  const rating = parseInt(document.getElementById("hfRating").value);
+
+  if (isNaN(rating) || rating < 1 || rating > 5) {
+    toast("Rating must be between 1 and 5", "error");
+    return;
+  }
   
   const body = {
     interviewId: intId,
     panelId: null, // HR feedback
-    rating: parseInt(document.getElementById("hfRating").value),
+    rating: rating,
     status: status,
     comments: document.getElementById("hfComments").value,
     strengths: "N/A (HR Round)",
@@ -767,7 +827,7 @@ window.viewAssignmentDetails = function(jsonStr) {
 };
 
 async function deleteInterview(id) {
-  if (!confirm("Delete interview I-"+id+"?")) return;
+  if (!confirm("Are you sure you want to DELETE this interview record permanently? This action cannot be undone and should only be used for correcting mistakes.")) return;
   try {
     const data = await deleteInterviewAction(id);
     if (data.success) { toast("Interview deleted"); loadInterviews(); } else toast(data.message||"Failed","error");
@@ -803,14 +863,37 @@ window.openEditPanelModal = function(id) {
 
 window.handlePanelSubmit = async function(e) {
   e.preventDefault();
+  clearErrors("panelForm");
+  
   const id = document.getElementById("pId").value;
+  const fullName = document.getElementById("pName").value.trim();
+  const mobileNumber = document.getElementById("pMobile").value.trim();
+  
   const body = {
-    fullName: document.getElementById("pName").value.trim(),
+    fullName: fullName,
     email: document.getElementById("pEmail").value.trim(),
     organization: document.getElementById("pOrg").value.trim(),
     designation: document.getElementById("pDesig").value.trim(),
-    mobileNumber: document.getElementById("pMobile").value.trim()
+    mobileNumber: mobileNumber
   };
+
+  let hasError = false;
+
+  // Name Validation: Only alphabets and spaces
+  const nameRegex = /^[a-zA-Z\s.-]+$/;
+  if (!nameRegex.test(fullName)) {
+    showFieldError("pName", "Name should contain only alphabets and spaces.");
+    hasError = true;
+  }
+
+  const mobileRegex = /^[0-9]{10}$/;
+  if (!mobileRegex.test(mobileNumber)) {
+    showFieldError("pMobile", "Mobile number must be exactly 10 digits.");
+    hasError = true;
+  }
+
+  if (hasError) return;
+
   try {
     const data = id ? await updatePanelAction(id, body) : await createPanelAction(body);
     if (data.success) {
@@ -847,6 +930,12 @@ async function submitFeedback(e) {
     weaknesses: document.getElementById("gfWeaknesses").value,
     areasCovered: document.getElementById("gfAreas").value
   };
+
+  if (isNaN(body.rating) || body.rating < 1 || body.rating > 5) {
+    toast("Rating must be between 1 and 5", "error");
+    return;
+  }
+
   try {
     const data = await submitFeedbackAction(body);
     if (data.success) {
@@ -881,6 +970,27 @@ document.getElementById("searchInterviews")?.addEventListener("input", (e) => {
         (i.stage || '').toLowerCase().includes(q) ||
         (i.status || '').toLowerCase().includes(q) ||
         i.id.toString().includes(q)
+    );
+    Renderers.renderInterviews(filtered);
+});
+
+document.getElementById("searchJobs")?.addEventListener("input", (e) => {
+    const q = e.target.value.toLowerCase();
+    const filtered = cachedJobs.filter(j => 
+        (j.title || '').toLowerCase().includes(q) || 
+        (j.location || '').toLowerCase().includes(q) ||
+        (j.skills || '').toLowerCase().includes(q)
+    );
+    Renderers.renderJobs(filtered);
+});
+
+document.getElementById("searchInterviews")?.addEventListener("input", (e) => {
+    const q = e.target.value.toLowerCase();
+    const filtered = cachedInterviews.filter(i => 
+        (i.candidateName || '').toLowerCase().includes(q) || 
+        (i.jobTitle || '').toLowerCase().includes(q) ||
+        (i.stage || '').toLowerCase().includes(q) ||
+        (i.status || '').toLowerCase().includes(q)
     );
     Renderers.renderInterviews(filtered);
 });

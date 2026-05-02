@@ -40,4 +40,16 @@ public interface EmailService {
 
     /** Send password setup link email after registration */
     void sendPasswordSetupEmail(String toEmail, String fullName, String setupUrl);
+
+    /** Notify candidate of final selection */
+    void sendSelectionEmail(String toEmail, String candidateName, String jobTitle);
+
+    /** Notify candidate of rejection */
+    void sendRejectionEmail(String toEmail, String candidateName, String jobTitle);
+
+    /** Notify candidate and panelist of interview cancellation */
+    void sendCancellationEmail(String toEmail, String recipientName, String stage, String dateTime, boolean isPanelist);
+
+    /** Notify candidate and panelist of interview rescheduling */
+    void sendRescheduledEmail(String toEmail, String recipientName, String stage, String newDateTime, boolean isPanelist);
 }

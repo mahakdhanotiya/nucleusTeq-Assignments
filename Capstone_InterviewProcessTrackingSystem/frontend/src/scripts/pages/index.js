@@ -1,5 +1,36 @@
 import { SITE_CONFIG } from "../config/site-config.js";
 import { fetchHandler } from "../lib/handlers/fetch.js";
+import { getMyProfile } from "../actions/user.js";
+
+/**
+ * Initializes UI elements based on authentication status.
+ * Hides Sign In/Up buttons and shows Dashboard link if token exists.
+ */
+function initAuthUI() {
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+    
+    const signInBtn = document.getElementById("navSignIn");
+    const signUpBtn = document.getElementById("navSignUp");
+    const heroSignUp = document.getElementById("heroSignUp");
+    const dashboardBtn = document.getElementById("navDashboard");
+
+    if (token) {
+        if (signInBtn) signInBtn.style.display = "none";
+        if (signUpBtn) signUpBtn.style.display = "none";
+        if (heroSignUp) heroSignUp.style.display = "none";
+        if (dashboardBtn) {
+            dashboardBtn.style.display = "inline-block";
+            // Map role to correct dashboard URL
+            let dashboardUrl = "sign-in/index.html"; // Default fallback
+            if (role === "HR") dashboardUrl = "hr-dashboard.html";
+            else if (role === "PANEL") dashboardUrl = "panel-dashboard.html";
+            else if (role === "CANDIDATE") dashboardUrl = "dashboard.html";
+            
+            dashboardBtn.href = dashboardUrl;
+        }
+    }
+}
 
 /**
  * Fetches all active job descriptions and renders them on the page.
@@ -53,20 +84,49 @@ async function loadJobs() {
 
 /**
  * Redirects the user to the application page for a specific job.
- * If not logged in, redirects to the sign-in page first.
+ * Handles role-based redirects and duplicate application checks.
  * 
  * @param {number} jobId - The ID of the job being applied for.
  * @param {string} jobTitle - The title of the job.
  */
-window.applyForJob = function(jobId, jobTitle) {
+window.applyForJob = async function(jobId, jobTitle) {
   const token = localStorage.getItem("token");
-  const url = `candidate-profile.html?jobId=${jobId}&jobTitle=${encodeURIComponent(jobTitle)}`;
+  const role = localStorage.getItem("role");
+  
   if (!token) {
-    localStorage.setItem("redirectAfterLogin", url);
+    // New User: Redirect to login without remembering the job (Dashboard first)
     window.location.href = `sign-in/index.html`;
-  } else {
-    window.location.href = url;
+    return;
+  }
+
+  if (role === "HR") {
+    window.location.href = `hr-dashboard.html`;
+    return;
+  }
+  
+  if (role === "PANEL") {
+    window.location.href = `panel-dashboard.html`;
+    return;
+  }
+
+  // Candidate: Check if they already have an application
+  try {
+      const res = await getMyProfile();
+      if (res.success && res.data) {
+          // Profile exists, so they already applied for something
+          alert("You already have an active job application.");
+          window.location.href = "dashboard.html";
+      } else {
+          // No profile yet, proceed to application form
+          window.location.href = `candidate-profile.html?jobId=${jobId}&jobTitle=${encodeURIComponent(jobTitle)}`;
+      }
+  } catch (e) {
+      // If profile not found (404), they can apply
+      window.location.href = `candidate-profile.html?jobId=${jobId}&jobTitle=${encodeURIComponent(jobTitle)}`;
   }
 };
 
-document.addEventListener("DOMContentLoaded", loadJobs);
+document.addEventListener("DOMContentLoaded", () => {
+    initAuthUI();
+    loadJobs();
+});

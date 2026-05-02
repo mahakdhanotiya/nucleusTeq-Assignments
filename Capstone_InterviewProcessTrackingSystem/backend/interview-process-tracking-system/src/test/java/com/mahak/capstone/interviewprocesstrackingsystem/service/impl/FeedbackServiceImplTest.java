@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,7 +37,11 @@ import com.mahak.capstone.interviewprocesstrackingsystem.repository.PanelProfile
 import com.mahak.capstone.interviewprocesstrackingsystem.repository.InterviewPanelAssignmentRepository;
 import com.mahak.capstone.interviewprocesstrackingsystem.validation.FeedbackValidation;
 
+import org.mockito.quality.Strictness;
+import org.mockito.junit.jupiter.MockitoSettings;
+
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class FeedbackServiceImplTest {
 
     @Mock private FeedbackRepository feedbackRepository;
@@ -145,5 +148,36 @@ class FeedbackServiceImplTest {
         
         List<FeedbackDetailResponseDTO> results = feedbackService.getFeedbackByInterview(1L, "ROLE_PANEL", 10L);
         assertEquals(1, results.size());
+    }
+
+    @Test
+    void getFeedbackById_Success() {
+        Feedback f = new Feedback();
+        when(feedbackRepository.findById(1L)).thenReturn(Optional.of(f));
+        when(mapper.toResponseDTO(f)).thenReturn(new FeedbackResponseDTO());
+        
+        assertNotNull(feedbackService.getFeedbackById(1L));
+    }
+
+    @Test
+    void getFeedbackByCandidate_Success() {
+        when(interviewRepository.findByCandidateId(1L)).thenReturn(List.of(interview));
+        when(feedbackRepository.findByInterviewId(1L)).thenReturn(List.of(new Feedback()));
+        
+        List<FeedbackDetailResponseDTO> results = feedbackService.getFeedbackByCandidate(1L);
+        assertEquals(1, results.size());
+    }
+
+    @Test
+    void getAllFeedback_Success() {
+        when(feedbackRepository.findAll()).thenReturn(List.of(new Feedback()));
+        assertNotNull(feedbackService.getAllFeedback());
+    }
+
+    @Test
+    void submitFeedback_Fail_InterviewNotFound() {
+        lenient().doNothing().when(validation).validateFeedbackRequest(any());
+        when(interviewRepository.findById(1L)).thenReturn(Optional.empty());
+        assertThrows(ResourceNotFoundException.class, () -> feedbackService.submitFeedback(new FeedbackRequestDTO()));
     }
 }

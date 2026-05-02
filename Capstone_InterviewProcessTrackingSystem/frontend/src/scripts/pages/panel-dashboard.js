@@ -1,6 +1,6 @@
 import { getAllInterviews } from "../actions/interview.js";
 import { submitFeedback as submitFeedbackAction, getFeedbackByInterview } from "../actions/feedback.js";
-import { renderSidebarProfile, showFieldError, clearErrors, getTrimmedValues, initFormCleanup } from "../lib/utils/ui.js";
+import { renderSidebarProfile, showFieldError, clearErrors, getTrimmedValues, initFormCleanup, getResumeUrl } from "../lib/utils/ui.js";
 
 const token = localStorage.getItem("token");
 if (!token || localStorage.getItem("role") !== "PANEL") {
@@ -32,7 +32,18 @@ window.logout = function() {
 }
 
 window.openModal = function(id) { document.getElementById(id).classList.add("active"); }
-window.closeModal = function(id) { document.getElementById(id).classList.remove("active"); }
+window.closeModal = function(id) { 
+  const modal = document.getElementById(id);
+  if (!modal) return;
+  modal.classList.remove("active"); 
+  
+  // Cleanup any forms inside
+  const forms = modal.querySelectorAll("form");
+  forms.forEach(form => {
+    form.reset();
+    if (form.id) clearErrors(form.id);
+  });
+}
 
 /**
  * Switches the dashboard to a specific section.
@@ -97,7 +108,7 @@ function renderAssigned(list) {
         <td><strong>I-${i.id}</strong></td>
         <td><strong>${i.candidateName || 'N/A'}</strong><br>
             <small style="color:#64748b">C-${i.candidateId}</small><br>
-            <a href="${i.candidateResumeUrl}" target="_blank" style="font-size:11px;color:#4f46e5;text-decoration:none;font-weight:600">📄 View Resume</a>
+            <a href="${getResumeUrl(i.candidateResumeUrl)}" target="_blank" style="font-size:11px;color:#4f46e5;text-decoration:none;font-weight:600">📄 View Resume</a>
         </td>
         <td>${i.jobTitle || 'N/A'}</td>
         <td><span class="badge badge-info">${i.stage || 'N/A'}</span></td>
@@ -143,7 +154,13 @@ window.submitFeedback = async function(e) {
 
   let hasError = false;
   if (!vals.fbRating) { showFieldError("fbRating", "Rating is required"); hasError = true; }
-  else if (parseInt(vals.fbRating) < 1 || parseInt(vals.fbRating) > 5) { showFieldError("fbRating", "Rating must be 1-5"); hasError = true; }
+  else {
+    const rating = parseInt(vals.fbRating);
+    if (isNaN(rating) || rating < 1 || rating > 5) { 
+      showFieldError("fbRating", "Rating must be 1-5"); 
+      hasError = true; 
+    }
+  }
   
   if (!vals.fbComments) { showFieldError("fbComments", "Comments are required"); hasError = true; }
 

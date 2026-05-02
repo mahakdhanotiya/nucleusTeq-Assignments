@@ -65,7 +65,10 @@ public class FeedbackController {
 
         logger.info("Fetching feedback for interviewId: {}", interviewId);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String role = auth.getAuthorities().stream().findFirst().get().getAuthority();
+        String role = "USER";
+        if (auth != null && !auth.getAuthorities().isEmpty()) {
+            role = auth.getAuthorities().iterator().next().getAuthority();
+        }
         
         List<FeedbackDetailResponseDTO> list = feedbackService.getFeedbackByInterview(interviewId, role, requesterPanelId);
         return new ApiResponseDTO<>(true, ApiConstants.FEEDBACK_FETCHED, list);

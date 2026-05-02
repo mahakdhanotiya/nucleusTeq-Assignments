@@ -12,5 +12,6 @@ public interface PanelProfileRepository extends JpaRepository<PanelProfile, Long
     Optional<PanelProfile> findByUserId(Long userId);
     Optional<PanelProfile> findByUserEmail(String email);
     boolean existsByUserId(Long userId);
+    boolean existsByMobileNumber(String mobileNumber);
 
 }

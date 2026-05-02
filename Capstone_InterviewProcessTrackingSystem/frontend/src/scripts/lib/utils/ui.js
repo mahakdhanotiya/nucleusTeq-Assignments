@@ -1,3 +1,18 @@
+import { SITE_CONFIG } from "../../config/site-config.js";
+
+/**
+ * Constructs a full URL for a resume, prepending the API URL if necessary.
+ * @param {string} url - The relative or absolute resume URL.
+ * @returns {string|null} The absolute URL or null.
+ */
+export function getResumeUrl(url) {
+    if (!url) return null;
+    if (url.startsWith('http')) return url;
+    const baseUrl = SITE_CONFIG.apiUrl;
+    const normalizedUrl = url.startsWith('/') ? url : `/${url}`;
+    return `${baseUrl}${normalizedUrl}`;
+}
+
 /**
  * Renders the user profile section in the sidebar.
  * @param {string} containerId - The ID of the container element.
@@ -43,16 +58,25 @@ export function showFieldError(inputId, message) {
     if (!input) return;
 
     // Add error class to input
-    input.classList.add('input-error');
+    input.classList.add('error-field');
 
-    // Remove existing error text if any
-    let errorEl = input.parentNode.querySelector('.error-text');
+    // Check for pre-existing error span (e.g., id="err-inputId")
+    let errorEl = document.getElementById(`err-${inputId}`);
+    
+    // If no specific span by ID, check for .field-error in the parent
+    if (!errorEl) {
+        errorEl = input.parentNode.querySelector('.field-error');
+    }
+
+    // If still no span, create one dynamically (legacy support)
     if (!errorEl) {
         errorEl = document.createElement('span');
-        errorEl.className = 'error-text';
+        errorEl.className = 'field-error';
         input.parentNode.appendChild(errorEl);
     }
+    
     errorEl.textContent = message;
+    errorEl.style.display = 'block';
 }
 
 /**
@@ -64,10 +88,13 @@ export function clearErrors(containerId) {
     if (!container) return;
 
     // Remove error classes from inputs
-    container.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+    container.querySelectorAll('.error-field').forEach(el => el.classList.remove('error-field'));
     
-    // Remove error text elements
-    container.querySelectorAll('.error-text').forEach(el => el.remove());
+    // Clear and hide all error spans
+    container.querySelectorAll('.field-error').forEach(el => {
+        el.textContent = '';
+        // el.style.display = 'none'; // Optional: keep hidden if empty
+    });
 }
 
 /**

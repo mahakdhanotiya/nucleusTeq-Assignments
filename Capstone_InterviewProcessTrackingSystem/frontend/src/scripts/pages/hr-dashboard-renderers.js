@@ -4,6 +4,7 @@
  */
 
 import { APPLICATION_STATUS } from "../constants/index.js";
+import { getResumeUrl } from "../lib/utils/ui.js";
 
 /**
  * Renders the Jobs grid.
@@ -96,7 +97,10 @@ export function renderInterviews(list) {
 
       return `<tr>
         <td><strong>I-${i.id}</strong></td>
-        <td><strong>${i.candidateName || 'N/A'}</strong></td>
+        <td>
+            <strong>${i.candidateName || 'N/A'}</strong><br>
+            <small style="color:#64748b">${i.candidateEmail || 'N/A'}</small>
+        </td>
         <td><span class="badge badge-info">${i.stage || 'N/A'}</span></td>
         <td>${i.interviewDateTime ? new Date(i.interviewDateTime).toLocaleString() : 'TBD'}</td>
         <td><span class="badge ${statusBadge}">${i.status || 'SCHEDULED'}</span></td>
@@ -107,11 +111,12 @@ export function renderInterviews(list) {
             <div class="dropdown-content">
               ${(i.status !== 'COMPLETED' && i.status !== 'CANCELLED') ? 
                 `<button onclick="openAssignPanel(${i.id}, '${i.stage}')">Assign Panel</button>
-                 <button onclick="openUpdateStatus(${i.id})">Update Status</button>` : ''}
+                 <button onclick="openUpdateStatus(${i.id})">Update Status</button>
+                 <button onclick="openEditInterview(${i.id})">Edit Interview</button>` : ''}
               ${(i.status === 'COMPLETED' || i.status === 'EVALUATED') ? 
                 `<button onclick="viewFeedback(${i.id})">View Feedback</button>` : ''}
               ${canGiveFeedback ? `<button onclick="openGiveFeedback(${i.id}, '${i.candidateName}', ${i.candidateId})">Give Feedback</button>` : ''}
-              <button style="color:var(--danger)" onclick="deleteInterview(${i.id})">Cancel Interview</button>
+              ${i.status !== 'COMPLETED' ? `<button style="color:var(--danger)" onclick="deleteInterview(${i.id})">Delete Interview</button>` : ''}
             </div>
           </div></div>
         </td>
@@ -134,8 +139,13 @@ export function renderPanels(list) {
         <td>${p.designation}</td>
         <td>${p.mobileNumber}</td>
         <td>
-            <button class="btn btn-sm btn-outline" onclick="openEditPanelModal(${p.id})">Edit</button>
-            <button class="btn btn-sm btn-danger" onclick="deletePanelMember(${p.id})">Delete</button>
+          <div class="actions-cell"><div class="dropdown">
+            <button class="btn-icon"><svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg></button>
+            <div class="dropdown-content">
+              <button onclick="openEditPanelModal(${p.id})">Edit Details</button>
+              <button style="color: var(--danger)" onclick="deletePanelMember(${p.id})">Delete Member</button>
+            </div>
+          </div></div>
         </td>
     </tr>`).join("");
 }
@@ -159,6 +169,7 @@ export function renderFeedbackCenter(list) {
         <div class="eval-header">
           <div class="eval-candidate-info">
             <h3>${f.candidateName || 'N/A'}</h3>
+            <small style="color:#64748b; display:block; margin-top:-4px; margin-bottom:4px;">${f.candidateEmail || 'N/A'}</small>
             <p>ID: C-${f.candidateId}</p>
           </div>
           <div class="eval-meta">
@@ -263,7 +274,10 @@ export function renderCandidates(list) {
 
       return `<tr>
         <td><strong>C-${c.id}</strong></td>
-        <td>${c.fullName || 'N/A'}</td>
+        <td>
+            <strong>${c.fullName || 'N/A'}</strong><br>
+            <small style="color:#64748b">${c.email || 'N/A'}</small>
+        </td>
         <td>${c.jobTitle || 'N/A'}</td>
         <td><span class="badge badge-info">${c.currentStage || 'N/A'}</span></td>
         <td><span class="badge ${statusClass}">${statusText || 'N/A'}</span></td>
@@ -273,7 +287,7 @@ export function renderCandidates(list) {
             <div class="dropdown-content">
               <button onclick="openStageModal(${c.id})">Progress Stage</button>
               <button onclick="viewCandidateFeedback(${c.id})">View All Feedbacks</button>
-              ${c.resumeUrl ? `<a href="${c.resumeUrl}" target="_blank">View Resume</a>` : ''}
+              ${c.resumeUrl ? `<a href="${getResumeUrl(c.resumeUrl)}" target="_blank">View Resume</a>` : ''}
               <button style="color: var(--danger)" onclick="deleteCandidate(${c.id})">Delete Candidate</button>
             </div>
           </div></div>

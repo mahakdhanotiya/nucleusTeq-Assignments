@@ -58,6 +58,7 @@ public class FeedbackMapper {
                 dto.setCandidateId(feedback.getInterview().getCandidate().getId());
                 if (feedback.getInterview().getCandidate().getUser() != null) {
                     dto.setCandidateName(feedback.getInterview().getCandidate().getUser().getFullName());
+                    dto.setCandidateEmail(feedback.getInterview().getCandidate().getUser().getEmail());
                 }
             }
         }

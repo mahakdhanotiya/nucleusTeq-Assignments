@@ -17,6 +17,7 @@ import com.mahak.capstone.interviewprocesstrackingsystem.entity.User;
 import com.mahak.capstone.interviewprocesstrackingsystem.enums.Role;
 import com.mahak.capstone.interviewprocesstrackingsystem.exception.InvalidRequestException;
 import com.mahak.capstone.interviewprocesstrackingsystem.exception.ResourceNotFoundException;
+import com.mahak.capstone.interviewprocesstrackingsystem.validation.ValidationUtils;
 import com.mahak.capstone.interviewprocesstrackingsystem.repository.PasswordTokenRepository;
 import com.mahak.capstone.interviewprocesstrackingsystem.repository.UserRepository;
 import com.mahak.capstone.interviewprocesstrackingsystem.repository.CandidateRepository;
@@ -77,6 +78,9 @@ public class AuthServiceImpl implements AuthService {
             logger.error("Registration failed - Email already exists: {}", dto.getEmail());
             throw new InvalidRequestException(ErrorConstants.USER_ALREADY_EXISTS);
         }
+        
+        // Ensure name contains no numbers
+        ValidationUtils.validateName(dto.getFullName(), "Full name");
 
         User user = new User();
         user.setFullName(dto.getFullName().trim());
@@ -162,7 +166,7 @@ public class AuthServiceImpl implements AuthService {
                     .map(com.mahak.capstone.interviewprocesstrackingsystem.entity.CandidateProfile::getId).orElse(null);
         }
 
-        return new LoginResponseDTO(token, role, user.getId(), profileId, user.getFullName());
+        return new LoginResponseDTO(token, role, user.getId(), profileId, user.getFullName(), user.getMobileNumber());
     }
 
     @Override

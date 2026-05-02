@@ -183,4 +183,105 @@ public class EmailServiceImpl implements EmailService {
             logger.error("Failed to send setup email: {}", e.getMessage());
         }
     }
+
+    @Override
+    @Async
+    public void sendSelectionEmail(String toEmail, String candidateName, String jobTitle) {
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            helper.setFrom(fromEmail);
+            helper.setTo(toEmail);
+            helper.setSubject(appName + " | Congratulations! Selection Update");
+
+            String content = "<p>Dear <strong>" + candidateName + "</strong>,</p>" +
+                    "<p>We are absolutely thrilled to inform you that you have been <strong>SELECTED</strong> for the <strong>" + jobTitle + "</strong> position at " + appName + "!</p>" +
+                    "<p>Your performance throughout the interview rounds was exceptional, and we believe you will be a fantastic addition to our team.</p>" +
+                    "<p>Our HR team will reach out to you shortly with the formal offer letter and next steps.</p>" +
+                    "<p>Congratulations once again!</p>";
+
+            helper.setText(buildHtml("Selection Update", content), true);
+            mailSender.send(mimeMessage);
+        } catch (Exception e) {
+            logger.error("Failed to send selection email: {}", e.getMessage());
+        }
+    }
+
+    @Override
+    @Async
+    public void sendRejectionEmail(String toEmail, String candidateName, String jobTitle) {
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            helper.setFrom(fromEmail);
+            helper.setTo(toEmail);
+            helper.setSubject(appName + " | Application Update - " + jobTitle);
+
+            String content = "<p>Dear <strong>" + candidateName + "</strong>,</p>" +
+                    "<p>Thank you for giving us the opportunity to consider you for the <strong>" + jobTitle + "</strong> position.</p>" +
+                    "<p>While we were impressed with your background, we have decided to move forward with other candidates who more closely match our current requirements.</p>" +
+                    "<p>We appreciate the time you invested in our recruitment process and wish you the very best in your future endeavors.</p>";
+
+            helper.setText(buildHtml("Application Update", content), true);
+            mailSender.send(mimeMessage);
+        } catch (Exception e) {
+            logger.error("Failed to send rejection email: {}", e.getMessage());
+        }
+    }
+
+    @Override
+    @Async
+    public void sendCancellationEmail(String toEmail, String recipientName, String stage, String dateTime, boolean isPanelist) {
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            helper.setFrom(fromEmail);
+            helper.setTo(toEmail);
+            helper.setSubject(appName + " | Interview Cancellation: " + stage + " Round");
+
+            String intro = isPanelist ? "Hello <strong>" + recipientName + "</strong>," : "Dear <strong>" + recipientName + "</strong>,";
+            String reason = isPanelist ? "The interview you were assigned to has been cancelled." : "We regret to inform you that your upcoming interview has been cancelled.";
+
+            String content = "<p>" + intro + "</p>" +
+                    "<p>" + reason + "</p>" +
+                    "<div style='background: #fee2e2; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #fecaca;'>" +
+                    "  <p style='margin: 5px 0; color: #991b1b;'><strong>Cancelled Round:</strong> " + stage + "</p>" +
+                    "  <p style='margin: 5px 0; color: #991b1b;'><strong>Original Time:</strong> " + dateTime + "</p>" +
+                    "</div>" +
+                    "<p>No further action is required from your side at this time. We apologize for any inconvenience caused.</p>";
+
+            helper.setText(buildHtml("Interview Cancelled", content), true);
+            mailSender.send(mimeMessage);
+        } catch (Exception e) {
+            logger.error("Failed to send cancellation email: {}", e.getMessage());
+        }
+    }
+
+    @Override
+    @Async
+    public void sendRescheduledEmail(String toEmail, String recipientName, String stage, String newDateTime, boolean isPanelist) {
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            helper.setFrom(fromEmail);
+            helper.setTo(toEmail);
+            helper.setSubject(appName + " | Interview Rescheduled: " + stage + " Round");
+
+            String intro = isPanelist ? "Hello <strong>" + recipientName + "</strong>," : "Dear <strong>" + recipientName + "</strong>,";
+            
+            String content = "<p>" + intro + "</p>" +
+                    "<p>Your upcoming interview round has been <strong>RESCHEDULED</strong> to a new time.</p>" +
+                    "<div style='background: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #bae6fd;'>" +
+                    "  <p style='margin: 5px 0; color: #0369a1;'><strong>Round:</strong> " + stage + "</p>" +
+                    "  <p style='margin: 5px 0; color: #0369a1;'><strong>New Date & Time:</strong> " + newDateTime + "</p>" +
+                    "</div>" +
+                    "<p>Please update your calendar accordingly. We look forward to your participation!</p>";
+
+            helper.setText(buildHtml("Interview Rescheduled", content), true);
+            mailSender.send(mimeMessage);
+            logger.info("Rescheduled email sent to: {}", toEmail);
+        } catch (Exception e) {
+            logger.error("Failed to send rescheduling email: {}", e.getMessage());
+        }
+    }
 }

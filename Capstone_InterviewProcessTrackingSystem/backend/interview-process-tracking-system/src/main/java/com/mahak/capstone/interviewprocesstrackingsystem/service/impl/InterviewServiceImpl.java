@@ -120,6 +120,12 @@ public class InterviewServiceImpl implements InterviewService {
                     return new ResourceNotFoundException(ErrorConstants.JD_NOT_FOUND);
                 });
 
+        // VALIDATION: Ensure the selected JD matches the candidate's applied job
+        if (candidate.getJobDescription() != null && !candidate.getJobDescription().getId().equals(jd.getId())) {
+            throw new InvalidRequestException("Candidate is applied for '" + candidate.getJobDescription().getTitle() + 
+                "'. You cannot schedule an interview for a different job.");
+        }
+
         Interview interview = interviewMapper.toEntity(dto, candidate, jd);
         
         // SYNC: Automatically update candidate's current stage and status to match the scheduled interview round
@@ -145,13 +151,29 @@ public class InterviewServiceImpl implements InterviewService {
     }
 
     private InterviewResponseDTO enrichInterviewDTO(InterviewResponseDTO dto) {
+        dto.setJobTitle("N/A"); // Default
+        
         // Fetch the actual interview entity to get candidate details easily
         Interview interview = interviewRepository.findById(dto.getId()).orElse(null);
-        if (interview != null && interview.getCandidate() != null) {
-            dto.setCandidateId(interview.getCandidate().getId());
-            dto.setCandidateCurrentStage(interview.getCandidate().getCurrentStage().name());
-            dto.setCandidateCurrentStatus(interview.getCandidate().getApplicationStatus().name());
-            dto.setCandidateResumeUrl(interview.getCandidate().getResumeUrl());
+        if (interview != null) {
+            // First check direct JD link
+            if (interview.getJobDescription() != null) {
+                dto.setJobTitle(interview.getJobDescription().getTitle());
+            }
+
+            if (interview.getCandidate() != null) {
+                dto.setCandidateId(interview.getCandidate().getId());
+                // Override with candidate's applied job if direct link is missing
+                if (dto.getJobTitle().equals("N/A") && interview.getCandidate().getJobDescription() != null) {
+                    dto.setJobTitle(interview.getCandidate().getJobDescription().getTitle());
+                }
+                dto.setCandidateCurrentStage(interview.getCandidate().getCurrentStage().name());
+                dto.setCandidateCurrentStatus(interview.getCandidate().getApplicationStatus().name());
+                dto.setCandidateResumeUrl(interview.getCandidate().getResumeUrl());
+                if (interview.getCandidate().getUser() != null) {
+                    dto.setCandidateEmail(interview.getCandidate().getUser().getEmail());
+                }
+            }
         }
 
         // Fetch assignments
@@ -306,6 +328,7 @@ public List<InterviewResponseDTO> getAllInterviews() {
         // 1. Handling Rejection (Can happen anytime)
         if ("REJECTED".equalsIgnoreCase(newStageStr)) {
             candidate.setApplicationStatus(com.mahak.capstone.interviewprocesstrackingsystem.enums.ApplicationStatus.REJECTED);
+            emailService.sendRejectionEmail(candidate.getUser().getEmail(), candidate.getUser().getFullName(), candidate.getJobDescription().getTitle());
         } 
         // 2. Handling Selection (Only after HR)
         else if ("SELECTED".equalsIgnoreCase(newStageStr)) {
@@ -313,6 +336,7 @@ public List<InterviewResponseDTO> getAllInterviews() {
                 throw new InvalidRequestException("Candidate must be in HR stage before being SELECTED");
             }
             candidate.setApplicationStatus(com.mahak.capstone.interviewprocesstrackingsystem.enums.ApplicationStatus.SELECTED);
+            emailService.sendSelectionEmail(candidate.getUser().getEmail(), candidate.getUser().getFullName(), candidate.getJobDescription().getTitle());
         }
         // 3. Handling Stage Progression
         else {
@@ -404,14 +428,43 @@ public List<InterviewResponseDTO> getAllInterviews() {
         Interview interview = interviewRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorConstants.INTERVIEW_NOT_FOUND));
 
-        if (dto.getInterviewDateTime() != null) {
+        boolean dateChanged = false;
+        if (dto.getInterviewDateTime() != null && !dto.getInterviewDateTime().equals(interview.getInterviewDateTime())) {
             interview.setInterviewDateTime(dto.getInterviewDateTime());
+            dateChanged = true;
         }
         if (dto.getFocusArea() != null && !dto.getFocusArea().isBlank()) {
             interview.setFocusArea(dto.getFocusArea());
         }
 
         interview = interviewRepository.save(interview);
+        
+        if (dateChanged) {
+            String newTime = interview.getInterviewDateTime().format(DATE_FMT);
+            String stage = interview.getStage().name();
+            
+            // Notify Candidate
+            emailService.sendRescheduledEmail(
+                interview.getCandidate().getUser().getEmail(),
+                interview.getCandidate().getUser().getFullName(),
+                stage,
+                newTime,
+                false
+            );
+            
+            // Notify Panelists
+            List<InterviewPanelAssignment> assignments = assignmentRepository.findByInterviewId(id);
+            for (InterviewPanelAssignment ass : assignments) {
+                emailService.sendRescheduledEmail(
+                    ass.getPanel().getUser().getEmail(),
+                    ass.getPanel().getUser().getFullName(),
+                    stage,
+                    newTime,
+                    true
+                );
+            }
+        }
+
         logger.info("Interview updated successfully: {}", id);
         return enrichInterviewDTO(interviewMapper.toResponseDTO(interview));
     }
@@ -445,6 +498,29 @@ public List<InterviewResponseDTO> getAllInterviews() {
         
         interview.setStatus(status);
         interviewRepository.save(interview);
+        
+        if (status == com.mahak.capstone.interviewprocesstrackingsystem.enums.InterviewStatus.CANCELLED) {
+            // Notify Candidate
+            emailService.sendCancellationEmail(
+                interview.getCandidate().getUser().getEmail(),
+                interview.getCandidate().getUser().getFullName(),
+                interview.getStage().name(),
+                interview.getInterviewDateTime().format(DATE_FMT),
+                false
+            );
+
+            // Notify Panelists
+            List<InterviewPanelAssignment> assignments = assignmentRepository.findByInterviewId(id);
+            for (InterviewPanelAssignment assignment : assignments) {
+                emailService.sendCancellationEmail(
+                    assignment.getPanel().getUser().getEmail(),
+                    assignment.getPanel().getUser().getFullName(),
+                    interview.getStage().name(),
+                    interview.getInterviewDateTime().format(DATE_FMT),
+                    true
+                );
+            }
+        }
         logger.info("Status updated successfully for interviewId: {}", id);
     }
 }

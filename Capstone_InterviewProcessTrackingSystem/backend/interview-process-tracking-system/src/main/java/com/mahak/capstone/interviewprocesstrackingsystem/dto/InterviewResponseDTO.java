@@ -24,6 +24,7 @@ public class InterviewResponseDTO {
     private List<String> assignedPanelFocusAreas = new ArrayList<>();
     private List<Long> feedbackProvidedBy = new ArrayList<>(); // IDs of panels who gave feedback, null for HR
     private String candidateResumeUrl;
+    private String candidateEmail;
 
     // Getters & Setters
 
@@ -136,4 +137,7 @@ public class InterviewResponseDTO {
 
     public String getCandidateResumeUrl() { return candidateResumeUrl; }
     public void setCandidateResumeUrl(String candidateResumeUrl) { this.candidateResumeUrl = candidateResumeUrl; }
+
+    public String getCandidateEmail() { return candidateEmail; }
+    public void setCandidateEmail(String candidateEmail) { this.candidateEmail = candidateEmail; }
 }

@@ -12,6 +12,7 @@ public class FeedbackResponseDTO {
     private String interviewStage;
     private Long candidateId;
     private String candidateName;
+    private String candidateEmail;
     private Integer rating;
     private String status;
     private String comments;
@@ -41,6 +42,9 @@ public class FeedbackResponseDTO {
 
     public String getCandidateName() { return candidateName; }
     public void setCandidateName(String candidateName) { this.candidateName = candidateName; }
+
+    public String getCandidateEmail() { return candidateEmail; }
+    public void setCandidateEmail(String candidateEmail) { this.candidateEmail = candidateEmail; }
 
     public Integer getRating() { return rating; }
     public void setRating(Integer rating) { this.rating = rating; }

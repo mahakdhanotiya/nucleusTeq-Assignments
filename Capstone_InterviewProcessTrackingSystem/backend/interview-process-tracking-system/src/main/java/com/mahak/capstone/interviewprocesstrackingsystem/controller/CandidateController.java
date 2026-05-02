@@ -121,10 +121,11 @@ public class CandidateController {
     public ApiResponseDTO<List<CandidateResponseDTO>> searchCandidates(
             @RequestParam(required = false) Long jdId,
             @RequestParam(required = false) InterviewStage stage,
-            @RequestParam(required = false) ApplicationStatus status) {
+            @RequestParam(required = false) ApplicationStatus status,
+            @RequestParam(required = false) String name) {
 
-        logger.info("HR searching candidates: jdId={}, stage={}, status={}", jdId, stage, status);
-        List<CandidateResponseDTO> list = candidateService.searchCandidates(jdId, stage, status);
+        logger.info("HR searching candidates: jdId={}, stage={}, status={}, name={}", jdId, stage, status, name);
+        List<CandidateResponseDTO> list = candidateService.searchCandidates(jdId, stage, status, name);
         logger.info("Found {} candidates matching filters", list.size());
         return new ApiResponseDTO<>(true, ApiConstants.CANDIDATES_FETCHED, list);
     }
