@@ -106,4 +106,32 @@ class JobDescriptionServiceImplTest {
         assertEquals("New Title", response.getTitle());
         verify(jdRepository, times(1)).save(existing);
     }
+    @Test
+    void getAllJobs_Success() {
+        when(jdRepository.findAll()).thenReturn(List.of(new JobDescription()));
+        List<JobResponseDTO> list = jobService.getAllJobs();
+        assertFalse(list.isEmpty());
+    }
+
+    @Test
+    void getAllActiveJobs_Success() {
+        when(jdRepository.findByIsActiveTrue()).thenReturn(List.of(new JobDescription()));
+        List<JobResponseDTO> list = jobService.getAllActiveJobs();
+        assertFalse(list.isEmpty());
+    }
+
+    @Test
+    void activateJob_Fail_AlreadyActive() {
+        JobDescription jd = new JobDescription();
+        jd.setIsActive(true);
+        when(jdRepository.findById(1L)).thenReturn(Optional.of(jd));
+        
+        assertThrows(InvalidRequestException.class, () -> jobService.activateJob(1L));
+    }
+
+    @Test
+    void updateJob_Fail_NotFound() {
+        when(jdRepository.findById(1L)).thenReturn(Optional.empty());
+        assertThrows(ResourceNotFoundException.class, () -> jobService.updateJob(1L, new JobRequestDTO()));
+    }
 }

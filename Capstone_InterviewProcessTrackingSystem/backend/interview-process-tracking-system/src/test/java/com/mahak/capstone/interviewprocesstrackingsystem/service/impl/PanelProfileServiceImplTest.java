@@ -47,13 +47,20 @@ class PanelProfileServiceImplTest {
     @InjectMocks private PanelProfileServiceImpl panelService;
 
     @Test
-    void createPanel_UserExists_DuplicateCheck() {
+    void createPanel_EmailExists_ThrowsException() {
         PanelProfileRequestDTO dto = new PanelProfileRequestDTO();
         dto.setEmail("exists@test.com");
-        User user = new User();
-        ReflectionTestUtils.setField(user, "id", 1L);
-        when(userRepository.findByEmail("exists@test.com")).thenReturn(Optional.of(user));
-        when(panelRepository.existsByUserId(1L)).thenReturn(true);
+        when(userRepository.existsByEmail("exists@test.com")).thenReturn(true);
+        assertThrows(InvalidRequestException.class, () -> panelService.createPanel(dto));
+    }
+
+    @Test
+    void createPanel_MobileExists_ThrowsException() {
+        PanelProfileRequestDTO dto = new PanelProfileRequestDTO();
+        dto.setEmail("new@test.com");
+        dto.setMobileNumber("9876543210");
+        when(userRepository.existsByEmail("new@test.com")).thenReturn(false);
+        when(panelRepository.existsByMobileNumber("9876543210")).thenReturn(true);
         assertThrows(InvalidRequestException.class, () -> panelService.createPanel(dto));
     }
 
@@ -62,7 +69,9 @@ class PanelProfileServiceImplTest {
         PanelProfileRequestDTO dto = new PanelProfileRequestDTO();
         dto.setEmail("new@test.com");
         dto.setFullName("New Panel");
-        when(userRepository.findByEmail("new@test.com")).thenReturn(Optional.empty());
+        dto.setMobileNumber("1234567890");
+        when(userRepository.existsByEmail("new@test.com")).thenReturn(false);
+        when(panelRepository.existsByMobileNumber("1234567890")).thenReturn(false);
         when(passwordEncoder.encode(anyString())).thenReturn("encoded");
         when(userRepository.save(any())).thenReturn(new User());
         PanelProfile panel = new PanelProfile();

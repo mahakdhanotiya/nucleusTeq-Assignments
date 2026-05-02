@@ -187,17 +187,89 @@ class InterviewServiceImplTest {
     }
 
     @Test
-    void updateInterview_PartialFields_Success() {
+    void updateInterview_DateChange_SendsEmail() {
+        InterviewUpdateDTO dto = new InterviewUpdateDTO();
+        LocalDateTime newDate = LocalDateTime.now().plusDays(5);
+        dto.setInterviewDateTime(newDate);
+
         when(interviewRepository.findById(1L)).thenReturn(Optional.of(interview));
         when(interviewRepository.save(any())).thenReturn(interview);
         when(interviewMapper.toResponseDTO(any())).thenReturn(new InterviewResponseDTO());
-        when(interviewRepository.findById(1L)).thenReturn(Optional.of(interview)); // for enrichment
-        
-        InterviewUpdateDTO dto = new InterviewUpdateDTO();
-        dto.setFocusArea("New Focus");
-        
+        when(assignmentRepository.findByInterviewId(1L)).thenReturn(new ArrayList<>());
+
         interviewService.updateInterview(1L, dto);
+
+        verify(emailService).sendRescheduledEmail(any(), any(), any(), any(), eq(false));
+    }
+
+    @Test
+    void getInterviewById_Success_Enriched() {
+        when(interviewRepository.findById(1L)).thenReturn(Optional.of(interview));
+        when(interviewMapper.toResponseDTO(any())).thenReturn(new InterviewResponseDTO());
         
-        assertEquals("New Focus", interview.getFocusArea());
+        InterviewResponseDTO result = interviewService.getInterviewById(1L);
+        
+        assertNotNull(result);
+        verify(interviewRepository, atLeastOnce()).findById(1L);
+    }
+    @Test
+    void assignPanel_Duplicate_Exception() {
+        PanelAssignmentRequestDTO dto = new PanelAssignmentRequestDTO();
+        dto.setInterviewId(1L);
+        dto.setPanelId(10L);
+
+        PanelProfile panel = new PanelProfile();
+        ReflectionTestUtils.setField(panel, "id", 10L);
+
+        InterviewPanelAssignment assignment = new InterviewPanelAssignment();
+        assignment.setPanel(panel);
+
+        when(interviewRepository.findById(1L)).thenReturn(Optional.of(interview));
+        when(panelRepository.findById(10L)).thenReturn(Optional.of(panel));
+        when(assignmentRepository.findByInterviewId(1L)).thenReturn(List.of(assignment));
+
+        assertThrows(InvalidRequestException.class, () -> interviewService.assignPanel(dto));
+    }
+
+    @Test
+    void assignPanel_LimitExceeded_Exception() {
+        PanelAssignmentRequestDTO dto = new PanelAssignmentRequestDTO();
+        dto.setInterviewId(1L);
+        dto.setPanelId(30L);
+
+        PanelProfile p1 = new PanelProfile();
+        ReflectionTestUtils.setField(p1, "id", 10L);
+        PanelProfile p2 = new PanelProfile();
+        ReflectionTestUtils.setField(p2, "id", 20L);
+
+        InterviewPanelAssignment a1 = new InterviewPanelAssignment();
+        a1.setPanel(p1);
+        InterviewPanelAssignment a2 = new InterviewPanelAssignment();
+        a2.setPanel(p2);
+
+        when(interviewRepository.findById(1L)).thenReturn(Optional.of(interview));
+        when(panelRepository.findById(30L)).thenReturn(Optional.of(new PanelProfile()));
+        when(assignmentRepository.findByInterviewId(1L)).thenReturn(List.of(a1, a2));
+
+        assertThrows(InvalidRequestException.class, () -> interviewService.assignPanel(dto));
+    }
+
+    @Test
+    void enrichInterviewDTO_NullJob_Success() {
+        interview.setJobDescription(null);
+        candidate.setJobDescription(null);
+        when(interviewRepository.findById(1L)).thenReturn(Optional.of(interview));
+        when(interviewMapper.toResponseDTO(any())).thenReturn(new InterviewResponseDTO());
+        
+        InterviewResponseDTO result = interviewService.getInterviewById(1L);
+        assertEquals("N/A", result.getJobTitle());
+    }
+
+    @Test
+    void scheduleInterview_NullCandidate_Exception() {
+        InterviewRequestDTO dto = new InterviewRequestDTO();
+        dto.setCandidateId(99L);
+        when(candidateRepository.findById(99L)).thenReturn(Optional.empty());
+        assertThrows(ResourceNotFoundException.class, () -> interviewService.scheduleInterview(dto));
     }
 }

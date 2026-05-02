@@ -75,6 +75,25 @@ class CandidateServiceImplTest {
     }
 
     @Test
+    void createCandidate_Success() {
+        CandidateRequestDTO dto = new CandidateRequestDTO();
+        dto.setUserId(1L);
+        dto.setJobId(1L);
+        dto.setTotalExperience(5);
+        dto.setMobileNumber("1234567890");
+        dto.setResumeUrl("resume.pdf");
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(candidateRepository.existsByUserAndApplicationStatusNot(user, ApplicationStatus.REJECTED)).thenReturn(false);
+        when(jobRepository.findById(1L)).thenReturn(Optional.of(jd));
+        when(candidateRepository.save(any())).thenReturn(candidate);
+
+        CandidateResponseDTO result = candidateService.createCandidate(dto);
+        assertNotNull(result);
+        assertEquals(1L, result.getId());
+    }
+
+    @Test
     void createCandidate_Fail_ActiveApplication() {
         CandidateRequestDTO dto = new CandidateRequestDTO();
         dto.setUserId(1L);
@@ -127,8 +146,8 @@ class CandidateServiceImplTest {
 
     @Test
     void searchCandidates_Success() {
-        when(candidateRepository.findByFilters(any(), any(), any())).thenReturn(List.of(candidate));
-        List<CandidateResponseDTO> list = candidateService.searchCandidates(1L, InterviewStage.L1, ApplicationStatus.EVALUATED);
+        when(candidateRepository.findByFilters(any(), any(), any(), any())).thenReturn(List.of(candidate));
+        List<CandidateResponseDTO> list = candidateService.searchCandidates(1L, InterviewStage.L1, ApplicationStatus.EVALUATED, null);
         assertFalse(list.isEmpty());
     }
 
@@ -182,5 +201,27 @@ class CandidateServiceImplTest {
         when(jobRepository.findById(999L)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> candidateService.createCandidate(dto));
+    }
+    @Test
+    void getAllCandidates_Success() {
+        when(candidateRepository.findAll()).thenReturn(List.of(candidate));
+        List<CandidateResponseDTO> list = candidateService.getAllCandidates();
+        assertFalse(list.isEmpty());
+        assertEquals(1, list.size());
+    }
+
+    @Test
+    void deleteCandidate_Success() {
+        when(candidateRepository.findById(1L)).thenReturn(Optional.of(candidate));
+        doNothing().when(candidateRepository).delete(candidate);
+        
+        assertDoesNotThrow(() -> candidateService.deleteCandidate(1L));
+        verify(candidateRepository, times(1)).delete(candidate);
+    }
+
+    @Test
+    void deleteCandidate_NotFound_Exception() {
+        when(candidateRepository.findById(1L)).thenReturn(Optional.empty());
+        assertThrows(ResourceNotFoundException.class, () -> candidateService.deleteCandidate(1L));
     }
 }
