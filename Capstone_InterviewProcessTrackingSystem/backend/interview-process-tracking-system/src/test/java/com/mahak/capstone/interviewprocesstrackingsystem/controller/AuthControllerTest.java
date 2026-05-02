@@ -69,7 +69,7 @@ public class AuthControllerTest {
         dto.setEmail("john@example.com");
         dto.setPassword("password");
 
-        LoginResponseDTO response = new LoginResponseDTO("token", "CANDIDATE", 1L, 10L, "John Doe");
+        LoginResponseDTO response = new LoginResponseDTO("token", "CANDIDATE", 1L, 10L, "John Doe", "1234567890");
         when(authService.login(any(LoginRequestDTO.class))).thenReturn(response);
 
         mockMvc.perform(post("/auth/login")

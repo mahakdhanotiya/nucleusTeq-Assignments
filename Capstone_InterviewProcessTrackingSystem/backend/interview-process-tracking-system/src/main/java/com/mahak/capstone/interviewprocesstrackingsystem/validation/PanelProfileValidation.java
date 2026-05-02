@@ -29,6 +29,9 @@ public class PanelProfileValidation {
             logger.error("Full name is invalid");
             throw new InvalidRequestException("Full name is required");
         }
+        
+        // Ensure name contains no numbers
+        ValidationUtils.validateName(dto.getFullName(), "Full name");
 
         if (Objects.isNull(dto.getEmail()) || dto.getEmail().isBlank()) {
             logger.error("Email is invalid");
