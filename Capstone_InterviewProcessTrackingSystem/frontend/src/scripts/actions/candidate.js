@@ -54,12 +54,13 @@ export async function updateMyProfile(body) {
 /**
  * HR: Search/filter candidates by JD, stage, and/or status.
  */
-export async function searchCandidates(jdId, stage, status) {
+export async function searchCandidates(jdId, stage, status, name) {
   let query = "";
   const params = [];
   if (jdId) params.push(`jdId=${jdId}`);
   if (stage) params.push(`stage=${stage}`);
   if (status) params.push(`status=${status}`);
+  if (name) params.push(`name=${encodeURIComponent(name)}`);
   
   if (params.length > 0) {
     query = "?" + params.join("&");

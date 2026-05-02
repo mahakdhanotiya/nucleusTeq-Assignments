@@ -25,8 +25,14 @@ window.logout = function() {
 async function init() {
   try {
     // 1. Check if they already applied
-    const profileRes = await getMyProfile();
-    if (profileRes.success && profileRes.data) {
+    let profileRes = null;
+    try {
+      profileRes = await getMyProfile();
+    } catch (e) {
+      // Expected if user hasn't applied yet, just continue to auto-fill
+    }
+
+    if (profileRes && profileRes.success && profileRes.data) {
       // Disable form and show message
       const btn = document.querySelector('button[type="submit"]');
       if (btn) {
@@ -55,16 +61,27 @@ async function init() {
 
       if (fullNameEl) {
         fullNameEl.value = user.fullName || "";
-        fullNameEl.readOnly = true;
-        fullNameEl.style.backgroundColor = "#f3f4f6";
+        if (user.fullName) {
+          fullNameEl.readOnly = true;
+          fullNameEl.style.backgroundColor = "#f3f4f6";
+          fullNameEl.style.cursor = "not-allowed";
+        }
       }
       if (emailEl) {
         emailEl.value = user.email || "";
-        emailEl.readOnly = true;
-        emailEl.style.backgroundColor = "#f3f4f6";
+        if (user.email) {
+          emailEl.readOnly = true;
+          emailEl.style.backgroundColor = "#f3f4f6";
+          emailEl.style.cursor = "not-allowed";
+        }
       }
       if (mobileEl) {
         mobileEl.value = user.mobileNumber || "";
+        if (user.mobileNumber) {
+          mobileEl.readOnly = true;
+          mobileEl.style.backgroundColor = "#f3f4f6";
+          mobileEl.style.cursor = "not-allowed";
+        }
       }
     }
   } catch (err) {
@@ -92,6 +109,18 @@ document.addEventListener("DOMContentLoaded", () => {
         if (msgEl) {
           msgEl.className = "msg error";
           msgEl.textContent = "Relevant experience cannot be greater than total experience.";
+          msgEl.style.display = "block";
+        }
+        return;
+      }
+
+      // Mobile Number Validation: Exactly 10 digits, numbers only
+      const mobileNumber = document.getElementById("apMobile")?.value.trim() || "";
+      const mobileRegex = /^[0-9]{10}$/;
+      if (!mobileRegex.test(mobileNumber)) {
+        if (msgEl) {
+          msgEl.className = "msg error";
+          msgEl.textContent = "Mobile number must be exactly 10 digits and contain only numbers.";
           msgEl.style.display = "block";
         }
         return;

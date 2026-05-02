@@ -1,3 +1,18 @@
+import { SITE_CONFIG } from "../../config/site-config.js";
+
+/**
+ * Constructs a full URL for a resume, prepending the API URL if necessary.
+ * @param {string} url - The relative or absolute resume URL.
+ * @returns {string|null} The absolute URL or null.
+ */
+export function getResumeUrl(url) {
+    if (!url) return null;
+    if (url.startsWith('http')) return url;
+    const baseUrl = SITE_CONFIG.apiUrl;
+    const normalizedUrl = url.startsWith('/') ? url : `/${url}`;
+    return `${baseUrl}${normalizedUrl}`;
+}
+
 /**
  * Renders the user profile section in the sidebar.
  * @param {string} containerId - The ID of the container element.

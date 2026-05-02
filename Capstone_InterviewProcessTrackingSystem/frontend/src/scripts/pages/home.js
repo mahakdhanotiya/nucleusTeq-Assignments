@@ -1,7 +1,7 @@
 import { getMyProfile, getInterviews, getJobs } from "../actions/user.js";
 import { fetchHandler } from "../lib/handlers/fetch.js";
 import { SITE_CONFIG } from "../config/site-config.js";
-import { renderSidebarProfile, initFormCleanup } from "../lib/utils/ui.js";
+import { renderSidebarProfile, initFormCleanup, getResumeUrl } from "../lib/utils/ui.js";
 
 const token = localStorage.getItem("token");
 const userId = localStorage.getItem("userId");
@@ -30,11 +30,12 @@ function formatStatus(str) {
  * @param {string} url - The URL of the resume.
  */
 window.viewResume = function(url) {
-  if (!url) {
+  const fullUrl = getResumeUrl(url);
+  if (!fullUrl) {
     toast('No resume available', 'error');
     return;
   }
-  window.open(url, '_blank');
+  window.open(fullUrl, '_blank');
 };
 
 /**
@@ -197,6 +198,17 @@ window.handleEditProfile = async function(e) {
   btn.disabled = true;
 
   let resumeUrl = cachedProfile.resumeUrl || '';
+
+  // Mobile Number Validation: Exactly 10 digits, numbers only
+  const mobileNumber = document.getElementById("epMobile").value.trim();
+  const mobileRegex = /^[0-9]{10}$/;
+  if (!mobileRegex.test(mobileNumber)) {
+    document.getElementById("epMsg").className = "msg error";
+    document.getElementById("epMsg").textContent = "Mobile number must be exactly 10 digits and contain only numbers.";
+    btn.textContent = prevText;
+    btn.disabled = false;
+    return;
+  }
 
   // Handle file upload if a new file was selected
   const fileInput = document.getElementById("epResumeFile");
