@@ -47,6 +47,13 @@
     </div>
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; align-items: end;">
       <div class="form-group" style="margin: 0;">
+        <label style="font-size: 0.85rem; margin-bottom: 5px;">Search Name</label>
+        <div class="search-bar-wrapper" style="max-width: 100%;">
+          <input type="search" id="searchCandidates" placeholder="Enter name..." class="search-input" style="padding: 10px 14px 10px 42px !important;">
+          <svg class="search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        </div>
+      </div>
+      <div class="form-group" style="margin: 0;">
         <label style="font-size: 0.85rem; margin-bottom: 5px;">Filter by JD</label>
         <select id="filterJD" class="form-input" style="padding: 8px;"></select>
       </div>
@@ -108,9 +115,9 @@
   <div class="page-header">
     <h1>Jobs</h1>
     <div style="display:flex; gap:12px; align-items:center;">
-      <div class="search-box-container" style="position:relative;">
-        <input type="search" id="searchJobs" placeholder="Search by title or location..." class="form-input" style="padding-left:36px; min-width:250px;">
-        <svg style="position:absolute; left:10px; top:50%; transform:translateY(-50%); width:18px; height:18px; fill:var(--text-secondary);" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+      <div class="search-bar-wrapper">
+        <input type="search" id="searchJobs" placeholder="Search by title or location..." class="search-input">
+        <svg class="search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
       </div>
       <button class="btn btn-primary" onclick="openModal('createJobModal')">+ Create Job</button>
     </div>
@@ -124,9 +131,9 @@
   <div class="page-header">
     <h1>Interviews</h1>
     <div style="display:flex; gap:12px; align-items:center;">
-      <div class="search-box-container" style="position:relative;">
-        <input type="search" id="searchInterviews" placeholder="Search by candidate or stage..." class="form-input" style="padding-left:36px; min-width:250px;">
-        <svg style="position:absolute; left:10px; top:50%; transform:translateY(-50%); width:18px; height:18px; fill:var(--text-secondary);" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+      <div class="search-bar-wrapper">
+        <input type="search" id="searchInterviews" placeholder="Search by candidate or stage..." class="search-input">
+        <svg class="search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
       </div>
       <button class="btn btn-primary" onclick="openScheduleModal()">+ Schedule Interview</button>
     </div>
@@ -147,9 +154,9 @@
       <h1>Feedback Center</h1>
       <p style="color:var(--text-light); font-size:0.9rem;">View all panelist evaluations and technical assessments in one place.</p>
     </div>
-    <div class="search-box-container" style="position:relative;">
-      <input type="search" id="searchFeedback" placeholder="Search by candidate, stage or status..." class="form-input" style="padding-left:36px; min-width:280px;">
-      <svg style="position:absolute; left:10px; top:50%; transform:translateY(-50%); width:18px; height:18px; fill:var(--text-secondary);" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+    <div class="search-bar-wrapper">
+      <input type="search" id="searchFeedback" placeholder="Search by candidate, stage or status..." class="search-input">
+      <svg class="search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
     </div>
   </div>
   <div id="fbCenterGrid" class="feedback-grid">
@@ -160,9 +167,9 @@
   <div class="page-header">
     <h1>Panel Members</h1>
     <div style="display:flex; gap:12px; align-items:center;">
-      <div class="search-box-container" style="position:relative;">
-        <input type="search" id="searchPanels" placeholder="Search by name or email..." class="form-input" style="padding-left:36px; min-width:250px;">
-        <svg style="position:absolute; left:10px; top:50%; transform:translateY(-50%); width:18px; height:18px; fill:var(--text-secondary);" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+      <div class="search-bar-wrapper">
+        <input type="search" id="searchPanels" placeholder="Search by name or email..." class="search-input">
+        <svg class="search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
       </div>
       <button class="btn btn-primary" onclick="openAddPanelModal()">+ Add Panel</button>
     </div>
@@ -231,8 +238,8 @@
     <div class="form-group"><label>Stage *</label><select id="siStage" required><option>L1</option><option>L2</option><option>HR</option></select></div>
     <div class="form-group"><label>Date & Time *</label><input id="siDate" type="datetime-local" required></div>
     <div class="form-group"><label>Focus Area *</label><input id="siFocus" placeholder="e.g. Coding, System Design" required></div>
+    <div class="msg" id="siMsg" style="margin-bottom: 12px; display: none;"></div>
     <button type="submit" id="siSubmitBtn" class="btn btn-primary btn-full">Schedule</button>
-    <div class="msg" id="siMsg"></div>
   </form>
 </div></div>
 

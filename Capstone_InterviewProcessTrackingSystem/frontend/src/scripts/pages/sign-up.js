@@ -16,6 +16,15 @@ form.addEventListener("submit", async (e) => {
     const role = "CANDIDATE";
 
     try {
+        // Mobile Number Validation: Exactly 10 digits, numbers only
+        const mobileRegex = /^[0-9]{10}$/;
+        if (!mobileRegex.test(mobileNumber)) {
+            msgEl.className = "msg error";
+            msgEl.textContent = "Mobile number must be exactly 10 digits and contain only numbers.";
+            msgEl.style.display = "block";
+            return;
+        }
+
         const data = await signUp(fullName, email, mobileNumber, dateOfBirth, gender, role);
 
         if (data.success) {
