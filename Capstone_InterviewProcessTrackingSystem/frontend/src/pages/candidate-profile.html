@@ -29,11 +29,11 @@
           <h1 id="applyTitle">Apply for Job</h1>
           <p class="subtitle" id="applySubtitle">Fill out your details below</p>
 
-          <form id="applyForm">
+          <form id="applyForm" novalidate>
             <h3 class="section-title">Personal Information</h3>
             <div class="form-row">
-              <div class="form-group"><label>Full Name *</label><input id="apFullName" required></div>
-              <div class="form-group"><label>Email *</label><input id="apEmail" type="email" required></div>
+              <div class="form-group"><label>Full Name *</label><input id="apFullName" required><span class="field-error" id="err-apFullName"></span></div>
+              <div class="form-group"><label>Email *</label><input id="apEmail" type="email" required><span class="field-error" id="err-apEmail"></span></div>
             </div>
             <div class="form-row">
               <div class="form-group">
@@ -69,7 +69,22 @@
               <div class="form-group"><label>Current CTC (LPA)</label><input id="apCurrentCtc" type="number" step="0.1" min="0"></div>
               <div class="form-group"><label>Expected CTC (LPA)</label><input id="apExpectedCtc" type="number" step="0.1" min="0"></div>
             </div>
-            <div class="form-group"><label>Notice Period (days)</label><input id="apNotice" type="number" min="0"></div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Notice Period (days)</label>
+                <input id="apNotice" type="number" min="0">
+              </div>
+              <div class="form-group">
+                <label>Application Source *</label>
+                <select id="apSource" class="form-input" required>
+                  <option value="CAREER_PORTAL">Career Portal</option>
+                  <option value="LINKEDIN">LinkedIn</option>
+                  <option value="NAUKRI">Naukri</option>
+                  <option value="REFERRAL">Referral</option>
+                </select>
+                <span class="field-error" id="err-apSource"></span>
+              </div>
+            </div>
 
             <div class="msg" id="apMsg" style="display:none"></div>
             <button type="submit" class="btn btn-primary btn-full" style="margin-top:16px">Submit Application</button>

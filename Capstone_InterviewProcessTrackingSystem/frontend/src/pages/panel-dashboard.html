@@ -50,13 +50,13 @@
   <div id="sec-feedback" style="display:none">
     <div class="page-header"><h1>Submit Feedback</h1></div>
     <div class="card">
-      <form id="feedbackForm" onsubmit="submitFeedback(event)">
+      <form id="feedbackForm" onsubmit="submitFeedback(event)" novalidate>
         <div class="form-row">
-          <div class="form-group"><label>Interview ID *</label><input id="fbIntId" type="number" readonly class="readonly-input" required></div>
-          <div class="form-group"><label>Decision *</label><select id="fbStatus" required><option value="SELECTED">Selected</option><option value="REJECTED">Rejected</option></select></div>
+          <div class="form-group"><label>Interview ID *</label><input id="fbIntId" type="number" readonly class="readonly-input" required><span class="field-error" id="err-fbIntId"></span></div>
+          <div class="form-group"><label>Decision *</label><select id="fbStatus" required><option value="SELECTED">Selected</option><option value="REJECTED">Rejected</option></select><span class="field-error" id="err-fbStatus"></span></div>
         </div>
-        <div class="form-group"><label>Rating (1-5) *</label><input id="fbRating" type="number" min="1" max="5" required placeholder="e.g. 4"></div>
-        <div class="form-group"><label>Comments *</label><textarea id="fbComments" rows="3" required placeholder="Overall technical assessment and cultural fitment"></textarea></div>
+        <div class="form-group"><label>Rating (1-5) *</label><input id="fbRating" type="number" min="1" max="5" required placeholder="e.g. 4"><span class="field-error" id="err-fbRating"></span></div>
+        <div class="form-group"><label>Comments *</label><textarea id="fbComments" rows="3" required placeholder="Overall technical assessment and cultural fitment"></textarea><span class="field-error" id="err-fbComments"></span></div>
         <div class="form-row">
           <div class="form-group"><label>Strengths</label><textarea id="fbStrengths" rows="2" placeholder="e.g. Strong problem solving, Good understanding of concurrency"></textarea></div>
           <div class="form-group"><label>Weaknesses</label><textarea id="fbWeaknesses" rows="2" placeholder="e.g. Needs improvement in System Design, Shallow knowledge of Docker"></textarea></div>

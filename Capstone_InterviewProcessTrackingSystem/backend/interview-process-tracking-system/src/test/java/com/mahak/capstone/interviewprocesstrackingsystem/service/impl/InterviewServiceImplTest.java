@@ -2,7 +2,12 @@ package com.mahak.capstone.interviewprocesstrackingsystem.service.impl;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
+
+import com.mahak.capstone.interviewprocesstrackingsystem.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -60,6 +65,8 @@ class InterviewServiceImplTest {
     @Mock private InterviewPanelAssignmentMapper assignmentMapper;
     @Mock private InterviewValidation interviewValidation;
     @Mock private EmailService emailService;
+    @Mock private UserRepository userRepository;
+
 
     @InjectMocks private InterviewServiceImpl interviewService;
 
@@ -159,20 +166,43 @@ class InterviewServiceImplTest {
     }
 
     @Test
-    void getAllInterviews_Empty_Exception() {
-        when(interviewRepository.findAll()).thenReturn(new ArrayList<>());
-        assertThrows(ResourceNotFoundException.class, () -> interviewService.getAllInterviews());
+    void getAllInterviews_HR_Success() {
+        when(interviewRepository.findAll()).thenReturn(List.of(interview));
+        when(interviewMapper.toResponseDTO(any())).thenReturn(new InterviewResponseDTO());
+
+        List<InterviewResponseDTO> results = interviewService.getAllInterviews("ROLE_HR", "hr@test.com");
+        assertFalse(results.isEmpty());
     }
 
     @Test
+    void getAllInterviews_Empty_ReturnsEmptyList() {
+        when(interviewRepository.findAll()).thenReturn(new ArrayList<>());
+        List<InterviewResponseDTO> results = interviewService.getAllInterviews("ROLE_HR", "hr@test.com");
+        assertTrue(results.isEmpty());
+    }
+
+
+    @Test
     void deleteInterview_WithAssignments_Success() {
+        interview.setStatus(InterviewStatus.SCHEDULED);
+        candidate.setApplicationStatus(ApplicationStatus.INTERVIEW_SCHEDULED);
         when(interviewRepository.findById(1L)).thenReturn(Optional.of(interview));
         when(assignmentRepository.findByInterviewId(1L)).thenReturn(List.of(new InterviewPanelAssignment()));
+        when(candidateRepository.save(any())).thenReturn(candidate);
         
         panelService_deleteInterview(1L);
         
         verify(assignmentRepository).deleteAll(any());
+        verify(candidateRepository).save(any());
         verify(interviewRepository).delete(interview);
+    }
+
+    @Test
+    void deleteInterview_Completed_Exception() {
+        interview.setStatus(InterviewStatus.COMPLETED);
+        when(interviewRepository.findById(1L)).thenReturn(Optional.of(interview));
+        
+        assertThrows(InvalidRequestException.class, () -> interviewService.deleteInterview(1L));
     }
 
     private void panelService_deleteInterview(Long id) {

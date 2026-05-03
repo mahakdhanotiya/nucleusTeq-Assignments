@@ -96,19 +96,22 @@
       <h2>Edit Profile</h2>
       <button class="btn btn-outline btn-sm" onclick="closeModal('editProfileModal')">✕</button>
     </div>
-    <form id="editProfileForm" onsubmit="handleEditProfile(event)">
+    <form id="editProfileForm" onsubmit="handleEditProfile(event)" novalidate>
       <div class="form-group">
         <label>Mobile Number <span style="color:red">*</span></label>
         <input type="text" id="epMobile" class="form-input" required pattern="^[0-9]{10}$">
+        <span class="field-error" id="err-epMobile"></span>
       </div>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
         <div class="form-group">
           <label>Total Experience (Years) <span style="color:red">*</span></label>
           <input type="number" id="epExperience" class="form-input" required min="0" step="1">
+          <span class="field-error" id="err-epExperience"></span>
         </div>
         <div class="form-group">
           <label>Relevant Experience (Years)</label>
           <input type="number" id="epRelExp" class="form-input" min="0" step="1">
+          <span class="field-error" id="err-epRelExp"></span>
         </div>
       </div>
       <div class="form-group">
@@ -118,6 +121,7 @@
       <div class="form-group">
         <label>Upload Resume (PDF only)</label>
         <input type="file" id="epResumeFile" class="form-input" accept=".pdf">
+        <span class="field-error" id="err-epResumeFile"></span>
         <small id="epResumeStatus" style="display:block; margin-top:6px; color:#64748b;"></small>
       </div>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
@@ -128,6 +132,7 @@
         <div class="form-group">
           <label>Expected CTC</label>
           <input type="number" id="epExpectedCTC" class="form-input" min="0" step="0.1">
+          <span class="field-error" id="err-epExpectedCTC"></span>
         </div>
       </div>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
@@ -139,6 +144,10 @@
           <label>Preferred Location</label>
           <input type="text" id="epLocation" class="form-input">
         </div>
+      </div>
+      <div class="form-group">
+        <label>Application Source</label>
+        <input type="text" id="epSource" class="form-input" readonly style="background:#f3f4f6; color:#64748b; cursor:not-allowed;">
       </div>
       <p id="epMsg" class="msg"></p>
       <div class="modal-footer">

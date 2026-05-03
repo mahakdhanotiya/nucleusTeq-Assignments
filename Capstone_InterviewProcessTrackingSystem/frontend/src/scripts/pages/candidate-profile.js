@@ -51,10 +51,25 @@ async function init() {
   applyLock(mobileEl, cachedMobile);
 
   try {
-    // 2. Sync with Backend
+    // 2. Sync with Backend (with LocalStorage Failsafe)
     const userData = await getMe();
     if (userData.success && userData.data) {
       currentUser = userData.data;
+    } else {
+      // FALLBACK: Use data from LocalStorage if API fails
+      console.warn("Backend profile fetch failed, using local storage fallback.");
+      const storedId = localStorage.getItem("userId");
+      if (storedId) {
+        currentUser = {
+          id: parseInt(storedId),
+          fullName: localStorage.getItem("userName"),
+          email: localStorage.getItem("email"),
+          mobileNumber: localStorage.getItem("mobileNumber")
+        };
+      }
+    }
+
+    if (currentUser) {
       applyLock(fullNameEl, currentUser.fullName);
       applyLock(emailEl, currentUser.email);
       applyLock(mobileEl, currentUser.mobileNumber);
@@ -89,44 +104,86 @@ document.addEventListener("DOMContentLoaded", () => {
   init();
 
   const applyForm = document.getElementById("applyForm");
+  const totalExpInput = document.getElementById("apExp");
+  const relExpInput = document.getElementById("apRelExp");
+  const currentCtcInput = document.getElementById("apCurrentCtc");
+  const expectedCtcInput = document.getElementById("apExpectedCtc");
+  const mobileInput = document.getElementById("apMobile");
+  const resumeInput = document.getElementById("apResumeFile");
+
+  // Helper to show/clear required errors
+  const checkRequired = (el, msg = "This field is required") => {
+    if (!el || !el.value || el.value.trim() === "") {
+      showFieldError(el ? el.id : "", msg);
+      return false;
+    }
+    return true;
+  };
+
+  // Real-time Validation Logic
+  const validateForm = () => {
+    clearErrors("applyForm");
+    let isValid = true;
+
+    // 1. Required Fields
+    if (!checkRequired(totalExpInput, "Total experience is required")) isValid = false;
+    if (!checkRequired(mobileInput, "Mobile number is required")) isValid = false;
+    
+    // 2. Experience Logic
+    const total = parseInt(totalExpInput?.value || "0");
+    const rel = parseInt(relExpInput?.value || "0");
+    if (rel > total) {
+      showFieldError("apRelExp", "Relevant experience cannot exceed total experience.");
+      isValid = false;
+    }
+
+    // 3. CTC Logic (Warning if Expected < Current)
+    const current = parseFloat(currentCtcInput?.value || "0");
+    const expected = parseFloat(expectedCtcInput?.value || "0");
+    if (expected > 0 && expected < current) {
+      showFieldError("apExpectedCtc", "Expected CTC is usually higher than current CTC.");
+    }
+
+    // 4. Mobile Format
+    const mobileRegex = /^[0-9]{10}$/;
+    if (mobileInput && mobileInput.value && !mobileRegex.test(mobileInput.value)) {
+      showFieldError("apMobile", "Mobile number must be exactly 10 digits.");
+      isValid = false;
+    }
+
+    return isValid;
+  };
+
+  // Attach real-time listeners
+  [totalExpInput, relExpInput, currentCtcInput, expectedCtcInput, mobileInput].forEach(el => {
+    el?.addEventListener("input", validateForm);
+  });
+
   if (applyForm) {
     applyForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      clearErrors("applyForm");
       
+      const isValid = validateForm();
+      const file = resumeInput?.files?.[0];
+
+      if (!file) {
+        showFieldError("apResumeFile", "Please upload your resume (PDF).");
+        return;
+      }
+
+      if (!isValid) return;
+
       const msgEl = document.getElementById("apMsg");
       if (msgEl) msgEl.style.display = "none";
 
-      const totalExpVal = document.getElementById("apExp")?.value || "0";
-      const relExpVal = document.getElementById("apRelExp")?.value || "0";
-      const totalExp = parseInt(totalExpVal);
-      const relExp = parseInt(relExpVal);
-
-      let hasError = false;
-
-      // Frontend Validation: Relevant <= Total
-      if (relExp > totalExp) {
-        showFieldError("apRelExp", "Relevant experience cannot be greater than total experience.");
-        hasError = true;
+      if (!currentUser) {
+        if (msgEl) {
+          msgEl.className = "msg error";
+          msgEl.textContent = "User information not loaded yet. Please wait a moment.";
+          msgEl.style.display = "block";
+        }
+        return;
       }
-
-      // Mobile Number Validation: Exactly 10 digits, numbers only
-      const mobileNumber = document.getElementById("apMobile")?.value.trim() || "";
-      const mobileRegex = /^[0-9]{10}$/;
-      if (!mobileRegex.test(mobileNumber)) {
-        showFieldError("apMobile", "Mobile number must be exactly 10 digits.");
-        hasError = true;
-      }
-
-      // Check Resume
-      const fileInput = document.getElementById("apResumeFile");
-      const file = fileInput?.files?.[0];
-      if (!file) {
-        showFieldError("apResumeFile", "Please upload a resume (PDF).");
-        hasError = true;
-      }
-
-      if (hasError) return;
 
       try {
         // 1. Upload Resume
@@ -155,13 +212,14 @@ document.addEventListener("DOMContentLoaded", () => {
           userId: currentUser.id,
           jobId: parseInt(jobId),
           mobileNumber: document.getElementById("apMobile").value.trim(),
-          totalExperience: parseFloat(document.getElementById("apExp").value),
-          relevantExperience: parseFloat(document.getElementById("apRelExp").value) || 0,
+          totalExperience: parseInt(document.getElementById("apExp").value),
+          relevantExperience: parseInt(document.getElementById("apRelExp").value) || 0,
           currentCompany: document.getElementById("apCompany").value.trim(),
           currentCTC: parseFloat(document.getElementById("apCurrentCtc").value) || 0,
           expectedCTC: parseFloat(document.getElementById("apExpectedCtc").value) || 0,
           noticePeriod: parseInt(document.getElementById("apNotice").value) || 0,
           preferredLocation: document.getElementById("apLocation").value.trim(),
+          source: document.getElementById("apSource").value,
           resumeUrl: uploadData.data.url
         };
 
@@ -183,7 +241,9 @@ document.addEventListener("DOMContentLoaded", () => {
       } catch (err) {
         if (msgEl) {
           msgEl.className = "msg error";
-          msgEl.textContent = "Server error. Please check your network or try again later.";
+          // Try to show the actual error from the backend if available
+          const errorMessage = err.message || "Server error. Please check your network or try again later.";
+          msgEl.textContent = errorMessage;
           msgEl.style.display = "block";
         }
       }

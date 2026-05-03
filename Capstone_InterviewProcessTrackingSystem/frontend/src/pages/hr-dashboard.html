@@ -189,11 +189,11 @@
 <!-- Create Job Modal -->
 <div class="modal-overlay" id="createJobModal"><div class="modal">
   <div class="modal-header"><h2>Create Job</h2><button class="modal-close" onclick="closeModal('createJobModal')">x</button></div>
-  <form id="createJobForm" onsubmit="createJob(event)">
-    <div class="form-group"><label>Title *</label><input id="jTitle" placeholder="e.g. Senior Java Developer" required></div>
-    <div class="form-group"><label>Description *</label><textarea id="jDesc" rows="3" placeholder="Describe the job responsibilities and requirements" required></textarea></div>
+  <form id="createJobForm" onsubmit="createJob(event)" novalidate>
+    <div class="form-group"><label>Title *</label><input id="jTitle" placeholder="e.g. Senior Java Developer" required><span class="field-error" id="err-jTitle"></span></div>
+    <div class="form-group"><label>Description *</label><textarea id="jDesc" rows="3" placeholder="Describe the job responsibilities and requirements" required></textarea><span class="field-error" id="err-jDesc"></span></div>
     <div class="form-group"><label>Skills (comma-separated)</label><input id="jSkills" placeholder="e.g. Java, Spring Boot, MySQL"></div>
-    <div class="form-group"><label>Location *</label><input id="jLoc" placeholder="e.g. Hyderabad, India" required></div>
+    <div class="form-group"><label>Location *</label><input id="jLoc" placeholder="e.g. Hyderabad, India" required><span class="field-error" id="err-jLoc"></span></div>
     <div class="form-row">
       <div class="form-group">
         <label>Min Exp</label>
@@ -218,7 +218,7 @@
         <span class="field-error" id="err-jMaxSal"></span>
       </div>
     </div>
-    <div class="form-group"><label>Job Type</label><select id="jType"><option>FULL_TIME</option><option>PART_TIME</option><option>CONTRACT</option><option>INTERNSHIP</option></select></div>
+    <div class="form-group"><label>Job Type</label><select id="jType"><option value="FULL_TIME">FULL_TIME</option><option value="CONTRACT">CONTRACT</option><option value="REMOTE">REMOTE</option></select></div>
     <button type="submit" class="btn btn-primary btn-full">Create</button>
     <div class="msg" id="jMsg"></div>
   </form>
@@ -226,12 +226,12 @@
 <!-- Edit Job Modal -->
 <div class="modal-overlay" id="editJobModal"><div class="modal">
   <div class="modal-header"><h2>Edit Job</h2><button class="modal-close" onclick="closeModal('editJobModal')">x</button></div>
-  <form id="editJobForm" onsubmit="updateJob(event)">
+  <form id="editJobForm" onsubmit="updateJob(event)" novalidate>
     <input type="hidden" id="ejId">
-    <div class="form-group"><label>Title *</label><input id="ejTitle" required></div>
-    <div class="form-group"><label>Description *</label><textarea id="ejDesc" rows="3" required></textarea></div>
+    <div class="form-group"><label>Title *</label><input id="ejTitle" required><span class="field-error" id="err-ejTitle"></span></div>
+    <div class="form-group"><label>Description *</label><textarea id="ejDesc" rows="3" required></textarea><span class="field-error" id="err-ejDesc"></span></div>
     <div class="form-group"><label>Skills (comma-separated)</label><input id="ejSkills" placeholder="Java, Spring Boot"></div>
-    <div class="form-group"><label>Location *</label><input id="ejLoc" required></div>
+    <div class="form-group"><label>Location *</label><input id="ejLoc" required><span class="field-error" id="err-ejLoc"></span></div>
     <div class="form-row">
       <div class="form-group">
         <label>Min Exp</label>
@@ -256,7 +256,7 @@
         <span class="field-error" id="err-ejMaxSal"></span>
       </div>
     </div>
-    <div class="form-group"><label>Job Type</label><select id="ejType"><option>FULL_TIME</option><option>PART_TIME</option><option>CONTRACT</option><option>INTERNSHIP</option></select></div>
+    <div class="form-group"><label>Job Type</label><select id="ejType"><option value="FULL_TIME">FULL_TIME</option><option value="CONTRACT">CONTRACT</option><option value="REMOTE">REMOTE</option></select></div>
     <button type="submit" class="btn btn-primary btn-full">Save Changes</button>
     <div class="msg" id="ejMsg"></div>
   </form>
@@ -264,16 +264,16 @@
 <!-- Schedule Interview Modal -->
 <div class="modal-overlay" id="scheduleModal"><div class="modal">
   <div class="modal-header"><h2>Schedule Interview</h2><button class="modal-close" onclick="closeModal('scheduleModal')">x</button></div>
-  <form id="scheduleForm" onsubmit="scheduleInterview(event)">
-    <div class="form-group"><label>Candidate *</label><select id="siCand" required></select></div>
-    <div class="form-group"><label>Job *</label><select id="siJob" required></select></div>
-    <div class="form-group"><label>Stage *</label><select id="siStage" required><option>L1</option><option>L2</option><option>HR</option></select></div>
+  <form id="scheduleForm" onsubmit="scheduleInterview(event)" novalidate>
+    <div class="form-group"><label>Candidate *</label><select id="siCand" required></select><span class="field-error" id="err-siCand"></span></div>
+    <div class="form-group"><label>Job *</label><select id="siJob" required></select><span class="field-error" id="err-siJob"></span></div>
+    <div class="form-group"><label>Stage *</label><select id="siStage" required><option>L1</option><option>L2</option><option>HR</option></select><span class="field-error" id="err-siStage"></span></div>
     <div class="form-group">
       <label>Date & Time *</label>
       <input id="siDate" type="datetime-local" required>
       <span class="field-error" id="err-siDate"></span>
     </div>
-    <div class="form-group"><label>Focus Area *</label><input id="siFocus" placeholder="e.g. Coding, System Design" required></div>
+    <div class="form-group"><label>Focus Area *</label><input id="siFocus" placeholder="e.g. Coding, System Design" required><span class="field-error" id="err-siFocus"></span></div>
     <div class="msg" id="siMsg" style="margin-bottom: 12px; display: none;"></div>
     <button type="submit" id="siSubmitBtn" class="btn btn-primary btn-full">Schedule</button>
   </form>
@@ -282,12 +282,12 @@
 <!-- Assign Panel Modal -->
 <div class="modal-overlay" id="assignPanelModal"><div class="modal">
   <div class="modal-header"><h2>Assign Panel</h2><button class="modal-close" onclick="closeModal('assignPanelModal')">x</button></div>
-  <form id="assignPanelForm" onsubmit="assignPanel(event)">
+  <form id="assignPanelForm" onsubmit="assignPanel(event)" novalidate>
     <input type="hidden" id="apInterviewId">
     <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid var(--border);">
       <h4 style="margin-bottom: 10px; color: var(--text);">Panel 1 (Required)</h4>
-      <div class="form-group"><label>Panel Member *</label><select id="apPanelId" required></select></div>
-      <div class="form-group"><label>Focus Area *</label><textarea id="apFocus" rows="2" placeholder="e.g., Coding skills" required></textarea></div>
+      <div class="form-group"><label>Panel Member *</label><select id="apPanelId" required></select><span class="field-error" id="err-apPanelId"></span></div>
+      <div class="form-group"><label>Focus Area *</label><textarea id="apFocus" rows="2" placeholder="e.g., Coding skills" required></textarea><span class="field-error" id="err-apFocus"></span></div>
     </div>
     
     <div style="margin-bottom: 20px;">
@@ -340,16 +340,18 @@
 <!-- HR Feedback Modal -->
 <div class="modal-overlay" id="hrFeedbackModal"><div class="modal">
   <div class="modal-header"><h2>HR Evaluation Verdict</h2><button class="modal-close" onclick="closeModal('hrFeedbackModal')">x</button></div>
-  <form onsubmit="handleHRFeedback(event)">
+  <form id="hrFeedbackForm" onsubmit="handleHRFeedback(event)" novalidate>
     <input type="hidden" id="hfIntId">
     <div class="form-group"><label>Candidate Rating *</label>
       <select id="hfRating" required><option value="5">5 - Excellent</option><option value="4">4 - Very Good</option><option value="3">3 - Average</option><option value="2">2 - Below Average</option><option value="1">1 - Poor</option></select>
+      <span class="field-error" id="err-hfRating"></span>
     </div>
     <div class="form-group"><label>Final Verdict *</label>
       <select id="hfStatus" required><option value="SELECTED">SELECTED</option><option value="REJECTED">REJECTED</option></select>
     </div>
     <div class="form-group"><label>HR Comments & Notes *</label>
       <textarea id="hfComments" rows="4" placeholder="Mention behavioral fitment, salary discussion, etc." required></textarea>
+      <span class="field-error" id="err-hfComments"></span>
     </div>
     <button type="submit" class="btn btn-primary btn-full">Submit Final Verdict</button>
   </form>
@@ -358,7 +360,7 @@
 <!-- Update Status Modal -->
 <div class="modal-overlay" id="updateStatusModal"><div class="modal">
   <div class="modal-header"><h2>Update Interview Status</h2><button class="modal-close" onclick="closeModal('updateStatusModal')">x</button></div>
-  <form id="updateStatusForm" onsubmit="handleUpdateStatus(event)">
+  <form id="updateStatusForm" onsubmit="handleUpdateStatus(event)" novalidate>
     <input type="hidden" id="usIntId">
     <div class="form-group">
       <label>New Status *</label>
@@ -369,6 +371,7 @@
         <option value="CANCELLED">Cancelled</option>
         <option value="NO_SHOW">No Show</option>
       </select>
+      <span class="field-error" id="err-usStatus"></span>
     </div>
     <button type="submit" class="btn btn-primary btn-full">Update Status</button>
     <div class="msg" id="usMsg" style="display:none"></div>
@@ -378,11 +381,11 @@
 <!-- Give Feedback Modal -->
 <div class="modal-overlay" id="giveFeedbackModal"><div class="modal">
   <div class="modal-header"><h2>Submit Feedback</h2><button class="modal-close" onclick="closeModal('giveFeedbackModal')">x</button></div>
-  <form id="giveFeedbackForm" onsubmit="submitFeedback(event)">
+  <form id="giveFeedbackForm" onsubmit="submitFeedback(event)" novalidate>
     <input type="hidden" id="gfIntId">
-    <div class="form-group"><label>Rating (1-5) *</label><input id="gfRating" type="number" min="1" max="5" required></div>
-    <div class="form-group"><label>Decision *</label><select id="gfStatus" required><option value="SELECTED">Selected</option><option value="REJECTED">Rejected</option></select></div>
-    <div class="form-group"><label>Comments *</label><textarea id="gfComments" rows="3" required></textarea></div>
+    <div class="form-group"><label>Rating (1-5) *</label><input id="gfRating" type="number" min="1" max="5" required><span class="field-error" id="err-gfRating"></span></div>
+    <div class="form-group"><label>Decision *</label><select id="gfStatus" required><option value="SELECTED">Selected</option><option value="REJECTED">Rejected</option></select><span class="field-error" id="err-gfStatus"></span></div>
+    <div class="form-group"><label>Comments *</label><textarea id="gfComments" rows="3" required></textarea><span class="field-error" id="err-gfComments"></span></div>
     <div class="form-group"><label>Strengths</label><textarea id="gfStrengths" rows="2"></textarea></div>
     <div class="form-group"><label>Weaknesses</label><textarea id="gfWeaknesses" rows="2"></textarea></div>
     <div class="form-group"><label>Areas Covered</label><input id="gfAreas"></div>
@@ -394,17 +397,17 @@
 <!-- Panel Modal (Add/Edit) -->
 <div class="modal-overlay" id="panelModal"><div class="modal">
   <div class="modal-header"><h2 id="panelModalTitle">Add Panel Member</h2><button class="modal-close" onclick="closeModal('panelModal')">x</button></div>
-  <form id="panelForm" onsubmit="handlePanelSubmit(event)">
+  <form id="panelForm" onsubmit="handlePanelSubmit(event)" novalidate>
     <input type="hidden" id="pId">
     <div class="form-group">
       <label>Full Name *</label>
       <input id="pName" required>
       <span class="field-error" id="err-pName"></span>
     </div>
-    <div class="form-group"><label>Email *</label><input id="pEmail" type="email" required></div>
-    <div class="form-group"><label>Organization *</label><input id="pOrg" required></div>
-    <div class="form-group"><label>Designation *</label><input id="pDesig" required></div>
-    <div class="form-group"><label>Mobile *</label><input id="pMobile" maxlength="10" pattern="[0-9]{10}" required></div>
+    <div class="form-group"><label>Email *</label><input id="pEmail" type="email" required><span class="field-error" id="err-pEmail"></span></div>
+    <div class="form-group"><label>Organization *</label><input id="pOrg" required><span class="field-error" id="err-pOrg"></span></div>
+    <div class="form-group"><label>Designation *</label><input id="pDesig" required><span class="field-error" id="err-pDesig"></span></div>
+    <div class="form-group"><label>Mobile *</label><input id="pMobile" maxlength="10" pattern="[0-9]{10}" required><span class="field-error" id="err-pMobile"></span></div>
     <button type="submit" class="btn btn-primary btn-full" id="panelSubmitBtn">Create</button>
     <div class="msg" id="pMsg"></div>
   </form>
@@ -415,8 +418,16 @@
   <div class="modal-header"><h2>Edit Interview</h2><button type="button" class="modal-close" onclick="closeModal('editInterviewModal')">x</button></div>
   <form onsubmit="handleEditInterview(event)">
     <input type="hidden" id="eiId">
-    <div class="form-group"><label>Date & Time</label><input type="datetime-local" id="eiDateTime" required></div>
-    <div class="form-group"><label>Focus Area</label><input type="text" id="eiFocus" required></div>
+    <div class="form-group">
+      <label>Date & Time</label>
+      <input type="datetime-local" id="eiDateTime" required>
+      <span class="field-error" id="err-eiDateTime"></span>
+    </div>
+    <div class="form-group">
+      <label>Focus Area</label>
+      <input type="text" id="eiFocus" required>
+      <span class="field-error" id="err-eiFocus"></span>
+    </div>
     <button type="submit" class="btn btn-primary btn-full submit-btn">Update Interview</button>
   </form>
 </div></div>

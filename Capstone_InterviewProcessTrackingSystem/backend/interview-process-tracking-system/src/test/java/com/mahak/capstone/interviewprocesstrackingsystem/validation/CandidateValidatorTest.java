@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import com.mahak.capstone.interviewprocesstrackingsystem.dto.CandidateRequestDTO;
 import com.mahak.capstone.interviewprocesstrackingsystem.exception.InvalidRequestException;
+import com.mahak.capstone.interviewprocesstrackingsystem.enums.ApplicationSource;
 
 public class CandidateValidatorTest {
 
@@ -17,6 +18,7 @@ public class CandidateValidatorTest {
         dto.setRelevantExperience(3);
         dto.setMobileNumber("9876543210");
         dto.setResumeUrl("http://example.com/resume.pdf");
+        dto.setSource(ApplicationSource.LINKEDIN); // Fixed: Use Enum instead of String
         
         assertDoesNotThrow(() -> CandidateValidator.validateCreateCandidate(dto));
     }

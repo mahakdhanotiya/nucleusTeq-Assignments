@@ -2,6 +2,7 @@ package com.mahak.capstone.interviewprocesstrackingsystem.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -94,7 +95,7 @@ public class InterviewControllerTest {
         InterviewResponseDTO response = new InterviewResponseDTO();
         response.setId(1L);
 
-        when(interviewService.getAllInterviews()).thenReturn(List.of(response));
+        when(interviewService.getAllInterviews(anyString(), anyString())).thenReturn(List.of(response));
 
         mockMvc.perform(get("/api/interviews"))
                 .andExpect(status().isOk())

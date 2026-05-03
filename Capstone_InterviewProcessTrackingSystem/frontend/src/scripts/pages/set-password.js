@@ -1,26 +1,35 @@
 import { setPassword } from "../actions/auth.js";
+import { showFieldError, clearErrors } from "../lib/utils/ui.js";
 
 const params = new URLSearchParams(window.location.search);
-const token = params.get("token");
+let token = params.get("token");
 const msgEl = document.getElementById("setMsg");
 
-if (!token) {
-  msgEl.className = "msg error";
-  msgEl.textContent = "Invalid link. No token found.";
-  msgEl.style.display = "block";
-  document.getElementById("setPasswordForm").querySelector("button").disabled = true;
-}
+// Removed immediate blocking logic to avoid confusion
+console.log("Token detected:", token ? "Yes" : "No");
 
 document.getElementById("setPasswordForm").addEventListener("submit", async (e) => {
   e.preventDefault();
-  msgEl.style.display = "none";
-
+  clearErrors("setPasswordForm");
   const password = document.getElementById("password").value;
   const confirmPassword = document.getElementById("confirmPassword").value;
 
-  if (password !== confirmPassword) {
+  let hasError = false;
+  if (!password) { showFieldError("password", "Password is required"); hasError = true; }
+  else if (password.length < 6) { showFieldError("password", "Min 6 characters required"); hasError = true; }
+  
+  if (!confirmPassword) { showFieldError("confirmPassword", "Please confirm your password"); hasError = true; }
+
+  if (!hasError && password !== confirmPassword) {
+    showFieldError("confirmPassword", "Passwords do not match");
+    hasError = true;
+  }
+
+  if (hasError) return;
+
+  if (!token) {
     msgEl.className = "msg error";
-    msgEl.textContent = "Passwords do not match";
+    msgEl.textContent = "Invalid setup link. Please use the link sent to your email.";
     msgEl.style.display = "block";
     return;
   }

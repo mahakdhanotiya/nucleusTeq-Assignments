@@ -30,7 +30,7 @@ public interface InterviewService {
     /**
      * Fetch all interviews
      */
-    List<InterviewResponseDTO> getAllInterviews();
+    List<InterviewResponseDTO> getAllInterviews(String role, String username);
     
     /**
      * get interviews by Candidate.
