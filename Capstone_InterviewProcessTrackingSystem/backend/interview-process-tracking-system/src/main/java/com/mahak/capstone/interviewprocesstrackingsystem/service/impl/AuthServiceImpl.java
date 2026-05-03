@@ -113,6 +113,7 @@ public class AuthServiceImpl implements AuthService {
         passwordTokenRepository.save(token);
 
         String setupUrl = frontendUrl + "/set-password.html?token=" + token.getToken();
+        logger.info("Password setup URL generated: {}", setupUrl);
         emailService.sendPasswordSetupEmail(dto.getEmail().trim(), dto.getFullName().trim(), setupUrl);
 
         logger.info("User registered successfully: {}", dto.getEmail());
