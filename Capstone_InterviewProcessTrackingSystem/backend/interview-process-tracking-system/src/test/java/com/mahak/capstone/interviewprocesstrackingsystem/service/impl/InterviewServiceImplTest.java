@@ -2,7 +2,12 @@ package com.mahak.capstone.interviewprocesstrackingsystem.service.impl;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
+
+import com.mahak.capstone.interviewprocesstrackingsystem.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -60,6 +65,8 @@ class InterviewServiceImplTest {
     @Mock private InterviewPanelAssignmentMapper assignmentMapper;
     @Mock private InterviewValidation interviewValidation;
     @Mock private EmailService emailService;
+    @Mock private UserRepository userRepository;
+
 
     @InjectMocks private InterviewServiceImpl interviewService;
 
@@ -159,10 +166,21 @@ class InterviewServiceImplTest {
     }
 
     @Test
-    void getAllInterviews_Empty_Exception() {
-        when(interviewRepository.findAll()).thenReturn(new ArrayList<>());
-        assertThrows(ResourceNotFoundException.class, () -> interviewService.getAllInterviews());
+    void getAllInterviews_HR_Success() {
+        when(interviewRepository.findAll()).thenReturn(List.of(interview));
+        when(interviewMapper.toResponseDTO(any())).thenReturn(new InterviewResponseDTO());
+
+        List<InterviewResponseDTO> results = interviewService.getAllInterviews("ROLE_HR", "hr@test.com");
+        assertFalse(results.isEmpty());
     }
+
+    @Test
+    void getAllInterviews_Empty_ReturnsEmptyList() {
+        when(interviewRepository.findAll()).thenReturn(new ArrayList<>());
+        List<InterviewResponseDTO> results = interviewService.getAllInterviews("ROLE_HR", "hr@test.com");
+        assertTrue(results.isEmpty());
+    }
+
 
     @Test
     void deleteInterview_WithAssignments_Success() {

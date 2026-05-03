@@ -146,9 +146,10 @@ class CandidateServiceImplTest {
 
     @Test
     void searchCandidates_Success() {
-        when(candidateRepository.findByFilters(any(), any(), any(), any())).thenReturn(List.of(candidate));
-        List<CandidateResponseDTO> list = candidateService.searchCandidates(1L, InterviewStage.L1, ApplicationStatus.EVALUATED, null);
+        when(candidateRepository.findAll()).thenReturn(List.of(candidate));
+        List<CandidateResponseDTO> list = candidateService.searchCandidates(1L, InterviewStage.PROFILING, ApplicationStatus.PROFILING_COMPLETED, null);
         assertFalse(list.isEmpty());
+        assertEquals(1, list.size());
     }
 
     @Test
