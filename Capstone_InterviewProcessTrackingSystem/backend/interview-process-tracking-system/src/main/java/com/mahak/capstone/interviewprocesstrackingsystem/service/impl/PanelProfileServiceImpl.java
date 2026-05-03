@@ -25,6 +25,7 @@ import com.mahak.capstone.interviewprocesstrackingsystem.service.EmailService;
 import com.mahak.capstone.interviewprocesstrackingsystem.service.PanelProfileService;
 import com.mahak.capstone.interviewprocesstrackingsystem.enums.Role;
 import com.mahak.capstone.interviewprocesstrackingsystem.validation.PanelProfileValidation;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * Implementation of PanelProfileService.
@@ -49,7 +50,7 @@ public class PanelProfileServiceImpl implements PanelProfileService {
     @Value("${app.frontend.url}")
     private String frontendUrl;
 
-    private final org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
     public PanelProfileServiceImpl(
             PanelProfileRepository panelRepository,
@@ -59,7 +60,7 @@ public class PanelProfileServiceImpl implements PanelProfileService {
             EmailService emailService,
             PasswordEncoder passwordEncoder,
             PasswordTokenRepository passwordTokenRepository,
-            org.springframework.jdbc.core.JdbcTemplate jdbcTemplate) {
+            JdbcTemplate jdbcTemplate) {
 
         this.panelRepository = panelRepository;
         this.userRepository = userRepository;

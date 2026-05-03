@@ -5,6 +5,9 @@ import com.mahak.capstone.interviewprocesstrackingsystem.dto.CandidateResponseDT
 import com.mahak.capstone.interviewprocesstrackingsystem.entity.CandidateProfile;
 import com.mahak.capstone.interviewprocesstrackingsystem.entity.JobDescription;
 import com.mahak.capstone.interviewprocesstrackingsystem.entity.User;
+import com.mahak.capstone.interviewprocesstrackingsystem.enums.ApplicationStatus;
+import com.mahak.capstone.interviewprocesstrackingsystem.enums.InterviewStage;
+import java.time.LocalDateTime;
 
 public class CandidateMapper {
 
@@ -38,6 +41,11 @@ public class CandidateMapper {
         c.setUser(user);
         c.setJobDescription(job);
 
+        // Manually set defaults in case @PrePersist fails
+        c.setCreatedAt(LocalDateTime.now());
+        c.setCurrentStage(InterviewStage.PROFILING);
+        c.setApplicationStatus(ApplicationStatus.PROFILING_COMPLETED);
+
         return c;
     }
 
@@ -69,12 +77,18 @@ public class CandidateMapper {
         
         dto.setCreatedAt(c.getCreatedAt());
         
-        // relations → IDs + names
-        dto.setUserId(c.getUser().getId());
-        dto.setJobId(c.getJobDescription().getId());
-        dto.setFullName(c.getUser().getFullName());
-        dto.setEmail(c.getUser().getEmail());
-        dto.setJobTitle(c.getJobDescription().getTitle());
+        // relations → IDs + names (Null-Safe)
+        if (c.getUser() != null) {
+            dto.setUserId(c.getUser().getId());
+            dto.setFullName(c.getUser().getFullName());
+            dto.setEmail(c.getUser().getEmail());
+        }
+        
+        if (c.getJobDescription() != null) {
+            dto.setJobId(c.getJobDescription().getId());
+            dto.setJobTitle(c.getJobDescription().getTitle());
+        }
+        
         return dto;
     }
 }

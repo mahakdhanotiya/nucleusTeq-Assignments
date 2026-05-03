@@ -28,6 +28,9 @@ public class CandidateValidator {
         }
 
         // 1. Experience Validations
+        if (dto.getTotalExperience() == null) {
+            throw new InvalidRequestException("Total experience is required");
+        }
         if (dto.getTotalExperience() < 0) {
             throw new InvalidRequestException("Total experience cannot be negative");
         }
@@ -40,8 +43,8 @@ public class CandidateValidator {
         }
 
         // 2. Mobile Number Validation (Simple 10-digit check)
-        if (dto.getMobileNumber() != null && !dto.getMobileNumber().matches("^[0-9]{10}$")) {
-            throw new InvalidRequestException("Mobile number must be exactly 10 digits");
+        if (dto.getMobileNumber() == null || !dto.getMobileNumber().matches("^[0-9]{10}$")) {
+            throw new InvalidRequestException("Mobile number is required and must be exactly 10 digits");
         }
 
         // 3. CTC Validations
@@ -52,7 +55,12 @@ public class CandidateValidator {
             throw new InvalidRequestException("Expected CTC cannot be negative");
         }
 
-        // 4. Resume Validation
+        // 4. Source Validation
+        if (dto.getSource() == null) {
+            throw new InvalidRequestException("Application source is required");
+        }
+
+        // 5. Resume Validation
         if (dto.getResumeUrl() == null || dto.getResumeUrl().isBlank()) {
             throw new InvalidRequestException("Resume URL is required");
         }

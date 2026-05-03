@@ -19,6 +19,9 @@ import com.mahak.capstone.interviewprocesstrackingsystem.mapper.CandidateMapper;
 import com.mahak.capstone.interviewprocesstrackingsystem.repository.CandidateRepository;
 import com.mahak.capstone.interviewprocesstrackingsystem.repository.JobDescriptionRepository;
 import com.mahak.capstone.interviewprocesstrackingsystem.repository.UserRepository;
+import com.mahak.capstone.interviewprocesstrackingsystem.repository.InterviewRepository;
+import com.mahak.capstone.interviewprocesstrackingsystem.repository.InterviewPanelAssignmentRepository;
+import com.mahak.capstone.interviewprocesstrackingsystem.repository.FeedbackRepository;
 import com.mahak.capstone.interviewprocesstrackingsystem.security.CurrentUserUtil;
 import com.mahak.capstone.interviewprocesstrackingsystem.service.CandidateService;
 import com.mahak.capstone.interviewprocesstrackingsystem.validation.CandidateValidator;
@@ -36,16 +39,25 @@ public class CandidateServiceImpl implements CandidateService {
     private final CandidateRepository candidateRepository;
     private final UserRepository userRepository;
     private final JobDescriptionRepository jobRepository;
+    private final InterviewRepository interviewRepository;
+    private final InterviewPanelAssignmentRepository assignmentRepository;
+    private final FeedbackRepository feedbackRepository;
 
     // Constructor Injection
     public CandidateServiceImpl(
             CandidateRepository candidateRepository,
             UserRepository userRepository,
-            JobDescriptionRepository jobRepository) {
+            JobDescriptionRepository jobRepository,
+            InterviewRepository interviewRepository,
+            InterviewPanelAssignmentRepository assignmentRepository,
+            FeedbackRepository feedbackRepository) {
 
         this.candidateRepository = candidateRepository;
         this.userRepository = userRepository;
         this.jobRepository = jobRepository;
+        this.interviewRepository = interviewRepository;
+        this.assignmentRepository = assignmentRepository;
+        this.feedbackRepository = feedbackRepository;
     }
 
     /**
@@ -58,6 +70,9 @@ public class CandidateServiceImpl implements CandidateService {
                 requestDTO.getUserId(), requestDTO.getJobId());
 
         // Validate request
+        if (requestDTO.getSource() == null) {
+            requestDTO.setSource(com.mahak.capstone.interviewprocesstrackingsystem.enums.ApplicationSource.CAREER_PORTAL);
+        }
         CandidateValidator.validateCreateCandidate(requestDTO);
 
         // Fetch User
@@ -82,12 +97,6 @@ public class CandidateServiceImpl implements CandidateService {
                     logger.error("Job not found with id: {}", requestDTO.getJobId());
                     return new ResourceNotFoundException(ErrorConstants.JOB_NOT_FOUND);
                 });
-
-        // Validate Resume (PDF only)
-        if (!requestDTO.getResumeUrl().toLowerCase().endsWith(".pdf")) {
-            logger.error("Invalid resume format for userId: {}", requestDTO.getUserId());
-            throw new InvalidRequestException(ErrorConstants.INVALID_RESUME_FORMAT);
-        }
 
         // Map DTO → Entity
         CandidateProfile candidate =
@@ -236,14 +245,37 @@ public class CandidateServiceImpl implements CandidateService {
      */
 
     @Override
+    @org.springframework.transaction.annotation.Transactional
     public void deleteCandidate(Long id) {
-        logger.info("Deleting candidate with id: {}", id);
+        logger.info("Deleting candidate and all associated interview data with id: {}", id);
         CandidateProfile candidate = candidateRepository.findById(id)
                 .orElseThrow(() -> {
                     logger.error(ErrorConstants.CANDIDATE_NOT_FOUND + " with id: {}", id);
                     return new ResourceNotFoundException(ErrorConstants.CANDIDATE_NOT_FOUND);
                 });
+
+        // 1. Find all interviews for this candidate
+        List<com.mahak.capstone.interviewprocesstrackingsystem.entity.Interview> interviews = interviewRepository.findByCandidateId(id);
+        
+        for (com.mahak.capstone.interviewprocesstrackingsystem.entity.Interview interview : interviews) {
+            // 2. Delete feedback for each interview
+            List<com.mahak.capstone.interviewprocesstrackingsystem.entity.Feedback> feedbackList = feedbackRepository.findByInterviewId(interview.getId());
+            if (!feedbackList.isEmpty()) {
+                feedbackRepository.deleteAll(feedbackList);
+            }
+            
+            // 3. Delete panel assignments for each interview
+            List<com.mahak.capstone.interviewprocesstrackingsystem.entity.InterviewPanelAssignment> assignments = assignmentRepository.findByInterviewId(interview.getId());
+            if (!assignments.isEmpty()) {
+                assignmentRepository.deleteAll(assignments);
+            }
+            
+            // 4. Delete the interview itself
+            interviewRepository.delete(interview);
+        }
+
+        // 5. Finally delete the candidate
         candidateRepository.delete(candidate);
-        logger.info("Candidate deleted successfully: {}", id);
+        logger.info("Candidate and all linked data deleted successfully: {}", id);
     }
 }

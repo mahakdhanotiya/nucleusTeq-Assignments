@@ -30,6 +30,9 @@ import com.mahak.capstone.interviewprocesstrackingsystem.exception.ResourceNotFo
 import com.mahak.capstone.interviewprocesstrackingsystem.repository.CandidateRepository;
 import com.mahak.capstone.interviewprocesstrackingsystem.repository.JobDescriptionRepository;
 import com.mahak.capstone.interviewprocesstrackingsystem.repository.UserRepository;
+import com.mahak.capstone.interviewprocesstrackingsystem.repository.InterviewRepository;
+import com.mahak.capstone.interviewprocesstrackingsystem.repository.InterviewPanelAssignmentRepository;
+import com.mahak.capstone.interviewprocesstrackingsystem.repository.FeedbackRepository;
 import com.mahak.capstone.interviewprocesstrackingsystem.security.CurrentUserUtil;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,6 +41,9 @@ class CandidateServiceImplTest {
     @Mock private CandidateRepository candidateRepository;
     @Mock private UserRepository userRepository;
     @Mock private JobDescriptionRepository jobRepository;
+    @Mock private InterviewRepository interviewRepository;
+    @Mock private InterviewPanelAssignmentRepository assignmentRepository;
+    @Mock private FeedbackRepository feedbackRepository;
 
     @InjectMocks private CandidateServiceImpl candidateService;
 
@@ -214,7 +220,7 @@ class CandidateServiceImplTest {
     @Test
     void deleteCandidate_Success() {
         when(candidateRepository.findById(1L)).thenReturn(Optional.of(candidate));
-        doNothing().when(candidateRepository).delete(candidate);
+        when(interviewRepository.findByCandidateId(1L)).thenReturn(new ArrayList<>());
         
         assertDoesNotThrow(() -> candidateService.deleteCandidate(1L));
         verify(candidateRepository, times(1)).delete(candidate);

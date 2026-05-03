@@ -184,13 +184,25 @@ class InterviewServiceImplTest {
 
     @Test
     void deleteInterview_WithAssignments_Success() {
+        interview.setStatus(InterviewStatus.SCHEDULED);
+        candidate.setApplicationStatus(ApplicationStatus.INTERVIEW_SCHEDULED);
         when(interviewRepository.findById(1L)).thenReturn(Optional.of(interview));
         when(assignmentRepository.findByInterviewId(1L)).thenReturn(List.of(new InterviewPanelAssignment()));
+        when(candidateRepository.save(any())).thenReturn(candidate);
         
         panelService_deleteInterview(1L);
         
         verify(assignmentRepository).deleteAll(any());
+        verify(candidateRepository).save(any());
         verify(interviewRepository).delete(interview);
+    }
+
+    @Test
+    void deleteInterview_Completed_Exception() {
+        interview.setStatus(InterviewStatus.COMPLETED);
+        when(interviewRepository.findById(1L)).thenReturn(Optional.of(interview));
+        
+        assertThrows(InvalidRequestException.class, () -> interviewService.deleteInterview(1L));
     }
 
     private void panelService_deleteInterview(Long id) {
