@@ -1,4 +1,4 @@
-/* ========== AUTH PAGES (Login/Register) ========== */
+/* ---------- AUTH PAGES (Login/Register) ---------- */
 .page-wrapper {
   display: flex;
   min-height: 100vh;
@@ -51,7 +51,7 @@
   color: var(--text-secondary);
 }
 
-/* ========== INPUT WITH ICON ========== */
+/* ---------- INPUT WITH ICON ---------- */
 .input-icon-wrapper {
   position: relative;
   display: flex;
@@ -74,7 +74,7 @@
   pointer-events: none;
 }
 
-/* ========== PASSWORD TOGGLE ========== */
+/* ---------- PASSWORD TOGGLE ---------- */
 .toggle-pw {
   position: absolute;
   right: 12px;
@@ -103,7 +103,7 @@
   padding-right: 40px;
 }
 
-/* ========== NAVBAR (for public pages) ========== */
+/* ---------- NAVBAR (for public pages) ---------- */
 .navbar {
   display: flex;
   align-items: center;
@@ -150,7 +150,7 @@
   border-radius: 8px !important;
 }
 
-/* ========== JOB CARDS (for HR and public pages) ========== */
+/* ---------- JOB CARDS (for HR and public pages) ---------- */
 .job-card {
   background: white;
   border-radius: 12px;
@@ -212,7 +212,7 @@
   text-transform: uppercase;
 }
 
-/* ========== FEEDBACK CARDS ========== */
+/* ---------- FEEDBACK CARDS ---------- */
 .feedback-card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -229,7 +229,7 @@
 .feedback-card .decision-selected { color: var(--success); font-weight: 600; }
 .feedback-card .decision-rejected { color: var(--danger); font-weight: 600; }
 
-/* ========== PIPELINE TRACKER (REIMAGINED) ========== */
+/* ---------- PIPELINE TRACKER (REIMAGINED) ---------- */
 .pipeline-container {
   display: flex;
   align-items: center;
@@ -318,7 +318,7 @@
 }
 .pipeline-step.rejected .pipeline-label { color: #ef4444; }
 
-/* ========== FEEDBACK CENTER (RICH CARDS) ========== */
+/* ---------- FEEDBACK CENTER (RICH CARDS) ---------- */
 .feedback-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
@@ -449,13 +449,13 @@
   position: relative;
 }
 
-/* ========== JOBS GRID ========== */
+/* ---------- JOBS GRID ---------- */
 .jobs-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 16px;
 }
-/* ========== VALIDATION & ERROR STYLES ========== */
+/* ---------- VALIDATION & ERROR STYLES ---------- */
 .field-error {
   color: #ef4444;
   font-size: 0.7rem;

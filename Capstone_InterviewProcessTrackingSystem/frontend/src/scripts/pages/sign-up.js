@@ -19,6 +19,10 @@ form.addEventListener("submit", async (e) => {
 
     let hasError = false;
 
+    if (!fullName) { showFieldError("fullName", "Name is required"); hasError = true; }
+    if (!email) { showFieldError("email", "Email is required"); hasError = true; }
+    if (!mobileNumber) { showFieldError("mobileNumber", "Mobile number is required"); hasError = true; }
+
     // Name Validation: Only alphabets and spaces
     const nameRegex = /^[a-zA-Z\s.-]+$/;
     if (!nameRegex.test(fullName)) {

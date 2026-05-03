@@ -13,6 +13,12 @@ form.addEventListener("submit", async (e) => {
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value;
 
+    let hasError = false;
+    if (!email) { showFieldError("email", "Email is required"); hasError = true; }
+    if (!password) { showFieldError("password", "Password is required"); hasError = true; }
+    
+    if (hasError) return;
+
     try {
         const data = await signIn(email, password);
 

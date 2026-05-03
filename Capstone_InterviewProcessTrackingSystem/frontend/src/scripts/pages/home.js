@@ -1,7 +1,7 @@
 import { getMyProfile, getInterviews, getJobs } from "../actions/user.js";
 import { fetchHandler } from "../lib/handlers/fetch.js";
 import { SITE_CONFIG } from "../config/site-config.js";
-import { renderSidebarProfile, initFormCleanup, getResumeUrl } from "../lib/utils/ui.js";
+import { renderSidebarProfile, initFormCleanup, getResumeUrl, showFieldError, clearErrors } from "../lib/utils/ui.js";
 
 const token = localStorage.getItem("token");
 const userId = localStorage.getItem("userId");
@@ -181,6 +181,7 @@ window.openEditProfileModal = function() {
   document.getElementById("epExpectedCTC").value = cachedProfile.expectedCTC || '';
   document.getElementById("epNotice").value = cachedProfile.noticePeriod || 0;
   document.getElementById("epLocation").value = cachedProfile.preferredLocation || '';
+  document.getElementById("epSource").value = cachedProfile.source ? cachedProfile.source.replace(/_/g, ' ') : 'N/A';
   document.getElementById("epMsg").textContent = "";
   
   document.getElementById("editProfileModal").classList.add("show");
@@ -197,14 +198,37 @@ window.handleEditProfile = async function(e) {
   btn.textContent = "Saving...";
   btn.disabled = true;
 
+  // 1. Clear previous errors
+  clearErrors("editProfileForm");
+  let isValid = true;
+  
   let resumeUrl = cachedProfile.resumeUrl || '';
 
-  // Mobile Number Validation: Exactly 10 digits, numbers only
+  // 2. Mobile Number Validation: Exactly 10 digits, numbers only
   const mobileNumber = document.getElementById("epMobile").value.trim();
   const mobileRegex = /^[0-9]{10}$/;
   if (!mobileRegex.test(mobileNumber)) {
-    document.getElementById("epMsg").className = "msg error";
-    document.getElementById("epMsg").textContent = "Mobile number must be exactly 10 digits and contain only numbers.";
+    showFieldError("epMobile", "Mobile number must be exactly 10 digits.");
+    isValid = false;
+  }
+
+  // 3. Experience Validation
+  const totalExp = parseInt(document.getElementById("epExperience").value || "0");
+  const relExp = parseInt(document.getElementById("epRelExp").value || "0");
+  if (relExp > totalExp) {
+    showFieldError("epRelExp", "Relevant experience cannot exceed total experience.");
+    isValid = false;
+  }
+
+  // 4. CTC Validation
+  const currentCtc = parseFloat(document.getElementById("epCurrentCTC").value || "0");
+  const expectedCtc = parseFloat(document.getElementById("epExpectedCTC").value || "0");
+  if (expectedCtc > 0 && expectedCtc < currentCtc) {
+    showFieldError("epExpectedCTC", "Expected CTC should not be less than current CTC.");
+    isValid = false;
+  }
+
+  if (!isValid) {
     btn.textContent = prevText;
     btn.disabled = false;
     return;
@@ -216,8 +240,7 @@ window.handleEditProfile = async function(e) {
     const file = fileInput.files[0];
     // Validate PDF
     if (!file.name.toLowerCase().endsWith('.pdf')) {
-      document.getElementById("epMsg").className = "msg error";
-      document.getElementById("epMsg").textContent = "Only PDF files are allowed for resume.";
+      showFieldError("epResumeFile", "Only PDF files are allowed for resume.");
       btn.textContent = prevText;
       btn.disabled = false;
       return;
@@ -251,21 +274,24 @@ window.handleEditProfile = async function(e) {
   }
 
   const body = {
-    mobileNumber: document.getElementById("epMobile").value,
+    userId: cachedProfile.userId,
+    jobId: cachedProfile.jobId,
+    source: cachedProfile.source,
+    mobileNumber: document.getElementById("epMobile").value.trim(),
     totalExperience: parseInt(document.getElementById("epExperience").value),
     relevantExperience: parseInt(document.getElementById("epRelExp").value) || 0,
-    currentCompany: document.getElementById("epCompany").value,
+    currentCompany: document.getElementById("epCompany").value.trim(),
     resumeUrl: resumeUrl,
     currentCTC: parseFloat(document.getElementById("epCurrentCTC").value) || null,
     expectedCTC: parseFloat(document.getElementById("epExpectedCTC").value) || null,
     noticePeriod: parseInt(document.getElementById("epNotice").value) || 0,
-    preferredLocation: document.getElementById("epLocation").value
+    preferredLocation: document.getElementById("epLocation").value.trim()
   };
 
   try {
     const data = await fetchHandler("/candidates/update", {
       method: "PUT",
-      body: JSON.stringify(body),
+      body: body,
       requireAuth: true
     });
     if (data.success) {
@@ -289,7 +315,7 @@ function toast(msg, type="success") {
   const container = document.getElementById("toastContainer");
   if(!container) return alert(msg);
   const t = document.createElement("div");
-  t.className = `toast toast-${type}`;
+  t.className = `toast ${type}`;
   t.textContent = msg;
   container.appendChild(t);
   setTimeout(() => { t.style.opacity="0"; setTimeout(()=>t.remove(), 300); }, 3000);

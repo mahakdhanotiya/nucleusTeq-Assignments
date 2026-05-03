@@ -461,11 +461,22 @@ window.openEditInterview = function(id) {
 
 window.handleEditInterview = async function(e) {
   e.preventDefault();
+  // Clear errors using form's parent or direct selection since form has no ID
+  const form = e.target;
+  const errorSpans = form.querySelectorAll(".field-error");
+  errorSpans.forEach(s => { s.textContent = ""; s.classList.remove("show"); });
+  form.querySelectorAll("input, select, textarea").forEach(i => i.classList.remove("error-field"));
+
   const id = document.getElementById("eiId").value;
   const body = {
     interviewDateTime: document.getElementById("eiDateTime").value,
     focusArea: document.getElementById("eiFocus").value
   };
+
+  if (new Date(body.interviewDateTime) <= new Date()) {
+    showFieldError("eiDateTime", "Interview date must be a future date");
+    return;
+  }
   try {
     const data = await updateInterviewAction(id, body);
     if (data.success) {
@@ -537,7 +548,7 @@ async function openScheduleModal() {
     submitBtn.disabled = false;
     jobSelect.disabled = false;
 
-    // 2. Validation Logic
+    // Validation Logic
     const validateSchedule = () => {
       const candId = parseInt(candSelect.value);
       const stage = stageSelect.value;
@@ -696,17 +707,23 @@ async function openAssignPanel(id) {
 
 async function assignPanel(e) {
   e.preventDefault();
+  clearErrors("assignPanelForm");
   const interviewId = parseInt(document.getElementById("apInterviewId").value);
   const panel1Id = document.getElementById("apPanelId").value;
   const panel1Focus = document.getElementById("apFocus").value;
   const panel2Id = document.getElementById("apPanelId2").value;
   const panel2Focus = document.getElementById("apFocus2") ? document.getElementById("apFocus2").value : "";
 
+  let hasError = false;
+  if (!panel1Id) { showFieldError("apPanelId", "Please select a panel member"); hasError = true; }
+  if (!panel1Focus.trim()) { showFieldError("apFocus", "Focus area is required"); hasError = true; }
+
   if (panel1Id === panel2Id && panel1Id) {
-    document.getElementById("apMsg").className="msg error"; 
-    document.getElementById("apMsg").textContent="Cannot assign the same panel member twice.";
-    return;
+    showFieldError("apPanelId2", "Cannot assign the same panel member twice.");
+    hasError = true;
   }
+  
+  if (hasError) return;
 
   try {
     const p1Data = await assignPanelAction({ interviewId, panelId: parseInt(panel1Id), focusArea: panel1Focus });
@@ -762,21 +779,30 @@ window.openHRFeedback = function(id, name) {
 
 window.handleHRFeedback = async function(e) {
   e.preventDefault();
+  clearErrors("hrFeedbackForm");
   const intId = parseInt(document.getElementById("hfIntId").value);
   const status = document.getElementById("hfStatus").value;
   const rating = parseInt(document.getElementById("hfRating").value);
+  const comments = document.getElementById("hfComments").value.trim();
 
+  let hasError = false;
   if (isNaN(rating) || rating < 1 || rating > 5) {
-    toast("Rating must be between 1 and 5", "error");
-    return;
+    showFieldError("hfRating", "Rating must be between 1 and 5");
+    hasError = true;
   }
+  if (!comments) {
+    showFieldError("hfComments", "Comments are required");
+    hasError = true;
+  }
+  
+  if (hasError) return;
   
   const body = {
     interviewId: intId,
     panelId: null, // HR feedback
     rating: rating,
     status: status,
-    comments: document.getElementById("hfComments").value,
+    comments: comments,
     strengths: "N/A (HR Round)",
     weaknesses: "N/A (HR Round)",
     areasCovered: "Behavioral, Culture Fit"
@@ -811,7 +837,6 @@ window.scheduleNextRound = async function(candId) {
   
   // When they submit the stage modal, it will refresh everything.
   // Then the user can just click "Schedule Interview" at the top.
-  // Actually, let's make it even smoother.
   toast("Progress the candidate first, then schedule the new round!");
 };
 window.viewAssignmentDetails = function(jsonStr) {
@@ -879,17 +904,31 @@ window.handlePanelSubmit = async function(e) {
 
   let hasError = false;
 
-  // Name Validation: Only alphabets and spaces
-  const nameRegex = /^[a-zA-Z\s.-]+$/;
-  if (!nameRegex.test(fullName)) {
-    showFieldError("pName", "Name should contain only alphabets and spaces.");
-    hasError = true;
+  if (!fullName) { showFieldError("pName", "Full Name is required"); hasError = true; }
+  else {
+    const nameRegex = /^[a-zA-Z\s.-]+$/;
+    if (!nameRegex.test(fullName)) {
+      showFieldError("pName", "Name should contain only alphabets and spaces.");
+      hasError = true;
+    }
   }
 
-  const mobileRegex = /^[0-9]{10}$/;
-  if (!mobileRegex.test(mobileNumber)) {
-    showFieldError("pMobile", "Mobile number must be exactly 10 digits.");
-    hasError = true;
+  const email = document.getElementById("pEmail").value.trim();
+  if (!email) { showFieldError("pEmail", "Email address is required"); hasError = true; }
+  
+  const organization = document.getElementById("pOrg").value.trim();
+  if (!organization) { showFieldError("pOrg", "Organization is required"); hasError = true; }
+
+  const designation = document.getElementById("pDesig").value.trim();
+  if (!designation) { showFieldError("pDesig", "Designation is required"); hasError = true; }
+
+  if (!mobileNumber) { showFieldError("pMobile", "Mobile number is required"); hasError = true; }
+  else {
+    const mobileRegex = /^[0-9]{10}$/;
+    if (!mobileRegex.test(mobileNumber)) {
+      showFieldError("pMobile", "Mobile number must be exactly 10 digits.");
+      hasError = true;
+    }
   }
 
   if (hasError) return;
@@ -918,23 +957,31 @@ async function deletePanelMember(id) {
 
 async function submitFeedback(e) {
   e.preventDefault();
-  const msgEl = document.getElementById("gfMsg");
-  msgEl.style.display = "none";
+  const ratingVal = parseInt(document.getElementById("gfRating").value);
+  const commentsVal = document.getElementById("gfComments").value.trim();
+  
+  let hasError = false;
+  if (isNaN(ratingVal) || ratingVal < 1 || ratingVal > 5) {
+    showFieldError("gfRating", "Rating must be between 1 and 5");
+    hasError = true;
+  }
+  if (!commentsVal) {
+    showFieldError("gfComments", "Comments are required");
+    hasError = true;
+  }
+  
+  if (hasError) return;
+
   const body = {
     interviewId: parseInt(document.getElementById("gfIntId").value),
     panelId: null, // HR feedback
-    rating: parseInt(document.getElementById("gfRating").value),
+    rating: ratingVal,
     status: document.getElementById("gfStatus").value,
-    comments: document.getElementById("gfComments").value,
+    comments: commentsVal,
     strengths: document.getElementById("gfStrengths").value,
     weaknesses: document.getElementById("gfWeaknesses").value,
     areasCovered: document.getElementById("gfAreas").value
   };
-
-  if (isNaN(body.rating) || body.rating < 1 || body.rating > 5) {
-    toast("Rating must be between 1 and 5", "error");
-    return;
-  }
 
   try {
     const data = await submitFeedbackAction(body);
@@ -1059,7 +1106,7 @@ async function loadDashboardStats() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    ["createJobForm", "editJobForm", "scheduleForm", "panelForm", "assignPanelForm"].forEach(initFormCleanup);
+    ["createJobForm", "editJobForm", "scheduleForm", "panelForm", "assignPanelForm", "updateStatusForm", "giveFeedbackForm", "hrFeedbackForm"].forEach(initFormCleanup);
     renderSidebarProfile();
     showTab("candidates");
     loadDashboardStats();

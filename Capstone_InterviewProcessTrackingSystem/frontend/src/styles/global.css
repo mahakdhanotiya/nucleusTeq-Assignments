@@ -1,4 +1,4 @@
-/* ========== RESET & ROOT ========== */
+/* ---------- RESET & ROOT ---------- */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
@@ -28,10 +28,10 @@ body {
 
 a { text-decoration: none; color: var(--primary); }
 
-/* ========== LAYOUT ========== */
+/* ---------- LAYOUT ---------- */
 .layout { display: flex; min-height: 100vh; }
 
-/* ========== SIDEBAR ========== */
+/* ---------- SIDEBAR ---------- */
 .sidebar {
   width: 240px;
   background: var(--primary);
@@ -225,7 +225,7 @@ a { text-decoration: none; color: var(--primary); }
   letter-spacing: -0.02em;
 }
 
-/* ========== MODERN SEARCH BAR ========== */
+/* ---------- MODERN SEARCH BAR ---------- */
 .search-bar-wrapper {
   position: relative;
   width: 100%;
@@ -279,7 +279,7 @@ a { text-decoration: none; color: var(--primary); }
   transform: translateY(-50%) scale(1.1);
 }
 
-/* ========== BUTTONS ========== */
+/* ---------- BUTTONS ---------- */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -310,7 +310,7 @@ a { text-decoration: none; color: var(--primary); }
 .btn-sm { padding: 6px 14px; font-size: 0.8rem; }
 .btn-full { width: 100%; justify-content: center; padding: 12px; }
 
-/* ========== CARDS ========== */
+/* ---------- CARDS ---------- */
 .card {
   background: var(--surface);
   border-radius: var(--radius);
@@ -319,7 +319,7 @@ a { text-decoration: none; color: var(--primary); }
   border: 1px solid var(--border);
 }
 
-/* ========== STAT CARDS ========== */
+/* ---------- STAT CARDS ---------- */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -361,7 +361,7 @@ a { text-decoration: none; color: var(--primary); }
   letter-spacing: 0.04em;
 }
 
-/* ========== TABLES ========== */
+/* ---------- TABLES ---------- */
 .data-table {
   width: 100%;
   border-collapse: separate;
@@ -389,7 +389,7 @@ a { text-decoration: none; color: var(--primary); }
 
 .data-table tr:hover { background: #f8fafc; }
 
-/* ========== STATUS BADGES ========== */
+/* ---------- STATUS BADGES ---------- */
 .badge {
   display: inline-block;
   padding: 4px 10px;
@@ -403,7 +403,7 @@ a { text-decoration: none; color: var(--primary); }
 .badge-warning { background: #fef3c7; color: #d97706; }
 .badge-danger { background: #fee2e2; color: #dc2626; }
 
-/* ========== FORMS ========== */
+/* ---------- FORMS ---------- */
 .form-group { margin-bottom: 16px; }
 
 .form-group label {
@@ -445,7 +445,7 @@ a { text-decoration: none; color: var(--primary); }
   .form-row { grid-template-columns: 1fr; }
 }
 
-/* ========== MODALS ========== */
+/* ---------- MODALS ---------- */
 .modal-overlay {
   display: none;
   position: fixed;
@@ -497,7 +497,7 @@ a { text-decoration: none; color: var(--primary); }
 
 .modal-close:hover { background: var(--bg); }
 
-/* ========== TOAST ========== */
+/* ---------- TOAST ---------- */
 .toast-container {
   position: fixed;
   top: 20px;
@@ -526,7 +526,7 @@ a { text-decoration: none; color: var(--primary); }
   to { opacity: 1; transform: translateX(0); }
 }
 
-/* ========== MISC ========== */
+/* ---------- MISC ---------- */
 .empty-state {
   text-align: center;
   padding: 40px;
@@ -543,7 +543,7 @@ a { text-decoration: none; color: var(--primary); }
 .msg.error { background: #fee2e2; color: #dc2626; }
 .msg.success { background: #d1fae5; color: #059669; }
 
-/* ========== VALIDATION ========== */
+/* ---------- VALIDATION ---------- */
 .error-text {
   color: var(--danger);
   font-size: 0.75rem;
