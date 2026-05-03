@@ -178,7 +178,13 @@ public class CandidateServiceImpl implements CandidateService {
 
         logger.info("Searching candidates with jdId={}, stage={}, status={}, name={}", jdId, stage, status, name);
 
-        List<CandidateProfile> candidates = candidateRepository.findByFilters(jdId, stage, status, name);
+        // Fetch all and filter in Java to avoid PostgreSQL Enum issues
+        List<CandidateProfile> candidates = candidateRepository.findAll().stream()
+                .filter(c -> jdId == null || c.getJobDescription().getId().equals(jdId))
+                .filter(c -> stage == null || c.getCurrentStage() == stage)
+                .filter(c -> status == null || c.getApplicationStatus() == status)
+                .filter(c -> name == null || c.getUser().getFullName().toLowerCase().contains(name.toLowerCase()))
+                .toList();
 
         logger.info("Found {} candidates matching filters", candidates.size());
 

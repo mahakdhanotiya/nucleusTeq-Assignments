@@ -271,21 +271,41 @@ public class InterviewServiceImpl implements InterviewService {
      */
 
     @Override
-public List<InterviewResponseDTO> getAllInterviews() {
+    public List<InterviewResponseDTO> getAllInterviews(String role, String username) {
 
-    logger.info("Fetching all interviews");
+        logger.info("Fetching interviews for role: {} and user: {}", role, username);
 
-    List<Interview> interviews = interviewRepository.findAll();
+        List<Interview> interviews = interviewRepository.findAll();
 
-    if (interviews.isEmpty()) {
-        logger.warn("No interviews found");
-        throw new ResourceNotFoundException("No interviews found");
-    }
+        // Automatic Security Filter: Panels only see their own assignments
+        if ("ROLE_PANEL".equals(role)) {
+            // Find the panel profile for this logged-in user
+            PanelProfile panel = panelRepository.findByUserEmail(username)
+                    .orElse(null);
+            
+            if (panel != null) {
+                Long panelId = panel.getId();
+                interviews = interviews.stream()
+                        .filter(i -> {
+                            List<InterviewPanelAssignment> assignments = assignmentRepository.findByInterviewId(i.getId());
+                            return assignments.stream().anyMatch(a -> Objects.equals(a.getPanel().getId(), panelId));
+                        })
+                        .toList();
+            } else {
+                // If no panel profile found for this user, return empty list
+                return new java.util.ArrayList<>();
+            }
+        }
 
-    return interviews.stream()
-            .map(interviewMapper::toResponseDTO)
-            .map(this::enrichInterviewDTO)
-            .toList();
+        if (interviews.isEmpty()) {
+            logger.warn("No interviews found for role: {}", role);
+            return new java.util.ArrayList<>();
+        }
+
+        return interviews.stream()
+                .map(interviewMapper::toResponseDTO)
+                .map(this::enrichInterviewDTO)
+                .toList();
     }
 
 

@@ -5,6 +5,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -100,9 +103,25 @@ public class InterviewController {
     @PreAuthorize("hasAnyRole('HR','PANEL')")
     public ApiResponseDTO<List<InterviewResponseDTO>> getAllInterviews() {
 
-        logger.info("Fetching all interviews");
-        List<InterviewResponseDTO> response = interviewService.getAllInterviews();
-        logger.info("Fetched {} interviews", response.size());
+        logger.info("Fetching interviews");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String role = "USER";
+        String username = null;
+        if (auth != null && !auth.getAuthorities().isEmpty()) {
+            role = auth.getAuthorities().iterator().next().getAuthority();
+            
+            Object principal = auth.getPrincipal();
+            if (principal instanceof com.mahak.capstone.interviewprocesstrackingsystem.entity.User) {
+                username = ((com.mahak.capstone.interviewprocesstrackingsystem.entity.User) principal).getEmail();
+            } else if (principal instanceof UserDetails) {
+                username = ((UserDetails) principal).getUsername();
+            } else {
+                username = auth.getName();
+            }
+        }
+
+        List<InterviewResponseDTO> response = interviewService.getAllInterviews(role, username);
+        logger.info("Fetched {} interviews for role {}", response.size(), role);
         return new ApiResponseDTO<>(true, ApiConstants.INTERVIEWS_FETCHED, response);
     }
 
