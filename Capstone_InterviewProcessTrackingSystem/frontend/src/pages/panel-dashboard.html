@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InterviewHub - Panel Dashboard</title>
+  <link rel="stylesheet" href="../styles/global.css">
+  <link rel="stylesheet" href="../styles/components.css">
+  <link rel="stylesheet" href="../styles/pages/panel-dashboard.css">
+</head>
+<body>
+<div class="layout">
+<div class="sidebar">
+  <div class="sidebar-brand"> InterviewHub</div>
+  <div class="user-profile" id="sidebarProfile">
+    <!-- Rendered via JS -->
+  </div>
+  <ul class="sidebar-nav">
+    <li><a href="#" class="active" onclick="showSec('assigned',this)"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg> Assigned Interviews</a></li>
+    <li><a href="#" onclick="showSec('feedback',this)"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg> Submit Feedback</a></li>
+  </ul>
+  <div class="sidebar-bottom-nav">
+    <a href="index.html">
+      <svg class="nav-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      Back to Career Site
+    </a>
+  </div>
+  <div class="sidebar-footer">
+    <a href="#" onclick="logout()"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg> Logout</a>
+  </div>
+</div>
+
+<main class="main-content">
+  <div id="sec-assigned">
+    <div class="page-header">
+      <h1>My Assigned Interviews</h1>
+      <div class="search-bar-wrapper">
+        <input type="search" id="searchAssigned" placeholder="Search by candidate or job..." class="search-input">
+        <svg class="search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+      </div>
+    </div>
+    <div class="card" style="overflow-x:auto">
+      <table class="data-table">
+        <thead><tr><th>Interview ID</th><th>Candidate</th><th>Job</th><th>Stage</th><th>Date/Time</th><th>Focus Area</th><th>Action</th></tr></thead>
+        <tbody id="assignedBody"><tr><td colspan="7" class="empty-state">Loading...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="sec-feedback" style="display:none">
+    <div class="page-header"><h1>Submit Feedback</h1></div>
+    <div class="card">
+      <form id="feedbackForm" onsubmit="submitFeedback(event)" novalidate>
+        <div class="form-row">
+          <div class="form-group"><label>Interview ID *</label><input id="fbIntId" type="number" readonly class="readonly-input" required><span class="field-error" id="err-fbIntId"></span></div>
+          <div class="form-group"><label>Decision *</label><select id="fbStatus" required><option value="SELECTED">Selected</option><option value="REJECTED">Rejected</option></select><span class="field-error" id="err-fbStatus"></span></div>
+        </div>
+        <div class="form-group"><label>Rating (1-5) *</label><input id="fbRating" type="number" min="1" max="5" required placeholder="e.g. 4"><span class="field-error" id="err-fbRating"></span></div>
+        <div class="form-group"><label>Comments *</label><textarea id="fbComments" rows="3" required placeholder="Overall technical assessment and cultural fitment"></textarea><span class="field-error" id="err-fbComments"></span></div>
+        <div class="form-row">
+          <div class="form-group"><label>Strengths</label><textarea id="fbStrengths" rows="2" placeholder="e.g. Strong problem solving, Good understanding of concurrency"></textarea></div>
+          <div class="form-group"><label>Weaknesses</label><textarea id="fbWeaknesses" rows="2" placeholder="e.g. Needs improvement in System Design, Shallow knowledge of Docker"></textarea></div>
+        </div>
+        <div class="form-group"><label>Areas Covered</label><input id="fbAreas" placeholder="e.g. Core Java, Multi-threading, Collections, Spring Boot"></div>
+        <button type="submit" class="btn btn-primary btn-full submit-btn">Submit Feedback</button>
+        <div class="msg" id="fbMsg" style="display:none"></div>
+      </form>
+    </div>
+  </div>
+</main>
+</div>
+
+<!-- View My Feedback Modal -->
+<div class="modal-overlay" id="feedbackModal"><div class="modal">
+  <div class="modal-header"><h2>My Submitted Feedback</h2><button class="modal-close" onclick="closeModal('feedbackModal')">x</button></div>
+  <div id="feedbackContent"><p class="empty-state">Loading...</p></div>
+</div></div>
+<div class="toast-container" id="toastContainer"></div>
+<script type="module" src="../scripts/pages/panel-dashboard.js"></script>
+</body>
+</html>
