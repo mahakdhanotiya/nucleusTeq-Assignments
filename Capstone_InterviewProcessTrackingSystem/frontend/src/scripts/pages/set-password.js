@@ -35,7 +35,9 @@ document.getElementById("setPasswordForm").addEventListener("submit", async (e) 
   }
 
   try {
-    const data = await setPassword(token, password);
+    // Encode password to Base64 for network security with prefix
+    const encodedPassword = "B64:" + btoa(password);
+    const data = await setPassword(token, encodedPassword);
 
     if (data.success) {
       msgEl.className = "msg success";

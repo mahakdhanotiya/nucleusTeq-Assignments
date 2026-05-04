@@ -20,7 +20,9 @@ form.addEventListener("submit", async (e) => {
     if (hasError) return;
 
     try {
-        const data = await signIn(email, password);
+        // Encode password to Base64 for network security with prefix
+        const encodedPassword = "B64:" + btoa(password);
+        const data = await signIn(email, encodedPassword);
 
         if (data.success && data.data) {
             localStorage.setItem("token", data.data.token);
