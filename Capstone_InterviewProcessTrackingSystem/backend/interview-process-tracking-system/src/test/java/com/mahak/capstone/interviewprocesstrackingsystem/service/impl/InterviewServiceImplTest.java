@@ -296,10 +296,92 @@ class InterviewServiceImplTest {
     }
 
     @Test
-    void scheduleInterview_NullCandidate_Exception() {
+    void scheduleInterview_PreviousStageNotCompleted_Exception() {
         InterviewRequestDTO dto = new InterviewRequestDTO();
-        dto.setCandidateId(99L);
-        when(candidateRepository.findById(99L)).thenReturn(Optional.empty());
-        assertThrows(ResourceNotFoundException.class, () -> interviewService.scheduleInterview(dto));
+        dto.setCandidateId(1L);
+        dto.setStage("L1");
+
+        // Current stage is SCREENING, but no COMPLETED screening interview found
+        when(candidateRepository.findById(1L)).thenReturn(Optional.of(candidate));
+        when(interviewRepository.findByCandidateIdAndStage(1L, InterviewStage.SCREENING)).thenReturn(new ArrayList<>());
+
+        assertThrows(InvalidRequestException.class, () -> interviewService.scheduleInterview(dto));
+    }
+
+    @Test
+    void scheduleInterview_JobMismatch_Exception() {
+        InterviewRequestDTO dto = new InterviewRequestDTO();
+        dto.setCandidateId(1L);
+        dto.setJobDescriptionId(2L); // Different JD
+        dto.setStage("L1");
+
+        JobDescription otherJd = new JobDescription();
+        ReflectionTestUtils.setField(otherJd, "id", 2L);
+        otherJd.setTitle("QA Engineer");
+
+        candidate.setCurrentStage(InterviewStage.L1); // Match the stage to pass validation
+        when(candidateRepository.findById(1L)).thenReturn(Optional.of(candidate));
+        when(jdRepository.findById(2L)).thenReturn(Optional.of(otherJd));
+
+        assertThrows(InvalidRequestException.class, () -> interviewService.scheduleInterview(dto));
+    }
+
+    @Test
+    void progressCandidateStage_StageNotCompleted_Exception() {
+        StageProgressionRequestDTO dto = new StageProgressionRequestDTO();
+        dto.setCandidateId(1L);
+        dto.setNewStage("L2");
+
+        candidate.setCurrentStage(InterviewStage.L1);
+        // No COMPLETED L1 interview
+        when(candidateRepository.findById(1L)).thenReturn(Optional.of(candidate));
+        lenient().when(interviewRepository.findByCandidateIdAndStage(1L, InterviewStage.L1)).thenReturn(new ArrayList<>());
+
+        assertThrows(InvalidRequestException.class, () -> interviewService.progressCandidateStage(dto));
+    }
+
+    @Test
+    void updateInterviewStatus_Cancelled_SendsEmails() {
+        when(interviewRepository.findById(1L)).thenReturn(Optional.of(interview));
+        when(assignmentRepository.findByInterviewId(1L)).thenReturn(new ArrayList<>());
+
+        interviewService.updateInterviewStatus(1L, InterviewStatus.CANCELLED);
+
+        verify(emailService, atLeastOnce()).sendCancellationEmail(any(), any(), any(), any(), eq(false));
+    }
+
+    @Test
+    void getAllInterviews_PanelRole_Success() {
+        PanelProfile panel = new PanelProfile();
+        ReflectionTestUtils.setField(panel, "id", 10L);
+        User panelUser = new User();
+        panelUser.setEmail("panel@test.com");
+        panel.setUser(panelUser);
+
+        InterviewPanelAssignment assignment = new InterviewPanelAssignment();
+        assignment.setPanel(panel);
+
+        when(interviewRepository.findAll()).thenReturn(List.of(interview));
+        when(panelRepository.findByUserEmail("panel@test.com")).thenReturn(Optional.of(panel));
+        when(assignmentRepository.findByInterviewId(1L)).thenReturn(List.of(assignment));
+        when(interviewMapper.toResponseDTO(any())).thenReturn(new InterviewResponseDTO());
+
+        List<InterviewResponseDTO> results = interviewService.getAllInterviews("ROLE_PANEL", "panel@test.com");
+        assertFalse(results.isEmpty());
+    }
+
+    @Test
+    void getInterviewsByCandidate_Success() {
+        when(interviewRepository.findByCandidateId(1L)).thenReturn(List.of(interview));
+        when(interviewMapper.toResponseDTO(any())).thenReturn(new InterviewResponseDTO());
+
+        List<InterviewResponseDTO> results = interviewService.getInterviewsByCandidate(1L);
+        assertFalse(results.isEmpty());
+    }
+
+    @Test
+    void getInterviewsByCandidate_Empty_Exception() {
+        when(interviewRepository.findByCandidateId(1L)).thenReturn(new ArrayList<>());
+        assertThrows(ResourceNotFoundException.class, () -> interviewService.getInterviewsByCandidate(1L));
     }
 }

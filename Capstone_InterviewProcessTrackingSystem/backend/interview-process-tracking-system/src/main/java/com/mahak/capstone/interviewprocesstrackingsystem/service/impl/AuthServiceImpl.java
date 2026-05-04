@@ -29,6 +29,7 @@ import com.mahak.capstone.interviewprocesstrackingsystem.service.EmailService;
 import java.time.LocalDate;
 import java.util.UUID;
 import java.util.Optional;
+import java.util.Base64;
 
 /**
  * Implementation of AuthService containing authentication logic.
@@ -136,7 +137,12 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByEmail(token.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorConstants.USER_NOT_FOUND));
 
-        user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        // Decode from Base64 if prefixed (Security requirement)
+        String rawPassword = dto.getPassword();
+        if (rawPassword != null && rawPassword.startsWith("B64:")) {
+            rawPassword = new String(Base64.getDecoder().decode(rawPassword.substring(4)));
+        }
+        user.setPassword(passwordEncoder.encode(rawPassword));
         userRepository.save(user);
 
         token.setUsed(true);
@@ -151,7 +157,12 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorConstants.USER_NOT_FOUND));
 
-        if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
+        // Decode from Base64 if prefixed (Security requirement)
+        String rawPassword = dto.getPassword();
+        if (rawPassword != null && rawPassword.startsWith("B64:")) {
+            rawPassword = new String(Base64.getDecoder().decode(rawPassword.substring(4)));
+        }
+        if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
             throw new InvalidRequestException(ErrorConstants.INVALID_CREDENTIALS);
         }
 

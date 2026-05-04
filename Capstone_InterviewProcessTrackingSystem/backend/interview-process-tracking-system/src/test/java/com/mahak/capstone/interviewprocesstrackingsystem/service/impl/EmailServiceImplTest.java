@@ -59,6 +59,42 @@ class EmailServiceImplTest {
     }
 
     @Test
+    void sendSelectionEmail_Success() {
+        emailService.sendSelectionEmail("can@test.com", "Can", "Dev");
+        verify(mailSender).send(any(MimeMessage.class));
+    }
+
+    @Test
+    void sendRejectionEmail_Success() {
+        emailService.sendRejectionEmail("can@test.com", "Can", "Dev");
+        verify(mailSender).send(any(MimeMessage.class));
+    }
+
+    @Test
+    void sendCancellationEmail_ToCandidate_Success() {
+        emailService.sendCancellationEmail("can@test.com", "Can", "L1", "Time", false);
+        verify(mailSender).send(any(MimeMessage.class));
+    }
+
+    @Test
+    void sendCancellationEmail_ToPanel_Success() {
+        emailService.sendCancellationEmail("panel@test.com", "Panel", "L1", "Time", true);
+        verify(mailSender).send(any(MimeMessage.class));
+    }
+
+    @Test
+    void sendRescheduledEmail_ToCandidate_Success() {
+        emailService.sendRescheduledEmail("can@test.com", "Can", "L1", "Time", false);
+        verify(mailSender).send(any(MimeMessage.class));
+    }
+
+    @Test
+    void sendRescheduledEmail_ToPanel_Success() {
+        emailService.sendRescheduledEmail("panel@test.com", "Panel", "L1", "Time", true);
+        verify(mailSender).send(any(MimeMessage.class));
+    }
+
+    @Test
     void sendEmail_Fail_ExceptionHandled() {
         doThrow(new RuntimeException("Mail error")).when(mailSender).send(any(MimeMessage.class));
         // Should not throw exception, just log it
