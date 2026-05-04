@@ -40,19 +40,19 @@ public class FileUploadController {
         String originalName = file.getOriginalFilename();
         logger.info("File upload request received: {}", originalName);
 
-        // Validate file type
+       
         if (originalName == null || !originalName.toLowerCase().endsWith(".pdf")) {
             logger.warn("Invalid file type rejected: {}", originalName);
             return new ApiResponseDTO<>(false, ErrorConstants.INVALID_FILE_TYPE, null);
         }
 
-        // Create uploads directory
+
         Path uploadPath = Paths.get(UPLOAD_DIR);
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
         }
 
-        // Save with unique name
+        
         String fileName = UUID.randomUUID() + "_" + originalName;
         Path filePath = uploadPath.resolve(fileName);
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);

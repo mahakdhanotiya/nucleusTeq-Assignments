@@ -72,7 +72,7 @@ class AuthServiceImplTest {
     void login_Success_Panel() {
         LoginRequestDTO dto = new LoginRequestDTO();
         dto.setEmail("panel@test.com");
-        dto.setPassword("pass");
+        dto.setPassword("cGFzcw=="); // Base64 for "pass"
 
         User user = new User();
         user.setEmail("panel@test.com");
@@ -111,7 +111,7 @@ class AuthServiceImplTest {
     void login_Success_Candidate() {
         LoginRequestDTO dto = new LoginRequestDTO();
         dto.setEmail("can@test.com");
-        dto.setPassword("pass");
+        dto.setPassword("cGFzcw=="); // Base64 for "pass"
 
         User user = new User();
         user.setEmail("can@test.com");
@@ -212,5 +212,25 @@ class AuthServiceImplTest {
         verify(userRepository).save(argThat(u -> 
             u.getDateOfBirth().toString().equals("1995-05-15") && 
             u.getRole() == Role.PANEL));
+    }
+
+    @Test
+    void setPassword_Success() {
+        SetPasswordRequestDTO dto = new SetPasswordRequestDTO();
+        dto.setToken("valid");
+        dto.setPassword("cGFzc3dvcmQxMjM="); // Base64 for "password123"
+
+        PasswordToken token = new PasswordToken("u@t.com");
+        User user = new User();
+        user.setEmail("u@t.com");
+
+        when(passwordTokenRepository.findByToken("valid")).thenReturn(Optional.of(token));
+        when(userRepository.findByEmail("u@t.com")).thenReturn(Optional.of(user));
+        when(passwordEncoder.encode("password123")).thenReturn("hashed");
+
+        authService.setPassword(dto);
+
+        verify(userRepository).save(user);
+        assertTrue(token.isUsed());
     }
 }

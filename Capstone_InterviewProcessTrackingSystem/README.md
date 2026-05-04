@@ -159,7 +159,7 @@ Open `frontend/src/pages/index.html` using a **Live Server** (VS Code) or any st
 ---
 
 ## 7. Quality Assurance
-The project ensures reliability through 151+ automated test cases. Run tests using:
+The project ensures reliability through **156+ automated test cases** with over **85% instruction coverage**. Run tests using:
 ```bash
 mvn test
 ```

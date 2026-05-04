@@ -137,11 +137,8 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByEmail(token.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorConstants.USER_NOT_FOUND));
 
-        // Decode from Base64 if prefixed (Security requirement)
-        String rawPassword = dto.getPassword();
-        if (rawPassword != null && rawPassword.startsWith("B64:")) {
-            rawPassword = new String(Base64.getDecoder().decode(rawPassword.substring(4)));
-        }
+        // Decode from Base64 (Security requirement)
+        String rawPassword = new String(Base64.getDecoder().decode(dto.getPassword()));
         user.setPassword(passwordEncoder.encode(rawPassword));
         userRepository.save(user);
 
@@ -157,11 +154,8 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorConstants.USER_NOT_FOUND));
 
-        // Decode from Base64 if prefixed (Security requirement)
-        String rawPassword = dto.getPassword();
-        if (rawPassword != null && rawPassword.startsWith("B64:")) {
-            rawPassword = new String(Base64.getDecoder().decode(rawPassword.substring(4)));
-        }
+        // Decode from Base64 (Security requirement)
+        String rawPassword = new String(Base64.getDecoder().decode(dto.getPassword()));
         if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
             throw new InvalidRequestException(ErrorConstants.INVALID_CREDENTIALS);
         }
