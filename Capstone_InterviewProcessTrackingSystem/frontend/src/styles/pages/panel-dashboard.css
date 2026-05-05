@@ -1,0 +1,52 @@
+/* Panel Dashboard specific styles */
+
+.readonly-input {
+  background-color: #f1f5f9;
+  color: #64748b;
+  cursor: not-allowed;
+  border-color: #cbd5e1;
+}
+
+#sec-feedback .card {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 32px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+  border: 1px solid #e2e8f0;
+}
+
+#sec-feedback .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+#sec-feedback textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+#sec-feedback .submit-btn {
+  margin-top: 24px;
+  font-size: 16px;
+  padding: 12px;
+}
+
+/* Add a subtle highlight to the feedback row when prefilling */
+.table-row-highlight {
+  background-color: #f0fdf4 !important;
+  transition: background-color 0.3s ease;
+}
+
+/* Refined table typography for panel dashboard */
+.data-table td {
+  vertical-align: middle;
+}
+
+.badge-info {
+  background-color: #e0e7ff;
+  color: #4f46e5;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 4px;
+}

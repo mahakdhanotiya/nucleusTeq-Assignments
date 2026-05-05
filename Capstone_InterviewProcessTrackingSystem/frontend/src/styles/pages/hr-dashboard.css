@@ -1,0 +1,150 @@
+.jobs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.job-detail-icon { width: 16px; height: 16px; fill: var(--text-secondary); flex-shrink: 0; }
+
+.edit-panel-emails { display: flex; flex-direction: column; gap: 8px; }
+.edit-panel-emails .email-row { display: flex; gap: 8px; }
+.edit-panel-emails .email-row input { flex: 1; }
+.edit-panel-emails .email-row button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+.btn-remove-email { background: #fee2e2; color: #dc2626; }
+.btn-add-email { background: #e0e7ff; color: var(--primary); padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
+
+/* ACTION DROPDOWN */
+.actions-cell {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  overflow: visible !important;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+  z-index: 100;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  background-color: #ffffff;
+  min-width: 200px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.15);
+  z-index: 1000 !important;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  top: 100%;
+}
+
+.dropdown-content a, .dropdown-content button {
+  color: var(--text);
+  padding: 12px 20px;
+  text-decoration: none;
+  display: block;
+  font-size: 0.9rem;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  white-space: nowrap;
+}
+
+.dropdown-content a:hover, .dropdown-content button:hover {
+  background-color: #f1f5f9;
+}
+
+.dropdown.active .dropdown-content {
+  display: block;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: 0.2s;
+}
+
+.btn-icon:hover {
+  background: #f1f5f9;
+}
+
+/* INACTIVE JOB STYLING */
+.job-inactive {
+  opacity: 0.7;
+  background: #f8fafc;
+  border-style: dashed;
+}
+
+.job-id-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* FEEDBACK DETAIL CARDS */
+.feedback-detail-card {
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.feedback-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.panelist-info h5 { font-size: 1rem; color: var(--text); margin-bottom: 2px; }
+.panelist-info p { font-size: 0.75rem; color: var(--text-secondary); }
+
+.feedback-score {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--warning);
+}
+
+.feedback-comment {
+  font-size: 0.9rem;
+  color: var(--text);
+  line-height: 1.5;
+  background: white;
+  padding: 12px;
+  border-radius: 8px;
+  border-left: 4px solid var(--primary);
+  margin-top: 10px;
+}
+
+.feedback-decision-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-top: 8px;
+}
+
+.tag-select { background: #d1fae5; color: #059669; }
+.tag-reject { background: #fee2e2; color: #dc2626; }
