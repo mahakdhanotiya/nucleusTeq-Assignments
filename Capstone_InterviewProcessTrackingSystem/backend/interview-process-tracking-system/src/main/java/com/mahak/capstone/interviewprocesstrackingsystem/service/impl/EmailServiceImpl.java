@@ -148,7 +148,7 @@ public class EmailServiceImpl implements EmailService {
                     "<p>Welcome to the <strong>" + appName + "</strong> panel! An account has been created for you to manage your interview assignments and submit feedback.</p>" +
                     "<p>Please click the button below to set up your password and access your dashboard:</p>" +
                     "<div style='text-align: center; margin: 30px 0;'>" +
-                    "  <a href='" + loginUrl + "' style='background: #4f46e5; color: white; padding: 12px 25px; text-decoration: none; border-radius: 6px; font-weight: bold;'>Set Up Password</a>" +
+                    "  <a href='" + loginUrl + "' target='_blank' style='background: #4f46e5; color: white; padding: 12px 25px; text-decoration: none; border-radius: 6px; font-weight: bold;'>Set Up Password</a>" +
                     "</div>" +
                     "<p>If the button doesn't work, copy and paste this link: <br>" + loginUrl + "</p>";
 
@@ -174,7 +174,7 @@ public class EmailServiceImpl implements EmailService {
                     "<p>Welcome to <strong>" + appName + "</strong>! We are excited to have you on board.</p>" +
                     "<p>To complete your registration and secure your account, please set your password by clicking the button below:</p>" +
                     "<div style='text-align: center; margin: 30px 0;'>" +
-                    "  <a href='" + setupUrl + "' style='background: #4f46e5; color: white; padding: 12px 25px; text-decoration: none; border-radius: 6px; font-weight: bold;'>Set Password</a>" +
+                    "  <a href='" + setupUrl + "' target='_blank' style='background: #4f46e5; color: white; padding: 12px 25px; text-decoration: none; border-radius: 6px; font-weight: bold;'>Set Password</a>" +
                     "</div>" +
                     "<p>If the button doesn't work, copy and paste this link into your browser: <br>" +
                     "<span style='color: #4f46e5; font-size: 13px; word-break: break-all;'>" + setupUrl + "</span></p>";
