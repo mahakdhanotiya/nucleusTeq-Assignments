@@ -14,6 +14,7 @@ Questions:
 """
 
 
+# Question 17
 def calculate_square(number: float) -> float:
     """
     Calculate square of a number.
@@ -21,6 +22,8 @@ def calculate_square(number: float) -> float:
     return number ** 2
 
 
+# Question 18 
+# Number palindrome
 def is_number_palindrome(number: int) -> bool:
     """
     Check whether a number is palindrome.
@@ -28,6 +31,8 @@ def is_number_palindrome(number: int) -> bool:
     original_number = number
     reversed_number = 0
 
+    # Reversing the number helps verify
+    # whether it reads the same from both ends
     while number > 0:
         digit = number % 10
         reversed_number = (reversed_number * 10) + digit
@@ -36,22 +41,36 @@ def is_number_palindrome(number: int) -> bool:
     return original_number == reversed_number
 
 
+# Question 18
+# String palindrome
 def is_string_palindrome(text: str) -> bool:
     """
     Check whether a string is palindrome.
     """
+    # Convert text to lowercase for case-insensitive comparison
+    text = text.lower()
+    
+    # Remove spaces before checking palindrome
+    text = text.replace(" ", "")
+    
     return text == text[::-1]
 
 
+# Question 19
 def find_maximum_number(numbers: list[int]) -> int:
     """
     Return the maximum number from a list.
     """
+    
+    # Handle empty list edge case
     if not numbers:
         raise ValueError("List cannot be empty.")
 
+    # Initialize maximum with the first element
+    # so remaining values can be compared against it
     maximum_number = numbers[0]
 
+    # Find the largest value in the list
     for number in numbers:
         if number > maximum_number:
             maximum_number = number
@@ -59,6 +78,9 @@ def find_maximum_number(numbers: list[int]) -> int:
     return maximum_number
 
 
+# Question 20
+# Default parameter allows the function
+# to work even when no name is supplied
 def greet_user(user_name: str = "Guest") -> str:
     """
     Greet user using a default parameter.
@@ -113,31 +135,13 @@ if __name__ == "__main__":
 
     print("\n--- Maximum Number from a List ---")
 
-    element_count = int(
-        input("Enter the number of elements: ")
-    )
-    # Convert input values into a list of integers
-    numbers = list(
-        map(
-            int,
-            input(
-                "Enter numbers separated by spaces: "
-            ).split()
-        )
-    )
+    numbers = [10, 25, 5, 40, 15]
 
-    if len(numbers) != element_count:
-        print(
-            "Number of elements does not match "
-            "the specified count."
-        )
-    else:
-        print(f"Numbers: {numbers}")
-
-        print(
-            f"Maximum Number: "
-            f"{find_maximum_number(numbers)}"
-        )
+    print(f"Numbers: {numbers}")
+    print(
+        f"Maximum Number: "
+        f"{find_maximum_number(numbers)}"
+    )
         
     print("\n--- Default Parameters ---")
 

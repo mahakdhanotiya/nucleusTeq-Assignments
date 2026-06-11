@@ -10,6 +10,7 @@ Questions:
 import sys
 
 
+# Question 1
 def print_welcome_message() -> None:
     """
     Display welcome message for Python training.
@@ -17,13 +18,16 @@ def print_welcome_message() -> None:
     print("Welcome to Python Training")
     
     
+# Question 2 
 def display_python_version() -> None:
     """
     Display the installed Python version.
     """
+    # Display current Python version
     print(f"Python Version: {sys.version}")
     
 
+# Question 3
 def display_user_information() -> None:
     """
     Take user name and age as input
@@ -31,11 +35,13 @@ def display_user_information() -> None:
     """
     user_name = input("Enter your name: ").strip().title()
     user_age = int(input("Enter your age: "))
-
+    
+    # Handle invalid age edge case
     if user_age < 0:
         print("Age cannot be negative.")
     else:
-        print(f"Hello {user_name}, you are {user_age} years old.")
+        print(f"Hello {user_name}, "
+              f"you are {user_age} years old.")
     
     
 if __name__ == "__main__":

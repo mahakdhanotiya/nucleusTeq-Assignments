@@ -14,6 +14,7 @@ Questions:
 """
 
 
+# Question 12
 def print_numbers_from_one_to_hundred() -> None:
     """
     Print numbers from 1 to 100.
@@ -23,86 +24,147 @@ def print_numbers_from_one_to_hundred() -> None:
     for number in range(1, 101):
         print(number)
         
-        
-def print_multiplication_table() -> None:
+  
+# Question 13      
+def print_multiplication_table(
+    number: int
+) -> None:
     """
     Print multiplication table of a number.
     """
-    print("\n--- Multiplication Table ---")
-
-    number = int(input("Enter a number: "))
-
+    
+    # Multiplication tables are commonly displayed
+    # from 1 to 10
     for multiplier in range(1, 11):
         print(f"{number} x {multiplier} = {number * multiplier}")
         
-        
-def calculate_factorial() -> None:
+
+# Question 14     
+def calculate_factorial(
+    number: int
+) -> int | None:
     """
     Calculate factorial of a number.
     """
-    print("\n--- Factorial Calculator ---")
-
-    number = int(input("Enter a number: "))
-
+    
+    # Handle negative number edge case
     if number < 0:
         print("Factorial is not defined for negative numbers.")
         return
 
     factorial = 1
 
+    # Factorial is the product of all
+    # positive integers from 1 to the given number
     for current_number in range(1, number + 1):
         factorial *= current_number
 
-    print(f"Factorial of {number} is {factorial}.")
+    return factorial
     
     
-def reverse_number() -> None:
+# Question 15
+def reverse_number(
+    number: int
+) -> int | None:
     """
     Reverse a number using loop.
     """
-    print("\n--- Reverse a Number ---")
+    # Handle zero edge case
+    if number == 0:
+        return 0
 
-    number = int(input("Enter a number: "))
-    
+    # Handle negative number edge case
     if number < 0:
         print("Please enter a non-negative number.")
         return
 
     reversed_number = 0
 
+    # Extracting and rebuilding digits in reverse order
+    # helps create the reversed number
     while number > 0:
         digit = number % 10
         reversed_number = (reversed_number * 10) + digit
         number //= 10
 
-    print(f"Reversed Number: {reversed_number}")
+    return reversed_number
     
     
-def check_prime_number() -> None:
+# Question 16
+def check_prime_number(
+    number: int
+) -> bool:
     """
     Check whether a number is prime.
     """
-    print("\n--- Prime Number Checker ---")
-
-    number = int(input("Enter a number: "))
-
+    # Handle numbers less than or equal to 1
     if number <= 1:
-        print(f"{number} is not a prime number.")
-        return
+        return False
 
+    # A prime number should not be divisible
+    # by any number other than 1 and itself
     for divisor in range(2, number):
-
-        # Check if number is divisible by any value other than 1 and itself
         if number % divisor == 0:
-            print(f"{number} is not a prime number.")
-            return
+            return False
 
-    print(f"{number} is a prime number.")
+    return True
     
     
 if __name__ == "__main__":
+    
     print_numbers_from_one_to_hundred()
-    print_multiplication_table()
-    calculate_factorial()
-    reverse_number()
-    check_prime_number()
+
+    print("\n--- Multiplication Table ---")
+    
+    number = int(
+        input("Enter a number: ")
+    )
+    print_multiplication_table(number)
+
+    print("\n--- Factorial Calculator ---")
+    
+    factorial_number = int(
+        input("Enter a number: ")
+    )
+    
+    factorial = calculate_factorial(
+        factorial_number
+    )
+
+    if factorial is not None:
+        print(
+            f"Factorial of "
+            f"{factorial_number} "
+            f"is {factorial}."
+        )
+
+    print("\n--- Reverse a Number ---")
+    
+    reverse_input = int(
+        input("Enter a number: ")
+    )
+    reversed_number = reverse_number(
+        reverse_input
+    )
+
+    if reversed_number is not None:
+        print(
+            f"Reversed Number: "
+            f"{reversed_number}"
+        )
+
+    print("\n--- Prime Number Checker ---")
+    
+    prime_input = int(
+        input("Enter a number: ")
+    )
+    if check_prime_number(prime_input):
+        print(
+            f"{prime_input} "
+            f"is a prime number."
+        )
+    else:
+        print(
+            f"{prime_input} "
+            f"is not a prime number."
+        )
