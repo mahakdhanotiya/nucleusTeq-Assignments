@@ -13,27 +13,44 @@ Python_Training/
 └── Assignment_1/
     ├── python_basic/
     │   ├── __init__.py
-    │   ├── calculator.py
-    │   ├── operators_and_conditionals.py
-    │   ├── file_operations.py
-    │   ├── functions.py
-    │   ├── introduction.py
-    │   ├── loops.py
-    │   ├── module_examples.py
-    │   ├── variables_and_data_types.py
-    │   ├── sample.txt
-    │   ├── copy_sample.txt
     │   │
-    │   └── data_structures/
+    │   ├── introduction/
+    │   │   ├── __init__.py
+    │   │   └── introduction.py
+    │   │
+    │   ├── basics/
+    │   │   ├── __init__.py
+    │   │   ├── variables_and_data_types.py
+    │   │   ├── operators_and_conditionals.py
+    │   │   └── loops.py
+    │   │
+    │   ├── functions/
+    │   │   ├── __init__.py
+    │   │   └── functions.py
+    │   │
+    │   ├── modules/
+    │   │   ├── __init__.py
+    │   │   ├── calculator.py
+    │   │   └── module_examples.py
+    │   │
+    │   ├── data_structures/
+    │   │   ├── __init__.py
+    │   │   ├── list_examples.py
+    │   │   ├── tuple_examples.py
+    │   │   ├── set_examples.py
+    │   │   └── dictionary_examples.py
+    │   │
+    │   └── file_handling/
     │       ├── __init__.py
-    │       ├── list_examples.py
-    │       ├── tuple_examples.py
-    │       ├── set_examples.py
-    │       └── dictionary_examples.py
+    │       ├── file_operations.py
+    │       ├── sample.txt
+    │       └── copy_sample.txt
     │
     └── python_advance/
         ├── __init__.py
-        └── oop.py
+        └── oop/
+            ├── __init__.py
+            └── oop.py
 ```
 
 ---
