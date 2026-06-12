@@ -11,7 +11,7 @@ Questions:
 
 import math
 import random
-from calculator import add_numbers
+from Python_Training.Assignment_1.python_basic.modules.calculator import add_numbers
 
 
 # Question 22
