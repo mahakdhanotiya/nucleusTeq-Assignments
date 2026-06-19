@@ -55,18 +55,24 @@ def get_division_message(
 if __name__ == "__main__":
 
     print("\n--- Division Exception Handling ---")
-
-    dividend = float(
-        input("Enter dividend: ")
-    )
-
-    divisor = float(
-        input("Enter divisor: ")
-    )
-
-    print(
-        get_division_message(
-            dividend,
-            divisor
+    
+    try:
+        dividend = float(
+            input("Enter dividend: ")
         )
-    )
+
+        divisor = float(
+            input("Enter divisor: ")
+        )
+
+        print(
+            get_division_message(
+                dividend,
+                divisor
+            )
+        )
+
+    except ValueError:
+        print( "Invalid input. "
+            "Please enter numeric values only."
+        )
