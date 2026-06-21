@@ -5,6 +5,9 @@ from fastapi import FastAPI
 
 from constants.settings import settings
 from database.database import connect_to_database, close_database_connection
+from exceptions.exception_handler import register_exception_handlers
+from routers.auth_router import router as auth_router
+ 
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -28,6 +31,9 @@ app = FastAPI(
     version="0.1.0",
     lifespan=lifespan,
 )
+
+register_exception_handlers(app)
+app.include_router(auth_router)
 
 
 @app.get("/health")
