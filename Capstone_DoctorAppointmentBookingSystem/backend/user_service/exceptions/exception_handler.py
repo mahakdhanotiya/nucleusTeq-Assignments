@@ -9,6 +9,12 @@ from exceptions.auth_exceptions import (
     InvalidCredentialsError,
     AccountDeactivatedError,
 )
+from exceptions.user_exceptions import (
+    InvalidTokenError,
+    UnauthorizedError,
+    UserNotFoundError,
+    IncorrectPasswordError,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -62,6 +68,42 @@ def register_exception_handlers(app: FastAPI) -> None:
             error_code="ACCOUNT_DEACTIVATED",
             message="This account has been deactivated. Please contact support.",
             status_code=status.HTTP_403_FORBIDDEN,
+        )
+
+    @app.exception_handler(InvalidTokenError)
+    async def handle_invalid_token(request: Request, exc: InvalidTokenError):
+        logger.warning(f"Invalid token on {request.url.path}: {exc}")
+        return _build_error_response(
+            error_code="INVALID_TOKEN",
+            message=str(exc),
+            status_code=status.HTTP_401_UNAUTHORIZED,
+        )
+
+    @app.exception_handler(UnauthorizedError)
+    async def handle_unauthorized(request: Request, exc: UnauthorizedError):
+        logger.warning(f"Unauthorized access attempt on {request.url.path}: requires {exc.required_role}")
+        return _build_error_response(
+            error_code="UNAUTHORIZED",
+            message=str(exc),
+            status_code=status.HTTP_403_FORBIDDEN,
+        )
+
+    @app.exception_handler(UserNotFoundError)
+    async def handle_user_not_found(request: Request, exc: UserNotFoundError):
+        logger.warning(f"User not found on {request.url.path}")
+        return _build_error_response(
+            error_code="USER_NOT_FOUND",
+            message=str(exc),
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+
+    @app.exception_handler(IncorrectPasswordError)
+    async def handle_incorrect_password(request: Request, exc: IncorrectPasswordError):
+        logger.warning(f"Incorrect old password on {request.url.path}")
+        return _build_error_response(
+            error_code="INCORRECT_PASSWORD",
+            message=str(exc),
+            status_code=status.HTTP_400_BAD_REQUEST,
         )
 
     @app.exception_handler(Exception)
