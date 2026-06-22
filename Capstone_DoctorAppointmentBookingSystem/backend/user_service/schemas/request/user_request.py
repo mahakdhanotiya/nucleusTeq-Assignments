@@ -39,3 +39,15 @@ class ChangePasswordRequest(BaseModel):
         if not re.search(r"[!@#$%^&*(),.?\":{}|<>_\-+=]", value):
             raise ValueError("Password must contain at least one special character.")
         return value
+
+
+class UpdateDoctorProfileRequest(BaseModel):
+    """
+    Request body for PUT /users/me when the authenticated user is a DOCTOR.
+    Covers FR-16: Update Qualification, Consultation Fee, Clinic Address.
+    All fields are optional — only provided fields are updated.
+    """
+
+    qualification: Optional[str] = Field(default=None, min_length=2)
+    consultation_fee: Optional[float] = Field(default=None, ge=0)
+    clinic_address: Optional[str] = Field(default=None, min_length=2)

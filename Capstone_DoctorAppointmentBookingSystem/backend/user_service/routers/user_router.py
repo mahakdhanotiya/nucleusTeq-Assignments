@@ -1,32 +1,52 @@
 from fastapi import APIRouter, Depends, status
 
 from models.user import User
-from schemas.request.user_request import UpdateProfileRequest, ChangePasswordRequest
-from schemas.response.user_response import UserProfileResponse, MessageResponse
+from schemas.request.user_request import UpdateProfileRequest, ChangePasswordRequest, UpdateDoctorProfileRequest
+from schemas.response.user_response import DoctorProfileResponse, MessageResponse
 from dependencies.auth_dependency import get_current_user
+from dependencies.role_dependency import require_doctor
 from services.user_service import (
     get_my_profile,
     update_my_profile,
+    update_my_doctor_profile,
     change_password,
-    deactivate_my_account,
 )
 
 router = APIRouter(prefix="/users", tags=["User Management"])
 
 
-@router.get("/me", response_model=UserProfileResponse, status_code=status.HTTP_200_OK)
-async def get_profile(current_user: User = Depends(get_current_user)) -> UserProfileResponse:
-    """Returns the current logged-in user's profile."""
+@router.get("/me", response_model=DoctorProfileResponse, status_code=status.HTTP_200_OK)
+async def get_profile(current_user: User = Depends(get_current_user)) -> DoctorProfileResponse:
+    """
+    Returns the current logged-in user's profile.
+    Doctor-specific fields are populated for DOCTOR users and null for all other roles.
+    """
     return await get_my_profile(current_user)
 
 
-@router.put("/me", response_model=UserProfileResponse, status_code=status.HTTP_200_OK)
+@router.put("/me", response_model=DoctorProfileResponse, status_code=status.HTTP_200_OK)
 async def update_profile(
     request: UpdateProfileRequest,
     current_user: User = Depends(get_current_user),
-) -> UserProfileResponse:
-    """Updates the current user's profile."""
+) -> DoctorProfileResponse:
+    """Updates common user fields (full_name, phone_number) for any authenticated user."""
     return await update_my_profile(current_user, request)
+
+
+@router.put(
+    "/me/doctor-profile",
+    response_model=DoctorProfileResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def update_doctor_profile(
+    request: UpdateDoctorProfileRequest,
+    current_user: User = Depends(require_doctor),
+) -> DoctorProfileResponse:
+    """
+    Updates doctor-specific fields: qualification, consultation_fee, clinic_address (FR-16).
+    Restricted to DOCTOR role only.
+    """
+    return await update_my_doctor_profile(current_user, request)
 
 
 @router.put("/change-password", response_model=MessageResponse, status_code=status.HTTP_200_OK)
@@ -36,9 +56,3 @@ async def update_password(
 ) -> MessageResponse:
     """Changes the current user's password after validating the old one."""
     return await change_password(current_user, request)
-
-
-@router.put("/deactivate", response_model=MessageResponse, status_code=status.HTTP_200_OK)
-async def deactivate_account(current_user: User = Depends(get_current_user)) -> MessageResponse:
-    """Deactivates the current user's account."""
-    return await deactivate_my_account(current_user)
