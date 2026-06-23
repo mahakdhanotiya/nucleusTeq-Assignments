@@ -31,6 +31,18 @@ async def get_all_doctors() -> list[User]:
     return await User.find(User.role == UserRole.DOCTOR).to_list()
 
 
+async def search_doctors_by_name(name: str) -> list[User]:
+    """
+    Searches active doctor users whose full_name partially matches the given string.
+    Case-insensitive. Used by GET /internal/doctors/search for FR-5 name search.
+    """
+    return await User.find(
+        User.role == UserRole.DOCTOR,
+        User.is_active == True,
+        {"full_name": {"$regex": name, "$options": "i"}},
+    ).to_list()
+
+
 async def get_user_counts() -> dict:
     """Returns aggregate counts of doctors and patients for the admin dashboard (FR-20)."""
     total_doctors = await User.find(User.role == UserRole.DOCTOR).count()
