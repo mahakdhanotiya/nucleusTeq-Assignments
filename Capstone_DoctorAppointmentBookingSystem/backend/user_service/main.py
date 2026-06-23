@@ -10,6 +10,7 @@ from middleware.logging_middleware import register_logging_middleware
 from routers.auth_router import router as auth_router
 from routers.user_router import router as user_router
 from routers.admin_router import router as admin_router
+from routers.internal_router import router as internal_router
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -39,6 +40,7 @@ register_logging_middleware(app)
 app.include_router(auth_router)
 app.include_router(user_router)
 app.include_router(admin_router)
+app.include_router(internal_router)
 
 
 @app.get("/health")

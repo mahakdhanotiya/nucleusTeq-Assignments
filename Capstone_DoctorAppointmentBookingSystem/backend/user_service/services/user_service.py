@@ -82,6 +82,8 @@ async def update_my_doctor_profile(
         profile.consultation_fee = request.consultation_fee
     if request.clinic_address is not None:
         profile.clinic_address = request.clinic_address
+    if request.profile_photo_url is not None:
+        profile.profile_photo_url = request.profile_photo_url
 
     await update_doctor_profile(profile)
 
