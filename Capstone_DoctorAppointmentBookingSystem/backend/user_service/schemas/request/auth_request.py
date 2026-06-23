@@ -54,6 +54,14 @@ class RegisterRequest(BaseModel):
             raise ValueError("Password must contain at least one special character.")
 
         return value
+    
+    
+    @field_validator("date_of_birth")
+    @classmethod
+    def validate_date_of_birth(cls, value: Optional[date]) -> Optional[date]:
+        if value is not None and value >= date.today():
+            raise ValueError("Date of birth must be a past date.")
+        return value
 
     @model_validator(mode="after")
     def validate_role_specific_fields(self) -> "RegisterRequest":

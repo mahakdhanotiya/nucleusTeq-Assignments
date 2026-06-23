@@ -43,11 +43,12 @@ class ChangePasswordRequest(BaseModel):
 
 class UpdateDoctorProfileRequest(BaseModel):
     """
-    Request body for PUT /users/me when the authenticated user is a DOCTOR.
-    Covers FR-16: Update Qualification, Consultation Fee, Clinic Address.
+    Request body for PUT /users/me/doctor-profile when the authenticated user is a DOCTOR.
+    Covers FR-16: Update Qualification, Consultation Fee, Clinic Address, Profile Photo.
     All fields are optional — only provided fields are updated.
     """
 
     qualification: Optional[str] = Field(default=None, min_length=2)
     consultation_fee: Optional[float] = Field(default=None, ge=0)
     clinic_address: Optional[str] = Field(default=None, min_length=2)
+    profile_photo_url: Optional[str] = Field(default=None, min_length=1)
