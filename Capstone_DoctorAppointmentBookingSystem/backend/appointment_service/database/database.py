@@ -19,21 +19,24 @@ async def connect_to_database() -> None:
     Called once at application startup. All Beanie Document models must be
     registered here so MongoDB creates their collections and indexes.
 
-    Milestone 1.1: document_models is empty — no models exist yet.
-    Milestone 1.2 will add: [Slot]
-    Milestone 1.3 will add: [Slot, Appointment, Payment]
     """
     global mongo_client
 
     logger.info("Connecting to MongoDB...")
 
-    mongo_client = AsyncIOMotorClient(settings.MONGO_URI)
+
+    mongo_client = AsyncIOMotorClient(
+    settings.MONGO_URI,
+    tlsAllowInvalidCertificates=True
+)
     database = mongo_client[settings.DATABASE_NAME]
 
     # Register all Beanie Document models here.
     # Each model added here causes Beanie to create the corresponding
     # MongoDB collection and apply the indexes defined in the model's Settings.
-    document_models: list = []  # Models will be added in later milestones
+    from models.slot import Slot
+ 
+    document_models: list = [Slot]
 
     await init_beanie(database=database, document_models=document_models)
 
