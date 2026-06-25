@@ -8,6 +8,8 @@ from exceptions.auth_exceptions import (
     DuplicateLicenseNumberError,
     InvalidCredentialsError,
     AccountDeactivatedError,
+    DoctorPendingApprovalError,
+    DoctorRejectedError,
 )
 from exceptions.user_exceptions import (
     InvalidTokenError,
@@ -67,6 +69,24 @@ def register_exception_handlers(app: FastAPI) -> None:
         return _build_error_response(
             error_code="ACCOUNT_DEACTIVATED",
             message="This account has been deactivated. Please contact support.",
+            status_code=status.HTTP_403_FORBIDDEN,
+        )
+
+    @app.exception_handler(DoctorPendingApprovalError)
+    async def handle_doctor_pending(request: Request, exc: DoctorPendingApprovalError):
+        logger.warning("Login attempt by a doctor with PENDING approval status.")
+        return _build_error_response(
+            error_code="DOCTOR_PENDING_APPROVAL",
+            message=str(exc),
+            status_code=status.HTTP_403_FORBIDDEN,
+        )
+
+    @app.exception_handler(DoctorRejectedError)
+    async def handle_doctor_rejected(request: Request, exc: DoctorRejectedError):
+        logger.warning("Login attempt by a doctor with REJECTED approval status.")
+        return _build_error_response(
+            error_code="DOCTOR_REJECTED",
+            message=str(exc),
             status_code=status.HTTP_403_FORBIDDEN,
         )
 

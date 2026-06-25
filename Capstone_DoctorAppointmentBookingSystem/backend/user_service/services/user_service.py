@@ -21,6 +21,7 @@ def _to_base_response(user: User) -> UserProfileResponse:
         phone_number=user.phone_number,
         role=user.role,
         is_active=user.is_active,
+        approval_status=user.approval_status,
         created_at=user.created_at,
         updated_at=user.updated_at,
     )
@@ -41,6 +42,7 @@ async def get_my_profile(user: User) -> DoctorProfileResponse | UserProfileRespo
             phone_number=user.phone_number,
             role=user.role,
             is_active=user.is_active,
+            approval_status=user.approval_status,
             created_at=user.created_at,
             updated_at=user.updated_at,
             qualification=profile.qualification if profile else None,

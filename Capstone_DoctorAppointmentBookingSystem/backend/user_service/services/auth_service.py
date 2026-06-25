@@ -4,6 +4,7 @@ from models.user import User
 from models.doctor_profile import DoctorProfile
 from models.patient_profile import PatientProfile
 from enums.user_role import UserRole
+from enums.approval_status import ApprovalStatus
 from schemas.request.auth_request import RegisterRequest, LoginRequest
 from schemas.response.auth_response import RegisterResponse, TokenResponse, UserSummaryResponse
 from utils.password import hash_password, verify_password
@@ -16,6 +17,8 @@ from exceptions.auth_exceptions import (
     DuplicateLicenseNumberError,
     InvalidCredentialsError,
     AccountDeactivatedError,
+    DoctorPendingApprovalError,
+    DoctorRejectedError,
 )
 
 logger = logging.getLogger(__name__)
@@ -29,6 +32,16 @@ async def register_user(request: RegisterRequest) -> RegisterResponse:
     if request.role == UserRole.DOCTOR:
         if await get_doctor_by_license_number(request.license_number) is not None:
             raise DuplicateLicenseNumberError(license_number=request.license_number)
+        
+    # Doctors are PENDING until an Admin approves them.
+
+    # All other roles (PATIENT, ADMIN) remain at the default APPROVED.
+
+    approval_status = (
+        ApprovalStatus.PENDING
+        if request.role == UserRole.DOCTOR
+        else ApprovalStatus.APPROVED
+    )
 
     new_user = User(
         full_name=request.full_name,
@@ -36,6 +49,8 @@ async def register_user(request: RegisterRequest) -> RegisterResponse:
         password_hash=hash_password(request.password),
         phone_number=request.phone_number,
         role=request.role,
+        approval_status=approval_status,
+        
     )
     await create_user(new_user)
 
@@ -59,8 +74,10 @@ async def register_user(request: RegisterRequest) -> RegisterResponse:
             )
         )
 
-    logger.info(f"New user registered: {new_user.email} (role={new_user.role.value})")
-
+    logger.info(
+        f"New user registered: {new_user.email} "
+        f"(role={new_user.role.value}, approval={new_user.approval_status.value})"
+    )
     return RegisterResponse(
         user_id=str(new_user.id),
         email=new_user.email,
@@ -79,6 +96,15 @@ async def login_user(request: LoginRequest) -> TokenResponse:
 
     if not user.is_active:
         raise AccountDeactivatedError()
+    
+    # Doctor approval check — only applies to DOCTOR accounts.
+    # PATIENT and ADMIN accounts always have approval_status=APPROVED
+    # so this check is effectively a no-op for them.
+    if user.role == UserRole.DOCTOR:
+        if user.approval_status == ApprovalStatus.PENDING:
+            raise DoctorPendingApprovalError()
+        if user.approval_status == ApprovalStatus.REJECTED:
+            raise DoctorRejectedError()
 
     token, expires_in = create_access_token(
         user_id=str(user.id),

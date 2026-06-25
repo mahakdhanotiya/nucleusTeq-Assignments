@@ -4,6 +4,7 @@ from typing import Optional
 from pydantic import BaseModel
 
 from enums.user_role import UserRole
+from enums.approval_status import ApprovalStatus
 
 
 class UserProfileResponse(BaseModel):
@@ -15,6 +16,7 @@ class UserProfileResponse(BaseModel):
     phone_number: str
     role: UserRole
     is_active: bool
+    approval_status: ApprovalStatus
     created_at: datetime
     updated_at: datetime
 
@@ -50,6 +52,7 @@ class AdminDoctorResponse(BaseModel):
     email: str
     phone_number: str
     is_active: bool
+    approval_status: ApprovalStatus
     specialization: Optional[str] = None
     qualification: Optional[str] = None
     experience_years: Optional[int] = None

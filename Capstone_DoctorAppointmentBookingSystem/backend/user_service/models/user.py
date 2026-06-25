@@ -1,5 +1,4 @@
-from datetime import date, datetime, timezone
-from enum import Enum
+from datetime import datetime, timezone
 from typing import Optional
 
 from beanie import Document, Indexed
@@ -7,75 +6,28 @@ from pydantic import Field
 from pymongo import IndexModel, ASCENDING
 
 from enums.user_role import UserRole
-from enums.gender import Gender
+from enums.approval_status import ApprovalStatus
 
 
 class User(Document):
-    """
-    User document storing authentication and basic profile details.
-    """
+    """MongoDB document for authentication and common account data."""
 
-    # Common fields for all users
-    full_name: str = Field(
-        ...,
-        min_length=2,
-        description="User's full name.",
-    )
+    full_name: str = Field(..., min_length=2)
+    email: Indexed(str, unique=True)
+    password_hash: str
+    phone_number: str = Field(..., min_length=10, max_length=10)
+    role: UserRole
+    is_active: bool = Field(default=True)
 
-    email: Indexed(str, unique=True) = Field(
-        ...,
-        description="Unique email address.",
-    )
+    # Only new DOCTOR registrations explicitly set this to PENDING
+    # (handled in auth_service.py).
+    approval_status: ApprovalStatus = Field(default=ApprovalStatus.APPROVED)
 
-    # Store hashed password only
-    password_hash: str = Field(
-        ...,
-        description="BCrypt hashed password.",
-    )
-
-    phone_number: str = Field(
-        ...,
-        min_length=10,
-        max_length=10,
-        description="10-digit phone number.",
-    )
-
-    role: UserRole = Field(
-        ...,
-        description="User role.",
-    )
-
-    is_active: bool = Field(
-        default=True,
-        description="Account status.",
-    )
-
-    # Patient-specific fields
-    gender: Optional[Gender] = Field(
-        default=None,
-        description="Applicable for patients.",
-    )
-
-    date_of_birth: Optional[date] = Field(
-        default=None,
-        description="Applicable for patients.",
-    )
-
-    # Audit fields
-    created_at: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc),
-    )
-
-    updated_at: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc),
-    )
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     class Settings:
-        """Beanie configuration."""
-
         name = "users"
-
-        # Optimizes role-based queries
         indexes = [
             IndexModel([("role", ASCENDING)], name="role_index"),
         ]
