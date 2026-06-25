@@ -1,23 +1,29 @@
 # Entry point for the Appointment Service.
+#   - Create the FastAPI application
+#   - Connect to MongoDB on startup, disconnect on shutdown
+#   - Expose a health check endpoint at GET /health
+
 
 import logging
 from contextlib import asynccontextmanager
-
+ 
 from fastapi import FastAPI
-
+ 
 from constants.settings import settings
 from database.database import connect_to_database, close_database_connection
-
-# Basic logging — a dedicated logging middleware will be added in Milestone 1.2
+from exceptions.exception_handler import register_exception_handlers
+from middleware.logging_middleware import register_logging_middleware
+from routers.slot_router import router as slot_router
+ 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-
+ 
+ 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
     Controls what happens when the application starts and stops.
-
+ 
     Everything before `yield` runs on startup.
     Everything after `yield` runs on shutdown.
     This is FastAPI's recommended pattern for lifecycle management.
@@ -25,16 +31,15 @@ async def lifespan(app: FastAPI):
     # --- Startup ---
     logger.info(f"Starting {settings.APP_NAME} in '{settings.APP_ENV}' mode...")
     await connect_to_database()
-
+ 
     yield  # Application runs while paused here
-
+ 
     # --- Shutdown ---
     logger.info(f"Shutting down {settings.APP_NAME}...")
     await close_database_connection()
-
-
+ 
+ 
 # Create the FastAPI application.
-# Routers will be registered here incrementally as each milestone is completed.
 app = FastAPI(
     title=settings.APP_NAME,
     description=(
@@ -44,9 +49,18 @@ app = FastAPI(
     version="0.1.0",
     lifespan=lifespan,
 )
-
-# Confirms the service is running and connected to MongoDB.
-
+ 
+# --- Cross-cutting concerns ---
+register_exception_handlers(app)
+register_logging_middleware(app)
+ 
+# --- Routers-----------
+app.include_router(slot_router)          
+ 
+# ---------------------------------------------------------------------------
+# Health check
+# ---------------------------------------------------------------------------
+ 
 @app.get("/health", tags=["Health"])
 async def health_check() -> dict:
     """
@@ -58,11 +72,12 @@ async def health_check() -> dict:
         "service": settings.APP_NAME,
         "environment": settings.APP_ENV,
     }
-
-
+ 
+ 
 # Allows running directly with: python main.py
 # Recommended command: uvicorn main:app --reload --port 8002
 if __name__ == "__main__":
     import uvicorn
-
+ 
     uvicorn.run("main:app", host="127.0.0.1", port=8002, reload=True)
+ 
