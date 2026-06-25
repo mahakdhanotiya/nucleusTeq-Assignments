@@ -3,6 +3,7 @@ from datetime import date
 from beanie import PydanticObjectId
 
 from models.slot import Slot
+from datetime import datetime, timezone, date
 
 
 async def create_slot(slot: Slot) -> Slot:
@@ -41,6 +42,8 @@ async def get_slots_by_doctor(
       - Doctors managing their own availability (GET /slots/my)
       - Patients viewing a doctor's available slots (GET /slots/doctor/{id})
     """
+    
+    # Build the query dynamically based on the filters provided by the caller.
     filters = [Slot.doctor_id == doctor_id]
 
     if slot_date is not None:
@@ -61,8 +64,8 @@ async def get_available_slots_for_doctor(
 ) -> list[Slot]:
     """
     Fetches only AVAILABLE slots for a specific doctor.
-    Convenience wrapper used during the booking flow (FR-7)
-    and when patients view a doctor's profile (FR-6).
+    Convenience wrapper used during the booking flow.
+    and when patients view a doctor's profile.
     """
     return await get_slots_by_doctor(
         doctor_id=doctor_id,
@@ -76,9 +79,9 @@ async def update_slot(slot: Slot) -> Slot:
     Saves changes made to an existing Slot document.
 
     The service layer is responsible for checking that the slot
-    is AVAILABLE before calling this — BOOKED slots must not be modified (FR-14).
+    is AVAILABLE before calling this — BOOKED slots must not be modified.
     """
-    from datetime import datetime, timezone
+    # Refresh the audit timestamp before saving the updated document.
     slot.updated_at = datetime.now(timezone.utc)
     await slot.save()
     return slot
@@ -89,8 +92,9 @@ async def delete_slot(slot: Slot) -> None:
     Permanently removes a slot from the database.
 
     The service layer is responsible for checking that the slot
-    is AVAILABLE before calling this — BOOKED slots must not be deleted (FR-14).
+    is AVAILABLE before calling this — BOOKED slots must not be deleted.
     """
+    # Physically removes the document from the slots collection.
     await slot.delete()
 
 

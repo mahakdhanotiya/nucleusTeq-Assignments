@@ -13,14 +13,17 @@ class Slot(Document):
     date + time window. Its `status` field controls whether a patient
     can book it:
       - AVAILABLE → can be booked
-      - BOOKED    → already taken; cannot be modified or deleted (FR-14)
+      - BOOKED    → already taken; cannot be modified or deleted 
+    This document is managed by Beanie ODM and stored in the `slots`
+    collection of the Appointment Service database.
+
     """
 
     # The doctor who created this slot.
     # References users._id in User Service (cross-service reference).
     # Stored as PydanticObjectId so MongoDB saves it as a native ObjectId,
     # not a plain string — consistent with how User Service stores user IDs.
-    doctor_id: Indexed(PydanticObjectId)
+    doctor_id: PydanticObjectId
 
     # Calendar date of the slot (e.g. 2025-09-15).
     # Stored as Python `date`, serialised as YYYY-MM-DD in API responses.
@@ -28,8 +31,9 @@ class Slot(Document):
 
     # Start and end times in 24-hour "HH:MM" format (e.g. "09:00", "17:30").
     # Validated in slot_service.py: end_time must always be after start_time.
-    start_time: str = Field(..., pattern=r"^\d{2}:\d{2}$")
-    end_time: str = Field(..., pattern=r"^\d{2}:\d{2}$")
+    start_time: str 
+    end_time: str
+    
 
     # Current lifecycle state of this slot.
     # Imported from enums/slot_status.py.
@@ -40,6 +44,8 @@ class Slot(Document):
     created_at: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc)
     )
+    
+    # Automatically updated whenever the slot is modified.
     updated_at: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc)
     )
@@ -49,7 +55,8 @@ class Slot(Document):
 
         # The MongoDB collection name.
         name = "slots"
-
+       
+        # Compound indexes to optimize frequent queries and prevent duplicate slots.
         indexes = [
             # --- Primary query index ---
             # Covers the most common read: "give me all AVAILABLE slots
