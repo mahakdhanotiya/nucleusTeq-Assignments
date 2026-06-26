@@ -14,6 +14,7 @@ from database.database import connect_to_database, close_database_connection
 from exceptions.exception_handler import register_exception_handlers
 from middleware.logging_middleware import register_logging_middleware
 from routers.slot_router import router as slot_router
+from routers.doctor_router import router as doctor_router
  
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -54,8 +55,10 @@ app = FastAPI(
 register_exception_handlers(app)
 register_logging_middleware(app)
  
-# --- Routers-----------
-app.include_router(slot_router)          
+# --- Routers -------------
+app.include_router(slot_router)  
+app.include_router(doctor_router)        
+ 
  
 # ---------------------------------------------------------------------------
 # Health check

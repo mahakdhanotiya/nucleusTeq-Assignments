@@ -6,6 +6,13 @@ class SlotNotFoundException(Exception):
     def __init__(self, slot_id: str = ""):
         self.slot_id = slot_id
         super().__init__(f"Slot not found: {slot_id}")
+        
+class DoctorNotFoundError(Exception):
+    """Raised when a doctor user_id does not exist in User Service."""
+ 
+    def __init__(self, user_id: str = ""):
+        self.user_id = user_id
+        super().__init__(f"Doctor not found: {user_id}")
 
 
 class SlotConflictError(Exception):
