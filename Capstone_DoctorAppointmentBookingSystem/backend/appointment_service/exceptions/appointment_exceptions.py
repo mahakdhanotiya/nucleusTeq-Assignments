@@ -73,7 +73,9 @@ class PastSlotDateError(Exception):
         super().__init__("Slot date must be today or a future date.")
 
 
+# ---------------------------------------------------------------------------
 # Auth exceptions (used by the dependency layer)
+# ---------------------------------------------------------------------------
 
 
 class InvalidTokenError(Exception):
@@ -89,3 +91,75 @@ class UnauthorizedError(Exception):
     def __init__(self, required_role: str):
         self.required_role = required_role
         super().__init__(f"This action requires the {required_role} role.")
+        
+        
+
+# ---------------------------------------------------------------------------
+# Appointment exceptions
+# ---------------------------------------------------------------------------
+ 
+class AppointmentNotFoundException(Exception):
+    """Raised when an appointment ID does not exist."""
+ 
+    def __init__(self, appointment_id: str = ""):
+        self.appointment_id = appointment_id
+        super().__init__(f"Appointment not found: {appointment_id}")
+ 
+ 
+class AppointmentNotOwnedError(Exception):
+    """Raised when a user tries to act on an appointment they do not own."""
+ 
+    def __init__(self):
+        super().__init__("You do not have permission to access this appointment.")
+ 
+ 
+class PastAppointmentDateError(Exception):
+    """Raised when a patient tries to book a slot on a past date (FR-7)."""
+ 
+    def __init__(self):
+        super().__init__("Appointment date must be today or a future date.")
+ 
+ 
+class SlotAlreadyBookedError(Exception):
+    """
+    Raised when the requested slot is no longer AVAILABLE at booking time.
+    Covers both the application-level check and the duplicate-key index catch.
+    """
+ 
+    def __init__(self):
+        super().__init__(
+            "This slot has already been booked. Please select another slot."
+        )
+ 
+ 
+class InvalidStatusTransitionError(Exception):
+    """Raised when a status update violates the allowed state machine (FR-17)."""
+ 
+    def __init__(self, current: str, requested: str):
+        super().__init__(
+            f"Cannot transition appointment from {current} to {requested}."
+        )
+ 
+ 
+class AppointmentNotCompletedYetError(Exception):
+    """
+    Raised when a doctor tries to mark an appointment COMPLETED or NO_SHOW
+    before the appointment time has passed (FR-17).
+    """
+ 
+    def __init__(self):
+        super().__init__(
+            "Appointment status can only be updated after the appointment time has passed."
+        )
+ 
+ 
+class CancellationWindowExpiredError(Exception):
+    """
+    Raised when a patient tries to cancel within 2 hours of the appointment (FR-9).
+    """
+ 
+    def __init__(self):
+        super().__init__(
+            "Appointments can only be cancelled at least 2 hours before the scheduled time."
+        )
+ 
