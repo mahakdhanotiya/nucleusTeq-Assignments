@@ -23,7 +23,7 @@ router = APIRouter(prefix="/admin", tags=["Admin"])
 async def get_all_doctors(
     current_user: User = Depends(require_admin),
 ) -> list[AdminDoctorResponse]:
-    """Returns all doctor accounts with profile data and approval status (FR-19)."""
+    """Returns all doctor accounts."""
     return await list_all_doctors()
 
 
@@ -39,7 +39,6 @@ async def approve_doctor(
 ) -> MessageResponse:
     """
     Approves a doctor's registration.
-    The doctor can log in and use the system after approval.
     """
     return await set_doctor_approval_status(user_id, ApprovalStatus.APPROVED)
 
@@ -56,7 +55,6 @@ async def reject_doctor(
 ) -> MessageResponse:
     """
     Rejects a doctor's registration.
-    The doctor cannot log in after rejection.
     """
     return await set_doctor_approval_status(user_id, ApprovalStatus.REJECTED)
 
@@ -71,7 +69,7 @@ async def activate_doctor(
     user_id: str,
     current_user: User = Depends(require_admin),
 ) -> MessageResponse:
-    """Re-activates a previously deactivated doctor account (FR-19)."""
+    """Activates a doctor account."""
     return await set_doctor_active_status(user_id, is_active=True)
 
 
@@ -85,7 +83,7 @@ async def deactivate_doctor(
     user_id: str,
     current_user: User = Depends(require_admin),
 ) -> MessageResponse:
-    """Deactivates a doctor account — they can no longer log in (FR-19)."""
+    """Deactivates a doctor account — they can no longer log in"""
     return await set_doctor_active_status(user_id, is_active=False)
 
 
@@ -98,5 +96,5 @@ async def deactivate_doctor(
 async def get_dashboard_user_stats(
     current_user: User = Depends(require_admin),
 ) -> AdminDashboardUsersResponse:
-    """Returns total_doctors, total_patients, active_doctors counts (FR-20)."""
+    """Returns admin dashboard statistics."""
     return await get_user_dashboard_stats()
