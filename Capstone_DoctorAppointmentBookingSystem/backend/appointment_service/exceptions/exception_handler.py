@@ -1,5 +1,3 @@
-# Registers global exception handlers on the FastAPI app.
-
 import logging
 
 from fastapi import FastAPI, Request, status
@@ -24,14 +22,13 @@ from exceptions.appointment_exceptions import (
     CancellationWindowExpiredError,
 )
 
+from constants.message_constants import INTERNAL_SERVER_ERROR_RESPONSE
+
 logger = logging.getLogger(__name__)
 
 
 def _error_response(error_code: str, message: str, status_code: int) -> JSONResponse:
-    """
-    Builds the standard error JSON shape used across all services:
-        { success, error_code, message, details }
-    """
+    """ Builds the standard error response."""
     return JSONResponse(
         status_code=status_code,
         content={
@@ -44,13 +41,7 @@ def _error_response(error_code: str, message: str, status_code: int) -> JSONResp
 
 
 def register_exception_handlers(app: FastAPI) -> None:
-    """
-    Attaches all custom exception handlers to the FastAPI application.
-    Once registered, any route or service that raises these exceptions
-    will automatically receive the correct HTTP response — no try/except
-    needed in routers or services.
-    """
-
+    """Registers all global exception handlers."""
     @app.exception_handler(InvalidTokenError)
     async def handle_invalid_token(request: Request, exc: InvalidTokenError):
         logger.warning(f"Auth failure on {request.url.path}: {exc}")
@@ -143,6 +134,6 @@ def register_exception_handlers(app: FastAPI) -> None:
         )
         return _error_response(
             "INTERNAL_SERVER_ERROR",
-            "Something went wrong. Please try again later.",
+            INTERNAL_SERVER_ERROR_RESPONSE,
             status.HTTP_500_INTERNAL_SERVER_ERROR,
         )

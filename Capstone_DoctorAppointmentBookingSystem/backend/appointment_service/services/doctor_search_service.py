@@ -1,9 +1,3 @@
-# Business logic for FR-5 (doctor search) and FR-6 (doctor detail view).
-#
-# This service composes responses from two data sources:
-#   - Doctor profile data  → User Service (via user_service_client)
-#   - Available slot data  → local `slots` collection (via slot_repository)
-
 import httpx
 import logging
 from datetime import date
@@ -30,12 +24,7 @@ async def search_doctors_service(
     name: Optional[str] = None,
     specialization: Optional[str] = None,
 ) -> list[DoctorSearchResult]:
-    """
-    Returns a list of doctors matching the search criteria (FR-5).
-
-    Fetches matching doctor profiles from User Service (APPROVED + active only),
-    then enriches each result with the count of available slots from local DB.
-    """
+    """Returns doctors matching the search criteria."""
     profiles = await search_doctors(name=name, specialization=specialization)
 
     results: list[DoctorSearchResult] = []
@@ -68,15 +57,7 @@ async def get_doctor_detail(
     user_id: str,
     slot_date: Optional[date] = None,
 ) -> DoctorDetailResponse:
-    """
-    Returns the full doctor profile with available slots (FR-6).
-
-    Fetches the doctor profile from User Service and combines it with
-    available slots from the local slots collection.
-    An optional `slot_date` filter narrows the slot list to a specific day.
-
-    Raises DoctorNotFoundError if User Service returns 404.
-    """
+    """Returns doctor details with available slots."""
 
     try:
         profile = await fetch_doctor(user_id)

@@ -19,8 +19,6 @@ class User(Document):
     role: UserRole
     is_active: bool = Field(default=True)
 
-    # Only new DOCTOR registrations explicitly set this to PENDING
-    # (handled in auth_service.py).
     approval_status: ApprovalStatus = Field(default=ApprovalStatus.APPROVED)
 
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

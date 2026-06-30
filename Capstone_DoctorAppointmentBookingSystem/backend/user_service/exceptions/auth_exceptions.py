@@ -1,9 +1,19 @@
+from constants.message_constants import (
+    DUPLICATE_EMAIL_TEMPLATE,
+    DUPLICATE_LICENSE_TEMPLATE,
+    INVALID_CREDENTIALS_ERROR,
+    ACCOUNT_DEACTIVATED_ERROR,
+    DOCTOR_PENDING_APPROVAL_ERROR,
+    DOCTOR_REJECTED_ERROR,
+)
+
+
 class DuplicateEmailError(Exception):
     """Raised when registering with an email that already exists."""
 
     def __init__(self, email: str):
         self.email = email
-        super().__init__(f"Email already registered: {email}")
+        super().__init__(DUPLICATE_EMAIL_TEMPLATE.format(email))
 
 
 class DuplicateLicenseNumberError(Exception):
@@ -11,44 +21,37 @@ class DuplicateLicenseNumberError(Exception):
 
     def __init__(self, license_number: str):
         self.license_number = license_number
-        super().__init__(f"License number already registered: {license_number}")
+        super().__init__(DUPLICATE_LICENSE_TEMPLATE.format(license_number))
 
 
 class InvalidCredentialsError(Exception):
     """Raised when login fails due to a wrong email or password."""
 
     def __init__(self):
-        super().__init__("Invalid email or password.")
+        super().__init__(INVALID_CREDENTIALS_ERROR)
 
 
 class AccountDeactivatedError(Exception):
     """Raised when a deactivated account attempts to log in."""
 
     def __init__(self):
-        super().__init__("This account has been deactivated. Please contact support.")
+        super().__init__(ACCOUNT_DEACTIVATED_ERROR)
         
 
 class DoctorPendingApprovalError(Exception):
-    """
-    Raised when a DOCTOR whose approval_status is PENDING attempts to log in.
-    The doctor must wait for an Admin to approve their account before accessing the system.
-    """
+    """Raised when a doctor's account is pending approval."""
  
     def __init__(self):
-        super().__init__(
-            "Your account is pending admin approval. "
-            "Please wait until your account is approved."
-        )
+        super().__init__(DOCTOR_PENDING_APPROVAL_ERROR)
  
  
 class DoctorRejectedError(Exception):
     """
-    Raised when a DOCTOR whose approval_status is REJECTED attempts to log in.
+    Raised when a doctor's account has been rejected.
     """
  
     def __init__(self):
-        super().__init__(
-            "Your registration has been rejected. Please contact support."
-        )
+        super().__init__(DOCTOR_REJECTED_ERROR)
+
  
  

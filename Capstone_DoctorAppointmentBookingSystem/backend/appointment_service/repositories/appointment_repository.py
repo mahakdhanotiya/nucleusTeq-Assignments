@@ -1,6 +1,3 @@
-# All database operations for the `appointments` collection.
-# No business logic — query construction only.
-
 from datetime import date, datetime, timezone
 
 from beanie import PydanticObjectId
@@ -24,10 +21,8 @@ async def get_appointments_by_patient(
     patient_id: PydanticObjectId,
     status: AppointmentStatus | None = None,
 ) -> list[Appointment]:
-    """
-    Returns all appointments for a patient, optionally filtered by status.
-    Used for FR-10 appointment history.
-    """
+    """Returns appointments for a patient."""
+    
     filters = [Appointment.patient_id == patient_id]
     if status is not None:
         filters.append(Appointment.status == status)
@@ -41,10 +36,8 @@ async def get_appointments_by_doctor(
     appointment_date: date | None = None,
     status: AppointmentStatus | None = None,
 ) -> list[Appointment]:
-    """
-    Returns all appointments for a doctor, optionally filtered by date and status.
-    Used for FR-15 doctor dashboard views.
-    """
+    """Returns appointments for a patient."""
+    
     filters = [Appointment.doctor_id == doctor_id]
     if appointment_date is not None:
         filters.append(Appointment.appointment_date == appointment_date)

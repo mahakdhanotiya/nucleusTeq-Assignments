@@ -8,12 +8,15 @@ from repositories.doctor_repository import get_doctor_profile_by_user_id
 from exceptions.user_exceptions import UserNotFoundError, UnauthorizedError
 from enums.user_role import UserRole
 from enums.approval_status import ApprovalStatus
+from constants.message_constants import DOCTOR_ACCOUNT_STATUS_SUCCESS_TEMPLATE
 
 logger = logging.getLogger(__name__)
 
 
 def _build_admin_doctor_response(user, profile) -> AdminDoctorResponse:
-    """Helper to build a consistent AdminDoctorResponse from a User + DoctorProfile."""
+    """
+    Builds an admin doctor response.
+    """
     return AdminDoctorResponse(
         user_id=str(user.id),
         full_name=user.full_name,
@@ -31,7 +34,7 @@ def _build_admin_doctor_response(user, profile) -> AdminDoctorResponse:
 
 
 async def list_all_doctors() -> list[AdminDoctorResponse]:
-    """Returns all doctor accounts with their profile data (FR-19)."""
+    """Returns all doctor accounts with their profile data."""
     doctors = await get_all_doctors()
     result = []
     for user in doctors:
@@ -42,9 +45,7 @@ async def list_all_doctors() -> list[AdminDoctorResponse]:
 
 async def set_doctor_active_status(user_id: str, is_active: bool) -> MessageResponse:
     """
-    Activates or deactivates a doctor account (FR-19).
-    Raises UserNotFoundError if the user doesn't exist.
-    Raises UnauthorizedError if the target user is not a DOCTOR.
+    Activates or deactivates a doctor account.
     """
     user = await get_user_by_id(PydanticObjectId(user_id))
 
@@ -58,7 +59,7 @@ async def set_doctor_active_status(user_id: str, is_active: bool) -> MessageResp
 
     action = "activated" if is_active else "deactivated"
     logger.info(f"Admin {action} doctor account: {user.email}")
-    return MessageResponse(message=f"Doctor account {action} successfully.")
+    return MessageResponse(message=DOCTOR_ACCOUNT_STATUS_SUCCESS_TEMPLATE.format(action))
 
 
 async def set_doctor_approval_status(
@@ -66,13 +67,7 @@ async def set_doctor_approval_status(
     approval_status: ApprovalStatus,
 ) -> MessageResponse:
     """
-    Approves or rejects a doctor's registration.
-
-    Only callable by Admin. Sets the doctor's approval_status so they
-    can (APPROVED) or cannot (REJECTED/PENDING) log in to the system.
-
-    Raises UserNotFoundError if the user doesn't exist.
-    Raises UnauthorizedError if the target user is not a DOCTOR.
+    Updates a doctor's approval status.
     """
     user = await get_user_by_id(PydanticObjectId(user_id))
 
@@ -86,10 +81,10 @@ async def set_doctor_approval_status(
 
     action = approval_status.value.lower()
     logger.info(f"Admin {action} doctor account: {user.email}")
-    return MessageResponse(message=f"Doctor account {action} successfully.")
+    return MessageResponse(message=DOCTOR_ACCOUNT_STATUS_SUCCESS_TEMPLATE.format(action))
 
 
 async def get_user_dashboard_stats() -> AdminDashboardUsersResponse:
-    """Returns user-side counts for the Admin Dashboard (FR-20)."""
+    """Returns user-side counts for the Admin Dashboard."""
     counts = await get_user_counts()
     return AdminDashboardUsersResponse(**counts)

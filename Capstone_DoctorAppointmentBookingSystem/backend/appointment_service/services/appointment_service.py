@@ -1,12 +1,3 @@
-# Core business logic for appointment booking, cancellation, history,
-# and status management (FR-7, FR-9, FR-10, FR-15, FR-17, FR-18).
-#
-# Double-booking prevention strategy:
-#   1. Application-level check: slot.status == AVAILABLE before writing.
-#   2. Database-level guarantee: unique compound index on (doctor_id, slot_id)
-#      in the appointments collection rejects any concurrent duplicate insert
-#      with a DuplicateKeyError, which is caught and mapped to SlotAlreadyBookedError.
-
 import logging
 from datetime import date, datetime, timezone, timedelta
 
@@ -64,7 +55,7 @@ def _to_appointment_response(
     appointment: Appointment,
     payment: Payment | None = None,
 ) -> AppointmentResponse:
-    """Converts Appointment + optional Payment documents into the API response schema."""
+    """Builds an appointment response."""
     return AppointmentResponse(
         id=str(appointment.id),
         patient_id=str(appointment.patient_id),
@@ -90,7 +81,7 @@ def _to_appointment_response(
 
 
 def _to_card(appointment: Appointment) -> AppointmentCardResponse:
-    """Converts an Appointment document into a lightweight card response."""
+    """Builds an appointment card response."""
     return AppointmentCardResponse(
         id=str(appointment.id),
         appointment_date=appointment.appointment_date,
@@ -108,23 +99,11 @@ async def book_appointment(
     request: BookAppointmentRequest,
     current_user: CurrentUser,
 ) -> AppointmentResponse:
-    """
-    Books an appointment for the authenticated patient (FR-7).
-
-    Steps:
-      1. Validate appointment date is not in the past.
-      2. Verify slot exists, belongs to the doctor, and is AVAILABLE.
-      3. Fetch doctor and patient snapshots from User Service.
-      4. Atomically mark slot BOOKED and insert appointment.
-         The unique DB index on (doctor_id, slot_id) is the final
-         concurrency guard against double booking.
-      5. Create a PENDING payment record (FR-8).
-    """
-    # Step 1 — future date check
+    """Books an appointment for the authenticated patient."""
+    
     if request.appointment_date < date.today():
         raise PastAppointmentDateError()
 
-    # Step 2 — slot validation
     slot_id = PydanticObjectId(request.slot_id)
     doctor_id = PydanticObjectId(request.doctor_id)
 
@@ -136,7 +115,6 @@ async def book_appointment(
     if slot.status != SlotStatus.AVAILABLE:
         raise SlotAlreadyBookedError()
 
-    # Step 3 — fetch snapshots from User Service
     doctor_data = await fetch_doctor(request.doctor_id)
     patient_data = await fetch_patient(current_user.user_id)
 
@@ -153,7 +131,6 @@ async def book_appointment(
         phone_number=patient_data["phone_number"],
     )
 
-    # Step 4 — atomically mark slot BOOKED and insert appointment
     slot.status = SlotStatus.BOOKED
     await update_slot(slot)
 
@@ -176,7 +153,6 @@ async def book_appointment(
         await update_slot(slot)
         raise SlotAlreadyBookedError()
 
-    # Step 5 — create PENDING payment
     payment = Payment(
         appointment_id=appointment.id,
         patient_id=PydanticObjectId(current_user.user_id),
@@ -199,15 +175,7 @@ async def cancel_appointment(
     request: CancelAppointmentRequest,
     current_user: CurrentUser,
 ) -> AppointmentResponse:
-    """
-    Cancels a CONFIRMED appointment (FR-9).
-
-    Rules:
-      - Appointment must belong to the requesting patient.
-      - Status must be CONFIRMED (not already cancelled/completed).
-      - Cancellation must be at least 2 hours before appointment start.
-      - Slot is immediately returned to AVAILABLE.
-    """
+    """Cancels a CONFIRMED appointment."""
     appointment = await get_appointment_by_id(PydanticObjectId(appointment_id))
     if appointment is None:
         raise AppointmentNotFoundException(appointment_id)
@@ -218,7 +186,6 @@ async def cancel_appointment(
     if appointment.status != AppointmentStatus.CONFIRMED:
         raise InvalidStatusTransitionError(appointment.status.value, "CANCELLED")
 
-    # Build the full appointment datetime and enforce the 2-hour window (FR-9)
     appt_datetime = datetime.combine(
         appointment.appointment_date,
         datetime.strptime(appointment.start_time, "%H:%M").time(),
@@ -227,7 +194,6 @@ async def cancel_appointment(
     if datetime.now(timezone.utc) >= appt_datetime - timedelta(hours=2):
         raise CancellationWindowExpiredError()
 
-    # Return slot to AVAILABLE
     slot = await get_slot_by_id(appointment.slot_id)
     if slot:
         slot.status = SlotStatus.AVAILABLE
@@ -248,7 +214,7 @@ async def get_patient_appointments(
     current_user: CurrentUser,
     status: AppointmentStatus | None = None,
 ) -> list[AppointmentCardResponse]:
-    """Returns appointment history for the authenticated patient (FR-10)."""
+    """Returns appointment history for the authenticated patient."""
     appointments = await get_appointments_by_patient(
         patient_id=PydanticObjectId(current_user.user_id),
         status=status,
@@ -261,14 +227,7 @@ async def get_doctor_appointments(
     view: str = "upcoming",
     appointment_date: date | None = None,
 ) -> list[AppointmentCardResponse]:
-    """
-    Returns appointments for the authenticated doctor (FR-15).
-
-    view options:
-      - today    : today's appointments regardless of status
-      - upcoming : future CONFIRMED appointments
-      - all      : all appointments, optionally filtered by date
-    """
+    """Returns appointments for the authenticated doctor."""
     doctor_id = PydanticObjectId(current_user.user_id)
 
     if view == "today":
@@ -289,15 +248,7 @@ async def update_appointment_status(
     request: UpdateAppointmentStatusRequest,
     current_user: CurrentUser,
 ) -> AppointmentResponse:
-    """
-    Allows a doctor to mark an appointment COMPLETED or NO_SHOW (FR-17).
-
-    Rules:
-      - Only the doctor linked to the appointment may update status.
-      - Only CONFIRMED appointments can be updated.
-      - Only COMPLETED and NO_SHOW are valid target statuses.
-      - The appointment time must have already passed.
-    """
+    """Updates an appointment status."""
     if request.status not in _DOCTOR_SETTABLE_STATUSES:
         raise InvalidStatusTransitionError("CONFIRMED", request.status.value)
 
@@ -311,7 +262,7 @@ async def update_appointment_status(
     if appointment.status != AppointmentStatus.CONFIRMED:
         raise InvalidStatusTransitionError(appointment.status.value, request.status.value)
 
-    # Appointment time must have passed (FR-17)
+    # Appointment time must have passed
     appt_datetime = datetime.combine(
         appointment.appointment_date,
         datetime.strptime(appointment.end_time, "%H:%M").time(),
@@ -336,10 +287,7 @@ async def get_appointment_detail(
     appointment_id: str,
     current_user: CurrentUser,
 ) -> AppointmentResponse:
-    """
-    Returns full appointment detail (FR-18).
-    Accessible by the patient or the doctor linked to the appointment.
-    """
+    """Returns full appointment detail."""
     appointment = await get_appointment_by_id(PydanticObjectId(appointment_id))
     if appointment is None:
         raise AppointmentNotFoundException(appointment_id)

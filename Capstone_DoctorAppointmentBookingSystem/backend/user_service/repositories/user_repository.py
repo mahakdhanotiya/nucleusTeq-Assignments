@@ -33,8 +33,7 @@ async def get_all_doctors() -> list[User]:
 
 async def search_doctors_by_name(name: str) -> list[User]:
     """
-    Searches active doctor users whose full_name partially matches the given string.
-    Case-insensitive. Used by GET /internal/doctors/search for FR-5 name search.
+    Searches active doctors by name.
     """
     return await User.find(
         User.role == UserRole.DOCTOR,
@@ -44,7 +43,7 @@ async def search_doctors_by_name(name: str) -> list[User]:
 
 
 async def get_user_counts() -> dict:
-    """Returns aggregate counts of doctors and patients for the admin dashboard (FR-20)."""
+    """Returns user statistics for the admin dashboard."""
     total_doctors = await User.find(User.role == UserRole.DOCTOR).count()
     active_doctors = await User.find(
         User.role == UserRole.DOCTOR, User.is_active == True

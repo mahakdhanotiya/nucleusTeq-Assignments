@@ -10,6 +10,8 @@ from repositories.user_repository import update_user
 from repositories.doctor_repository import get_doctor_profile_by_user_id, update_doctor_profile
 from exceptions.user_exceptions import IncorrectPasswordError
 
+from constants.message_constants import PASSWORD_CHANGED_SUCCESS
+
 logger = logging.getLogger(__name__)
 
 
@@ -29,9 +31,7 @@ def _to_base_response(user: User) -> UserProfileResponse:
 
 async def get_my_profile(user: User) -> DoctorProfileResponse | UserProfileResponse:
     """
-    Returns the current authenticated user's profile.
-    DOCTOR users receive the full DoctorProfileResponse including doctor-specific fields.
-    All other roles receive the base UserProfileResponse.
+    Returns the authenticated user's profile.
     """
     if user.role == UserRole.DOCTOR:
         profile = await get_doctor_profile_by_user_id(user.id)
@@ -58,7 +58,9 @@ async def get_my_profile(user: User) -> DoctorProfileResponse | UserProfileRespo
 
 
 async def update_my_profile(user: User, request: UpdateProfileRequest) -> DoctorProfileResponse | UserProfileResponse:
-    """Updates common user fields (full_name, phone_number). Applicable to all roles."""
+    """
+    Updates the authenticated user's profile
+    """
     if request.full_name is not None:
         user.full_name = request.full_name
     if request.phone_number is not None:
@@ -75,7 +77,9 @@ async def update_my_doctor_profile(
     user: User,
     request: UpdateDoctorProfileRequest,
 ) -> DoctorProfileResponse:
-    """Updates doctor-specific profile fields (FR-16). Only callable by DOCTOR role users."""
+    """
+    Updates doctor-specific profile fields.
+    """
     profile = await get_doctor_profile_by_user_id(user.id)
 
     if request.qualification is not None:
@@ -94,7 +98,9 @@ async def update_my_doctor_profile(
 
 
 async def change_password(user: User, request: ChangePasswordRequest) -> MessageResponse:
-    """Validates the old password and sets a new hashed password."""
+    """
+    Validates the old password and sets a new hashed password.
+    """
     if not verify_password(request.old_password, user.password_hash):
         raise IncorrectPasswordError()
 
@@ -103,4 +109,4 @@ async def change_password(user: User, request: ChangePasswordRequest) -> Message
     await update_user(user)
 
     logger.info(f"User changed password: {user.email}")
-    return MessageResponse(message="Password changed successfully.")
+    return MessageResponse(message=PASSWORD_CHANGED_SUCCESS)

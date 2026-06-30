@@ -9,6 +9,13 @@ from repositories.user_repository import get_user_by_id
 from exceptions.user_exceptions import InvalidTokenError
 from exceptions.auth_exceptions import AccountDeactivatedError
 
+from constants.message_constants import (
+    TOKEN_EXPIRED_ERROR,
+    INVALID_TOKEN_ERROR,
+    TOKEN_MISSING_CLAIMS_ERROR,
+    USER_NOT_FOUND_FOR_TOKEN_ERROR,
+)
+
 bearer_scheme = HTTPBearer()
 
 
@@ -21,17 +28,18 @@ async def get_current_user(
     try:
         payload = decode_access_token(token)
     except jwt.ExpiredSignatureError:
-        raise InvalidTokenError("Token has expired. Please log in again.")
+        raise InvalidTokenError(TOKEN_EXPIRED_ERROR)
     except jwt.InvalidTokenError:
-        raise InvalidTokenError("Invalid token.")
+        raise InvalidTokenError(INVALID_TOKEN_ERROR)
 
     user_id = payload.get("sub")
     if user_id is None:
-        raise InvalidTokenError("Token is missing required claims.")
+        raise InvalidTokenError(TOKEN_MISSING_CLAIMS_ERROR)
 
     user = await get_user_by_id(PydanticObjectId(user_id))
     if user is None:
-        raise InvalidTokenError("User associated with this token no longer exists.")
+        raise InvalidTokenError(USER_NOT_FOUND_FOR_TOKEN_ERROR)
+
 
     if not user.is_active:
         raise AccountDeactivatedError()

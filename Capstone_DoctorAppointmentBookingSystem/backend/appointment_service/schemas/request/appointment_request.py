@@ -7,7 +7,7 @@ from enums.appointment_status import AppointmentStatus
 
 
 class BookAppointmentRequest(BaseModel):
-    """Request body for POST /appointments — patient books a slot (FR-7)."""
+    """Request schema for booking a new appointment."""
 
     doctor_id: str = Field(..., description="User ID of the doctor.")
     slot_id: str = Field(..., description="ID of the slot to book.")
@@ -15,7 +15,7 @@ class BookAppointmentRequest(BaseModel):
 
 
 class UpdateAppointmentStatusRequest(BaseModel):
-    """Request body for PATCH /appointments/{id}/status — doctor marks outcome (FR-17)."""
+    """Request schema for updating an appointment status."""
 
     status: AppointmentStatus = Field(
         ...,
@@ -24,6 +24,6 @@ class UpdateAppointmentStatusRequest(BaseModel):
 
 
 class CancelAppointmentRequest(BaseModel):
-    """Request body for PATCH /appointments/{id}/cancel — patient cancels (FR-9)."""
+    """Request schema for cancelling an existing appointment."""
 
     reason: Optional[str] = Field(default=None, description="Optional cancellation reason.")

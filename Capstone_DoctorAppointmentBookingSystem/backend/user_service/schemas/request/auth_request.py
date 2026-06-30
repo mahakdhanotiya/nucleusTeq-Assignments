@@ -6,6 +6,17 @@ from pydantic import BaseModel, EmailStr, Field, field_validator, model_validato
 
 from enums.gender import Gender
 from enums.user_role import UserRole
+from constants.message_constants import (
+    FULL_NAME_VALIDATION_ERROR,
+    PHONE_NUMBER_VALIDATION_ERROR,
+    PASSWORD_UPPERCASE_ERROR,
+    PASSWORD_SPECIAL_CHAR_ERROR,
+    PASSWORD_DIGIT_ERROR,
+    DOB_MUST_BE_PAST_ERROR,
+    PATIENT_REGISTRATION_MISSING_FIELDS_ERROR,
+    DOCTOR_REGISTRATION_MISSING_FIELDS_TEMPLATE,
+    ADMIN_REGISTRATION_FORBIDDEN_ERROR,
+)
 
 
 class RegisterRequest(BaseModel):
@@ -31,27 +42,27 @@ class RegisterRequest(BaseModel):
     @classmethod
     def validate_full_name(cls, value: str) -> str:
         if not re.fullmatch(r"[A-Za-z\s]+", value):
-            raise ValueError("Full name must contain only alphabets and spaces.")
+            raise ValueError(FULL_NAME_VALIDATION_ERROR)
         return value.strip()
 
     @field_validator("phone_number")
     @classmethod
     def validate_phone_number(cls, value: str) -> str:
         if not re.fullmatch(r"\d{10}", value):
-            raise ValueError("Phone number must be exactly 10 digits.")
+            raise ValueError(PHONE_NUMBER_VALIDATION_ERROR)
         return value
 
     @field_validator("password")
     @classmethod
     def validate_password(cls, value: str) -> str:
         if not re.search(r"[A-Z]", value):
-            raise ValueError("Password must contain at least one uppercase letter.")
+            raise ValueError(PASSWORD_UPPERCASE_ERROR)
 
         if not re.search(r"\d", value):
-            raise ValueError("Password must contain at least one digit.")
+            raise ValueError(PASSWORD_DIGIT_ERROR)
 
         if not re.search(r"[!@#$%^&*(),.?\":{}|<>_\-+=]", value):
-            raise ValueError("Password must contain at least one special character.")
+            raise ValueError(PASSWORD_SPECIAL_CHAR_ERROR)
 
         return value
     
@@ -60,16 +71,14 @@ class RegisterRequest(BaseModel):
     @classmethod
     def validate_date_of_birth(cls, value: Optional[date]) -> Optional[date]:
         if value is not None and value >= date.today():
-            raise ValueError("Date of birth must be a past date.")
+            raise ValueError(DOB_MUST_BE_PAST_ERROR)
         return value
 
     @model_validator(mode="after")
     def validate_role_specific_fields(self) -> "RegisterRequest":
         if self.role == UserRole.PATIENT:
             if self.gender is None or self.date_of_birth is None:
-                raise ValueError(
-                    "Gender and date_of_birth are required for PATIENT registration."
-                )
+                raise ValueError(PATIENT_REGISTRATION_MISSING_FIELDS_ERROR)
 
         if self.role == UserRole.DOCTOR:
             missing = [
@@ -85,13 +94,11 @@ class RegisterRequest(BaseModel):
 
             if missing:
                 raise ValueError(
-                    f"Missing required DOCTOR fields: {', '.join(missing)}"
+                    DOCTOR_REGISTRATION_MISSING_FIELDS_TEMPLATE.format(', '.join(missing))
                 )
 
         if self.role == UserRole.ADMIN:
-            raise ValueError(
-                "ADMIN accounts cannot be created through registration."
-            )
+            raise ValueError(ADMIN_REGISTRATION_FORBIDDEN_ERROR)
 
         return self
 

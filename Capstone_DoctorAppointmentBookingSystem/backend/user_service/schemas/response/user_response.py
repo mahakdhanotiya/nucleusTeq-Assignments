@@ -8,8 +8,7 @@ from enums.approval_status import ApprovalStatus
 
 
 class UserProfileResponse(BaseModel):
-    """Response body for GET /users/me and PUT /users/me."""
-
+    """User profile response model."""
     id: str
     full_name: str
     email: str
@@ -22,18 +21,14 @@ class UserProfileResponse(BaseModel):
 
 
 class MessageResponse(BaseModel):
-    """Generic confirmation response for actions with no resource to return."""
+    """Generic success response."""
 
     success: bool = True
     message: str
 
 
 class DoctorProfileResponse(UserProfileResponse):
-    """
-    Extended profile response for DOCTOR role users.
-    Inherits all base user fields; adds doctor-specific fields.
-    Patient users receive null for all doctor-specific fields.
-    """
+    """Doctor profile response model."""
 
     qualification: Optional[str] = None
     specialization: Optional[str] = None
@@ -45,8 +40,7 @@ class DoctorProfileResponse(UserProfileResponse):
 
 
 class AdminDoctorResponse(BaseModel):
-    """Single doctor entry in the admin doctor list."""
-
+    """Admin doctor response model."""
     user_id: str
     full_name: str
     email: str
@@ -62,7 +56,7 @@ class AdminDoctorResponse(BaseModel):
 
 
 class AdminDashboardUsersResponse(BaseModel):
-    """User-side stats for the Admin Dashboard (FR-20)."""
+    """User-side stats for the Admin Dashboard."""
 
     total_doctors: int
     total_patients: int
@@ -70,16 +64,7 @@ class AdminDashboardUsersResponse(BaseModel):
 
 
 class InternalDoctorResponse(BaseModel):
-    """
-    Response contract for GET /internal/doctors/{user_id}.
-    Consumed exclusively by Appointment Service for:
-      - Doctor search result enrichment (FR-5)
-      - Doctor detail page (FR-6)
-      - Appointment booking snapshot (FR-7)
-
-    Deliberately excludes: email, phone_number, license_number
-    (User Service security concerns — Appointment Service has no need for them).
-    """
+    """Internal doctor response model."""
 
     user_id: str
     full_name: str
@@ -93,14 +78,7 @@ class InternalDoctorResponse(BaseModel):
 
 
 class InternalPatientResponse(BaseModel):
-    """
-    Response contract for GET /internal/patients/{user_id}.
-    Consumed exclusively by Appointment Service at booking time (FR-7)
-    to build the patient_snapshot stored inside the appointment document.
-
-    Only name and phone are included — enough to satisfy FR-18 (doctor views
-    patient info on an appointment) without exposing unnecessary patient data.
-    """
+    """Internal patient response model."""
 
     user_id: str
     full_name: str

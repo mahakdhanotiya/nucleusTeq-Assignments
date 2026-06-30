@@ -18,8 +18,7 @@ router = APIRouter(prefix="/users", tags=["User Management"])
 @router.get("/me", response_model=DoctorProfileResponse, status_code=status.HTTP_200_OK)
 async def get_profile(current_user: User = Depends(get_current_user)) -> DoctorProfileResponse:
     """
-    Returns the current logged-in user's profile.
-    Doctor-specific fields are populated for DOCTOR users and null for all other roles.
+    Returns the authenticated user's profile.
     """
     return await get_my_profile(current_user)
 
@@ -29,7 +28,7 @@ async def update_profile(
     request: UpdateProfileRequest,
     current_user: User = Depends(get_current_user),
 ) -> DoctorProfileResponse:
-    """Updates common user fields (full_name, phone_number) for any authenticated user."""
+    """Updates the authenticated user's profile."""
     return await update_my_profile(current_user, request)
 
 
@@ -43,8 +42,7 @@ async def update_doctor_profile(
     current_user: User = Depends(require_doctor),
 ) -> DoctorProfileResponse:
     """
-    Updates doctor-specific fields: qualification, consultation_fee, clinic_address (FR-16).
-    Restricted to DOCTOR role only.
+    Updates the authenticated doctor's profile.
     """
     return await update_my_doctor_profile(current_user, request)
 

@@ -1,6 +1,3 @@
-# HTTP request/response logging middleware.
-# Logs the method, path, status code, and processing time for every request.
-
 import logging
 import time
 

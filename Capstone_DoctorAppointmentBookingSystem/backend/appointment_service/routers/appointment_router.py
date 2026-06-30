@@ -1,6 +1,3 @@
-# HTTP routes for appointment booking, cancellation, history, and status
-# management (FR-7, FR-9, FR-10, FR-15, FR-17, FR-18).
-
 from datetime import date
 from typing import Optional
 
@@ -38,17 +35,13 @@ router = APIRouter(prefix="/appointments", tags=["Appointments"])
     "",
     response_model=AppointmentResponse,
     status_code=status.HTTP_201_CREATED,
-    summary="Book an appointment (FR-7)",
+    summary="Book an appointment",
 )
 async def book(
     request: BookAppointmentRequest,
     current_user: CurrentUser = Depends(require_patient),
 ) -> AppointmentResponse:
-    """
-    Books an available slot for the authenticated patient.
-    Creates a PENDING payment record automatically.
-    Double booking is prevented by a unique DB index on (doctor_id, slot_id).
-    """
+    """Books a new appointment for the authenticated patient."""
     return await book_appointment(request, current_user)
 
 
@@ -56,18 +49,14 @@ async def book(
     "/{appointment_id}/cancel",
     response_model=AppointmentResponse,
     status_code=status.HTTP_200_OK,
-    summary="Cancel an appointment (FR-9)",
+    summary="Cancel an appointment",
 )
 async def cancel(
     appointment_id: str,
     request: CancelAppointmentRequest,
     current_user: CurrentUser = Depends(require_patient),
 ) -> AppointmentResponse:
-    """
-    Cancels a CONFIRMED appointment.
-    Only allowed at least 2 hours before the appointment start time.
-    The slot is immediately returned to AVAILABLE on cancellation.
-    """
+    """Cancels an existing appointment for the patient."""
     return await cancel_appointment(appointment_id, request, current_user)
 
 
@@ -75,16 +64,13 @@ async def cancel(
     "/my",
     response_model=list[AppointmentCardResponse],
     status_code=status.HTTP_200_OK,
-    summary="Patient appointment history (FR-10)",
+    summary="Patient appointment history",
 )
 async def patient_history(
     appt_status: Optional[AppointmentStatus] = None,
     current_user: CurrentUser = Depends(require_patient),
 ) -> list[AppointmentCardResponse]:
-    """
-    Returns the authenticated patient's appointment history.
-    Optional `appt_status` filter: CONFIRMED, COMPLETED, CANCELLED, NO_SHOW.
-    """
+    """Returns the patient's appointment history."""
     return await get_patient_appointments(current_user, status=appt_status)
 
 
@@ -92,21 +78,14 @@ async def patient_history(
     "/doctor/my",
     response_model=list[AppointmentCardResponse],
     status_code=status.HTTP_200_OK,
-    summary="Doctor appointment views (FR-15)",
+    summary="Doctor appointment views",
 )
 async def doctor_appointments(
     view: str = "upcoming",
     appointment_date: Optional[date] = None,
     current_user: CurrentUser = Depends(require_doctor),
 ) -> list[AppointmentCardResponse]:
-    """
-    Returns appointments for the authenticated doctor.
-
-    `view` options:
-    - today    : today's appointments regardless of status
-    - upcoming : future CONFIRMED appointments (default)
-    - all      : all appointments, optionally filtered by `appointment_date`
-    """
+    """Returns appointments assigned to the authenticated doctor."""
     return await get_doctor_appointments(current_user, view=view, appointment_date=appointment_date)
 
 
@@ -114,7 +93,7 @@ async def doctor_appointments(
     "/{appointment_id}/status",
     response_model=AppointmentResponse,
     status_code=status.HTTP_200_OK,
-    summary="Mark appointment COMPLETED or NO_SHOW (FR-17)",
+    summary="Mark appointment COMPLETED or NO_SHOW",
 )
 async def update_status(
     appointment_id: str,
@@ -132,14 +111,11 @@ async def update_status(
     "/{appointment_id}",
     response_model=AppointmentResponse,
     status_code=status.HTTP_200_OK,
-    summary="Get appointment detail (FR-18)",
+    summary="Get appointment detail",
 )
 async def get_detail(
     appointment_id: str,
     current_user: CurrentUser = Depends(get_current_user),
 ) -> AppointmentResponse:
-    """
-    Returns full appointment detail including patient and doctor snapshots.
-    Accessible by the patient or the doctor linked to the appointment.
-    """
+    """Returns detailed information for an appointment."""
     return await get_appointment_detail(appointment_id, current_user)

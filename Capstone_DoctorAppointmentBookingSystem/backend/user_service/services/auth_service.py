@@ -33,10 +33,7 @@ async def register_user(request: RegisterRequest) -> RegisterResponse:
         if await get_doctor_by_license_number(request.license_number) is not None:
             raise DuplicateLicenseNumberError(license_number=request.license_number)
         
-    # Doctors are PENDING until an Admin approves them.
-
-    # All other roles (PATIENT, ADMIN) remain at the default APPROVED.
-
+    
     approval_status = (
         ApprovalStatus.PENDING
         if request.role == UserRole.DOCTOR
@@ -97,9 +94,6 @@ async def login_user(request: LoginRequest) -> TokenResponse:
     if not user.is_active:
         raise AccountDeactivatedError()
     
-    # Doctor approval check — only applies to DOCTOR accounts.
-    # PATIENT and ADMIN accounts always have approval_status=APPROVED
-    # so this check is effectively a no-op for them.
     if user.role == UserRole.DOCTOR:
         if user.approval_status == ApprovalStatus.PENDING:
             raise DoctorPendingApprovalError()

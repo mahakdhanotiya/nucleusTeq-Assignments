@@ -17,11 +17,19 @@ from exceptions.user_exceptions import (
     UserNotFoundError,
     IncorrectPasswordError,
 )
+from constants.message_constants import (
+    DUPLICATE_EMAIL_RESPONSE,
+    DUPLICATE_LICENSE_RESPONSE,
+    INVALID_CREDENTIALS_ERROR,
+    ACCOUNT_DEACTIVATED_ERROR,
+    INTERNAL_SERVER_ERROR_RESPONSE,
+)
 
 logger = logging.getLogger(__name__)
 
 
 def _build_error_response(error_code: str, message: str, status_code: int) -> JSONResponse:
+    """Builds a standardized error response."""
     return JSONResponse(
         status_code=status_code,
         content={
@@ -41,7 +49,7 @@ def register_exception_handlers(app: FastAPI) -> None:
         logger.warning(f"Registration attempt with duplicate email: {exc.email}")
         return _build_error_response(
             error_code="DUPLICATE_EMAIL",
-            message="An account with this email already exists.",
+            message=DUPLICATE_EMAIL_RESPONSE,
             status_code=status.HTTP_409_CONFLICT,
         )
 
@@ -50,7 +58,7 @@ def register_exception_handlers(app: FastAPI) -> None:
         logger.warning(f"Registration attempt with duplicate license number: {exc.license_number}")
         return _build_error_response(
             error_code="DUPLICATE_LICENSE_NUMBER",
-            message="A doctor account with this license number already exists.",
+            message=DUPLICATE_LICENSE_RESPONSE,
             status_code=status.HTTP_409_CONFLICT,
         )
 
@@ -59,7 +67,7 @@ def register_exception_handlers(app: FastAPI) -> None:
         logger.warning("Failed login attempt: invalid credentials.")
         return _build_error_response(
             error_code="INVALID_CREDENTIALS",
-            message="Invalid email or password.",
+            message=INVALID_CREDENTIALS_ERROR,
             status_code=status.HTTP_401_UNAUTHORIZED,
         )
 
@@ -68,7 +76,7 @@ def register_exception_handlers(app: FastAPI) -> None:
         logger.warning("Login attempt on a deactivated account.")
         return _build_error_response(
             error_code="ACCOUNT_DEACTIVATED",
-            message="This account has been deactivated. Please contact support.",
+            message=ACCOUNT_DEACTIVATED_ERROR,
             status_code=status.HTTP_403_FORBIDDEN,
         )
 
@@ -131,6 +139,6 @@ def register_exception_handlers(app: FastAPI) -> None:
         logger.error(f"Unhandled exception on {request.url.path}: {exc}", exc_info=True)
         return _build_error_response(
             error_code="INTERNAL_SERVER_ERROR",
-            message="Something went wrong. Please try again later.",
+            message=INTERNAL_SERVER_ERROR_RESPONSE,
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )

@@ -1,10 +1,3 @@
-# =============================================================================
-# user_service/requirements.txt
-# =============================================================================
-# This file lists every Python package the User Service needs to run.
-# Install all of them at once with:  pip install -r requirements.txt
-# =============================================================================
-
 # --- Web framework ---
 fastapi==0.115.0          # The web framework we use to build our API
 uvicorn[standard]==0.30.6 # The server that actually runs our FastAPI app

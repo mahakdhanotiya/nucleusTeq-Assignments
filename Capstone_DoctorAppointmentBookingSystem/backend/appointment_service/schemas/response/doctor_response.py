@@ -1,6 +1,3 @@
-# Response schemas for doctor-facing endpoints in Appointment Service.
-# These are composed from User Service profile data + local slot data.
-
 from datetime import date, datetime
 from typing import Optional
 
@@ -10,7 +7,7 @@ from enums.slot_status import SlotStatus
 
 
 class SlotSummary(BaseModel):
-    """Minimal slot representation embedded inside a doctor detail response."""
+    """Response schema for slot details."""
 
     id: str
     date: date
@@ -20,10 +17,7 @@ class SlotSummary(BaseModel):
 
 
 class DoctorSearchResult(BaseModel):
-    """
-    Single doctor card returned by GET /doctors/search (FR-5).
-    Composed from User Service profile + available slot count from local DB.
-    """
+    """Response schema for doctor search results."""
 
     user_id: str
     full_name: str
@@ -37,11 +31,7 @@ class DoctorSearchResult(BaseModel):
 
 
 class DoctorDetailResponse(BaseModel):
-    """
-    Full doctor profile returned by GET /doctors/{user_id} (FR-6).
-    Includes all profile fields from User Service plus the doctor's
-    available slots from the local slots collection.
-    """
+    """Response schema for doctor details."""
 
     user_id: str
     full_name: str

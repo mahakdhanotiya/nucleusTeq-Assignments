@@ -45,7 +45,7 @@ app.include_router(internal_router)
 
 @app.get("/health")
 async def health_check():
-    """Returns service status. Used to verify the service is running."""
+    """Service health check."""
     return {
         "status": "ok",
         "service": settings.APP_NAME,

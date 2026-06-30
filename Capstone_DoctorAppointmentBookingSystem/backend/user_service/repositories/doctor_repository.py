@@ -16,7 +16,7 @@ async def create_doctor_profile(profile: DoctorProfile) -> DoctorProfile:
 
 
 async def get_doctor_profile_by_user_id(user_id: PydanticObjectId) -> DoctorProfile | None:
-    """Fetches a doctor's profile document by their user ID, or None if not found."""
+    """Fetches a doctor's profile by user ID."""
     return await DoctorProfile.find_one(DoctorProfile.user_id == user_id)
 
 
@@ -30,14 +30,7 @@ async def search_doctor_profiles(
     specialization: str | None = None,
     user_ids: list[PydanticObjectId] | None = None,
 ) -> list[DoctorProfile]:
-    """
-    Searches doctor profiles by optional specialization filter and/or a list of user IDs.
-
-    Used by GET /internal/doctors/search to support FR-5 doctor search.
-    - If specialization is provided, filters case-insensitively.
-    - If user_ids is provided, restricts results to that set of IDs.
-    - Both filters can be combined.
-    """
+    """Searches doctor profiles using the provided filters."""
     query_filters = []
 
     if specialization:

@@ -2,10 +2,16 @@ import re
 from typing import Optional
 
 from pydantic import BaseModel, Field, field_validator
+from constants.message_constants import (
+    FULL_NAME_VALIDATION_ERROR,
+    PHONE_NUMBER_VALIDATION_ERROR,
+    PASSWORD_UPPERCASE_ERROR,
+    PASSWORD_SPECIAL_CHAR_ERROR,
+)
 
 
 class UpdateProfileRequest(BaseModel):
-    """Request body for PUT /users/me. All fields optional; only provided fields are updated."""
+    """Request model for updating a user profile."""
 
     full_name: Optional[str] = Field(default=None, min_length=2)
     phone_number: Optional[str] = None
@@ -14,19 +20,19 @@ class UpdateProfileRequest(BaseModel):
     @classmethod
     def validate_full_name(cls, value: Optional[str]) -> Optional[str]:
         if value is not None and not re.fullmatch(r"[A-Za-z\s]+", value):
-            raise ValueError("Full name must contain only alphabets and spaces.")
+            raise ValueError(FULL_NAME_VALIDATION_ERROR)
         return value.strip() if value else value
 
     @field_validator("phone_number")
     @classmethod
     def validate_phone_number(cls, value: Optional[str]) -> Optional[str]:
         if value is not None and not re.fullmatch(r"\d{10}", value):
-            raise ValueError("Phone number must be exactly 10 digits.")
+            raise ValueError(PHONE_NUMBER_VALIDATION_ERROR)
         return value
 
 
 class ChangePasswordRequest(BaseModel):
-    """Request body for PUT /users/change-password."""
+    """Request model for changing a password."""
 
     old_password: str
     new_password: str = Field(..., min_length=8, max_length=12)
@@ -35,18 +41,14 @@ class ChangePasswordRequest(BaseModel):
     @classmethod
     def validate_new_password(cls, value: str) -> str:
         if not re.search(r"[A-Z]", value):
-            raise ValueError("Password must contain at least one uppercase letter.")
+            raise ValueError(PASSWORD_UPPERCASE_ERROR)
         if not re.search(r"[!@#$%^&*(),.?\":{}|<>_\-+=]", value):
-            raise ValueError("Password must contain at least one special character.")
+            raise ValueError(PASSWORD_SPECIAL_CHAR_ERROR)
         return value
 
 
 class UpdateDoctorProfileRequest(BaseModel):
-    """
-    Request body for PUT /users/me/doctor-profile when the authenticated user is a DOCTOR.
-    Covers FR-16: Update Qualification, Consultation Fee, Clinic Address, Profile Photo.
-    All fields are optional — only provided fields are updated.
-    """
+    """Request model for updating a doctor's profile."""
 
     qualification: Optional[str] = Field(default=None, min_length=2)
     consultation_fee: Optional[float] = Field(default=None, ge=0)

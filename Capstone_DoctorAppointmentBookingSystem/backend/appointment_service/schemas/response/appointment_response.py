@@ -51,7 +51,7 @@ class AppointmentResponse(BaseModel):
 class AppointmentCardResponse(BaseModel):
     """
     Lightweight appointment card for list views.
-    Used in patient history (FR-10) and doctor dashboard (FR-15).
+    Used in patient history and doctor dashboard.
     """
 
     id: str

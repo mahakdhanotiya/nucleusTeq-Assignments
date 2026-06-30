@@ -1,6 +1,3 @@
-# Response schemas for slot-related API endpoints.
-# These control exactly what the API sends back — never the raw Beanie document.
-
 from datetime import date, datetime
 
 from pydantic import BaseModel
@@ -9,10 +6,7 @@ from enums.slot_status import SlotStatus
 
 
 class SlotResponse(BaseModel):
-    """
-    Represents a single slot in any API response.
-    Used by all slot endpoints: create, list, update.
-    """
+    """Response schema for slot information."""
 
     id: str
     doctor_id: str
@@ -29,7 +23,7 @@ class SlotResponse(BaseModel):
 
 
 class MessageResponse(BaseModel):
-    """Generic confirmation response for actions that return no resource."""
+    """Response schema for confirmation messages."""
 
     success: bool = True
     message: str

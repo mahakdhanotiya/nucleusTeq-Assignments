@@ -3,49 +3,25 @@ from datetime import date, datetime, timezone
 from beanie import Document, Indexed, PydanticObjectId
 from pydantic import Field
 from pymongo import ASCENDING, IndexModel
+from enums.slot_status import SlotStatus
 
 
 class Slot(Document):
-    """
-    MongoDB document representing one doctor availability slot.
+    """Represents a doctor's availability slot in the database."""
 
-    Each slot belongs to exactly one doctor and covers a specific
-    date + time window. Its `status` field controls whether a patient
-    can book it:
-      - AVAILABLE → can be booked
-      - BOOKED    → already taken; cannot be modified or deleted 
-    This document is managed by Beanie ODM and stored in the `slots`
-    collection of the Appointment Service database.
-
-    """
-
-    # The doctor who created this slot.
-    # References users._id in User Service (cross-service reference).
-    # Stored as PydanticObjectId so MongoDB saves it as a native ObjectId,
-    # not a plain string — consistent with how User Service stores user IDs.
     doctor_id: PydanticObjectId
 
-    # Calendar date of the slot (e.g. 2025-09-15).
-    # Stored as Python `date`, serialised as YYYY-MM-DD in API responses.
     date: date
 
-    # Start and end times in 24-hour "HH:MM" format (e.g. "09:00", "17:30").
-    # Validated in slot_service.py: end_time must always be after start_time.
     start_time: str 
     end_time: str
     
+    status: SlotStatus = Field(default=SlotStatus.AVAILABLE)
 
-    # Current lifecycle state of this slot.
-    # Imported from enums/slot_status.py.
-    # Default is AVAILABLE when a doctor first creates a slot.
-    status: str = Field(default="AVAILABLE")
-
-    # Audit timestamps — set automatically, never sent by the client.
     created_at: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc)
     )
     
-    # Automatically updated whenever the slot is modified.
     updated_at: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc)
     )
@@ -53,17 +29,10 @@ class Slot(Document):
     class Settings:
         """Beanie configuration for the slots collection."""
 
-        # The MongoDB collection name.
         name = "slots"
        
-        # Compound indexes to optimize frequent queries and prevent duplicate slots.
         indexes = [
-            # --- Primary query index ---
-            # Covers the most common read: "give me all AVAILABLE slots
-            # for doctor X on date Y". All three fields are used together
-            # in every slot availability query, so a compound index on all
-            # three is much more efficient than three separate single-field
-            # indexes.
+            # Optimizes doctor slot queries.
             IndexModel(
                 [
                     ("doctor_id", ASCENDING),
@@ -72,11 +41,7 @@ class Slot(Document):
                 ],
                 name="doctor_date_status_index",
             ),
-            # --- Duplicate prevention index ---
-            # Prevents a doctor from creating two slots that start at the
-            # same time on the same day. This is enforced at the database
-            # level, not just in application code, so it holds even under
-            # concurrent requests.
+            # Prevents duplicate slots for the same doctor.
             IndexModel(
                 [
                     ("doctor_id", ASCENDING),

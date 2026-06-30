@@ -33,15 +33,7 @@ async def create_slot(
     request: CreateSlotRequest,
     current_user: CurrentUser = Depends(require_doctor),
 ) -> SlotResponse:
-    """
-    Creates a new availability slot for the authenticated doctor.
- 
-    Rules enforced:
-    - Date must be today or a future date
-    - End time must be after start time
-    - Must not overlap with the doctor's existing slots on that date
-    - Restricted to DOCTOR role only
-    """
+    """Creates a new availability slot for the doctor."""
     return await create_slot_for_doctor(request, current_user)
  
  
@@ -56,17 +48,7 @@ async def get_my_slots_route(
     slot_status: Optional[str] = None,
     current_user: CurrentUser = Depends(require_doctor),
 ) -> list[SlotResponse]:
-    """
-    Returns all slots belonging to the authenticated doctor (FR-14).
- 
-    Optional query parameters:
-    - slot_date   : filter by a specific date (YYYY-MM-DD)
-    - slot_status : filter by status (AVAILABLE or BOOKED)
- 
-    Results are sorted chronologically by date and start_time.
-    """
-    
-    # Delegate all filtering and business logic to the service layer.
+    """Returns slots for the authenticated doctor."""
     return await get_my_slots(current_user, slot_date=slot_date, status=slot_status)
  
  
@@ -81,19 +63,7 @@ async def get_available_slots(
     slot_date: Optional[date] = None,
     current_user: CurrentUser = Depends(get_current_user),
 ) -> list[SlotResponse]:
-    """
-    Returns AVAILABLE slots for a specific doctor.
- 
-    Used by patients when viewing a doctor's profile to see
-    which time slots are open for booking.
- 
-    Optional query parameter:
-    - slot_date : filter by a specific date (YYYY-MM-DD)
- 
-    Accessible by any authenticated user (PATIENT, DOCTOR, ADMIN).
-    """
-    
-    # Return only slots that are currently available for booking.
+    """Returns available slots for the specified doctor."""
     return await get_doctor_available_slots(doctor_id, slot_date=slot_date)
  
  
@@ -108,16 +78,7 @@ async def update_slot_route(
     request: UpdateSlotRequest,
     current_user: CurrentUser = Depends(require_doctor),
 ) -> SlotResponse:
-    """
-    Updates an existing availability slot (FR-14).
- 
-    Rules enforced:
-    - Slot must belong to the authenticated doctor
-    - Slot must be AVAILABLE (BOOKED slots cannot be modified)
-    - New date must be today or future
-    - Updated times must not overlap with other existing slots
-    - All fields are optional — only provided fields are updated
-    """
+    """Updates an existing availability slot."""
     return await update_slot_for_doctor(slot_id, request, current_user)
  
  
@@ -131,12 +92,6 @@ async def delete_slot_route(
     slot_id: str,
     current_user: CurrentUser = Depends(require_doctor),
 ) -> MessageResponse:
-    """
-    Deletes an availability slot (FR-14).
- 
-    Rules enforced:
-    - Slot must belong to the authenticated doctor
-    - Slot must be AVAILABLE — booked slots cannot be deleted
-    """
+    """Deletes an availability slot."""
     return await delete_slot_for_doctor(slot_id, current_user)
  

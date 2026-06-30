@@ -1,21 +1,12 @@
-"""
-scripts/seed_admin.py
-
-One-time script to create the System Admin account.
-Run once from inside the user_service directory:
-
-    python scripts/seed_admin.py
-
-Safe to run multiple times — will not create a duplicate if the admin
-email already exists.
-
-Credentials are read from environment variables (your .env file).
-Never hardcode real credentials in this script.
-"""
+"""Script to create the initial admin account."""
 
 import asyncio
 import os
 import sys
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -30,11 +21,11 @@ from utils.password import hash_password
 
 
 def _get_required_env(key: str) -> str:
-    """Reads a required env variable. Exits with a clear error if it is missing."""
+    """Gets a required environment variable."""
     value = os.environ.get(key)
     if not value:
-        print(f"ERROR: environment variable '{key}' is not set.")
-        print("Add it to your .env file and try again.")
+        logger.error(f"Environment variable '{key}' is not set.")
+        logger.error("Add it to your .env file and try again.")
         sys.exit(1)
     return value
 
@@ -49,7 +40,7 @@ async def seed_admin() -> None:
 
     existing = await User.find_one(User.email == email)
     if existing is not None:
-        print(f"Admin already exists: {email}")
+        logger.info(f"Admin already exists: {email}")
         await close_database_connection()
         return
 
@@ -62,10 +53,10 @@ async def seed_admin() -> None:
     )
     await admin.insert()
 
-    print("Admin created successfully.")
-    print(f"  Email : {email}")
-    print(f"  Role  : {admin.role.value}")
-    print(f"  ID    : {admin.id}")
+    logger.info("Admin created successfully.")
+    logger.info(f"Email: {email}")
+    logger.info(f"Role: {admin.role.value}")
+    logger.info(f"ID: {admin.id}")
 
     await close_database_connection()
 
