@@ -44,7 +44,7 @@ async def process_payment(
     if appointment is None:
         raise AppointmentNotFoundException(appointment_id)
 
-    if str(appointment.patient_id) != current_user.user_id:
+    if str(appointment.patient_id) != str(current_user.user_id):
         raise AppointmentNotOwnedError()
 
     payment = await get_payment_by_appointment_id(appointment.id)
@@ -70,8 +70,8 @@ async def get_payment_for_appointment(
     if appointment is None:
         raise AppointmentNotFoundException(appointment_id)
 
-    is_patient = str(appointment.patient_id) == current_user.user_id
-    is_doctor = str(appointment.doctor_id) == current_user.user_id
+    is_patient = str(appointment.patient_id) == str(current_user.id)
+    is_doctor = str(appointment.doctor_id) == str(current_user.id)
     if not is_patient and not is_doctor:
         raise AppointmentNotOwnedError()
 
