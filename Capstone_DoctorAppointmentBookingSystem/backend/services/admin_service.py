@@ -89,5 +89,6 @@ async def set_doctor_approval_status(
 
 async def get_user_dashboard_stats() -> AdminDashboardUsersResponse:
     """Returns user-side counts for the Admin Dashboard."""
+    counts = await get_user_counts()
     admin_dashboard_users_response = AdminDashboardUsersResponse(**counts)
     return admin_dashboard_users_response
