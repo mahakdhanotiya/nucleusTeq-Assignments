@@ -18,7 +18,7 @@ from exceptions.appointment_exceptions import (
     SlotAlreadyBookedError,
     SlotNotFoundException,
 )
-from integrations.user_service_client import fetch_doctor, fetch_patient
+from services.user_service import internal_fetch_doctor, internal_fetch_patient
 from models.appointment import Appointment, DoctorSnapshot, PatientSnapshot
 from models.payment import Payment
 from repositories.appointment_repository import (
@@ -115,8 +115,8 @@ async def book_appointment(
     if slot.status != SlotStatus.AVAILABLE:
         raise SlotAlreadyBookedError()
 
-    doctor_data = await fetch_doctor(request.doctor_id)
-    patient_data = await fetch_patient(current_user.user_id)
+    doctor_data = await internal_fetch_doctor(request.doctor_id)
+    patient_data = await internal_fetch_patient(current_user.user_id)
 
     doctor_snapshot = DoctorSnapshot(
         user_id=doctor_data["user_id"],
@@ -180,7 +180,7 @@ async def cancel_appointment(
     if appointment is None:
         raise AppointmentNotFoundException(appointment_id)
 
-    if str(appointment.patient_id) != current_user.user_id:
+    if str(appointment.patient_id) != str(current_user.user_id):
         raise AppointmentNotOwnedError()
 
     if appointment.status != AppointmentStatus.CONFIRMED:
@@ -256,7 +256,7 @@ async def update_appointment_status(
     if appointment is None:
         raise AppointmentNotFoundException(appointment_id)
 
-    if str(appointment.doctor_id) != current_user.user_id:
+    if str(appointment.doctor_id) != str(current_user.user_id):
         raise AppointmentNotOwnedError()
 
     if appointment.status != AppointmentStatus.CONFIRMED:
@@ -292,8 +292,8 @@ async def get_appointment_detail(
     if appointment is None:
         raise AppointmentNotFoundException(appointment_id)
 
-    is_patient = str(appointment.patient_id) == current_user.user_id
-    is_doctor = str(appointment.doctor_id) == current_user.user_id
+    is_patient = str(appointment.patient_id) == str(current_user.id)
+    is_doctor = str(appointment.doctor_id) == str(current_user.id)
 
     if not is_patient and not is_doctor:
         raise AppointmentNotOwnedError()
