@@ -1,7 +1,7 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
-    """Monolithic configuration for the Doctor Appointment Booking System, loaded from .env."""
+    """configuration for the Doctor Appointment Booking System, loaded from .env."""
 
     # --- MongoDB ---
     MONGO_URI: str
@@ -12,9 +12,6 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRY_MINUTES: int = 30
 
-    # --- Legacy Service Integration ---
-    USER_SERVICE_BASE_URL: str = "http://127.0.0.1:8001"
-    INTERNAL_API_KEY: str = ""
 
     # --- App ---
     APP_NAME: str = "Doctor Appointment Booking System"

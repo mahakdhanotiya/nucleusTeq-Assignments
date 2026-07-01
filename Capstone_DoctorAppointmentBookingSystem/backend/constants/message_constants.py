@@ -1,4 +1,4 @@
-# Validation and error messages for the monolith
+# Validation and error messages for the Doctor Appointment Booking System backend.
 
 # Field Validation Messages
 FULL_NAME_VALIDATION_ERROR = "Full name must contain only alphabets and spaces."
@@ -30,8 +30,6 @@ INVALID_TOKEN_ERROR = "Invalid token."
 TOKEN_MISSING_CLAIMS_ERROR = "Token is missing required claims."
 USER_NOT_FOUND_FOR_TOKEN_ERROR = "User associated with this token no longer exists."
 
-# Internal API Route Messages
-INVALID_INTERNAL_API_KEY = "Invalid internal API key."
 INVALID_ID_FORMAT = "Invalid ID format."
 DOCTOR_NOT_FOUND_ERROR = "Doctor not found."
 PATIENT_NOT_FOUND_ERROR = "Patient not found."
