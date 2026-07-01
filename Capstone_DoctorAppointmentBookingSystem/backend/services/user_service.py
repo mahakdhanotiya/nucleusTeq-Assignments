@@ -110,3 +110,77 @@ async def change_password(user: User, request: ChangePasswordRequest) -> Message
 
     logger.info(f"User changed password: {user.email}")
     return MessageResponse(message=PASSWORD_CHANGED_SUCCESS)
+
+# --- Internal Monolith Functions (replaces old internal API calls) ---
+from beanie import PydanticObjectId
+from repositories.user_repository import search_doctors_by_name, get_user_by_id
+from exceptions.appointment_exceptions import DoctorNotFoundError
+
+async def internal_fetch_doctor(user_id: str) -> dict:
+    object_id = PydanticObjectId(user_id)
+    user = await get_user_by_id(object_id)
+
+    if user is None or user.role != UserRole.DOCTOR:
+        raise DoctorNotFoundError(user_id)
+
+    profile = await get_doctor_profile_by_user_id(object_id)
+
+    return {
+        "user_id": str(user.id),
+        "full_name": user.full_name,
+        "is_active": user.is_active,
+        "specialization": profile.specialization if profile else None,
+        "qualification": profile.qualification if profile else None,
+        "experience_years": profile.experience_years if profile else None,
+        "consultation_fee": profile.consultation_fee if profile else None,
+        "clinic_address": profile.clinic_address if profile else None,
+        "profile_photo_url": profile.profile_photo_url if profile else None,
+    }
+
+async def internal_fetch_patient(user_id: str) -> dict:
+    object_id = PydanticObjectId(user_id)
+    user = await get_user_by_id(object_id)
+
+    if user is None or user.role != UserRole.PATIENT:
+        # Note: PATIENT_NOT_FOUND_ERROR mapped to generic in appointment logic
+        from exceptions.user_exceptions import UserNotFoundError
+        raise UserNotFoundError()
+
+    return {
+        "user_id": str(user.id),
+        "full_name": user.full_name,
+        "phone_number": user.phone_number,
+    }
+
+async def internal_search_doctors(name: str | None = None, specialization: str | None = None) -> list[dict]:
+    from repositories.doctor_repository import search_doctor_profiles
+    
+    name_matched_ids = None
+    if name:
+        name_users = await search_doctors_by_name(name)
+        name_matched_ids = [u.id for u in name_users]
+        if not name_matched_ids:
+            return []
+
+    profiles = await search_doctor_profiles(
+        specialization=specialization,
+        user_ids=name_matched_ids,
+    )
+
+    results = []
+    for profile in profiles:
+        user = await get_user_by_id(profile.user_id)
+        if user is None or not user.is_active:
+            continue
+        results.append({
+            "user_id": str(user.id),
+            "full_name": user.full_name,
+            "is_active": user.is_active,
+            "specialization": profile.specialization,
+            "qualification": profile.qualification,
+            "experience_years": profile.experience_years,
+            "consultation_fee": profile.consultation_fee,
+            "clinic_address": profile.clinic_address,
+            "profile_photo_url": profile.profile_photo_url,
+        })
+    return results
