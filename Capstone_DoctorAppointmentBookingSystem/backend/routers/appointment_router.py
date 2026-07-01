@@ -61,7 +61,7 @@ async def cancel(
 
 
 @router.get(
-    "/my",
+    "/me",
     response_model=list[AppointmentCardResponse],
     status_code=status.HTTP_200_OK,
     summary="Patient appointment history",
@@ -75,7 +75,7 @@ async def patient_history(
 
 
 @router.get(
-    "/doctor/my",
+    "/doctor/me",
     response_model=list[AppointmentCardResponse],
     status_code=status.HTTP_200_OK,
     summary="Doctor appointment views",
