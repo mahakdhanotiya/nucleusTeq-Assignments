@@ -16,6 +16,11 @@ class Settings(BaseSettings):
     # --- App ---
     APP_NAME: str = "Doctor Appointment Booking System"
     APP_ENV: str = "development"
+    
+    ADMIN_SEED_EMAIL: str
+    ADMIN_SEED_PASSWORD: str
+    ADMIN_SEED_FULL_NAME: str
+    ADMIN_SEED_PHONE: str
 
     model_config = SettingsConfigDict(
         env_file=".env",
