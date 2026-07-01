@@ -1,11 +1,10 @@
-import httpx
 import logging
 from datetime import date
 from typing import Optional
 
 from beanie import PydanticObjectId
 
-from integrations.user_service_client import fetch_doctor, search_doctors
+from services.user_service import internal_fetch_doctor, internal_search_doctors
 from repositories.slot_repository import (
     get_available_slots_for_doctor,
     get_slots_by_doctor,
@@ -25,7 +24,7 @@ async def search_doctors_service(
     specialization: Optional[str] = None,
 ) -> list[DoctorSearchResult]:
     """Returns doctors matching the search criteria."""
-    profiles = await search_doctors(name=name, specialization=specialization)
+    profiles = await internal_search_doctors(name=name, specialization=specialization)
 
     results: list[DoctorSearchResult] = []
     for profile in profiles:
@@ -60,10 +59,8 @@ async def get_doctor_detail(
     """Returns doctor details with available slots."""
 
     try:
-        profile = await fetch_doctor(user_id)
-    except httpx.HTTPStatusError as exc:
-        if exc.response.status_code == 404:
-            raise DoctorNotFoundError(user_id)
+        profile = await internal_fetch_doctor(user_id)
+    except DoctorNotFoundError:
         raise
 
     doctor_id = PydanticObjectId(user_id)
