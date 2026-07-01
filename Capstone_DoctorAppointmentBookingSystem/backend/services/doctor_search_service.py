@@ -82,7 +82,7 @@ async def get_doctor_detail(
 
     logger.info(f"Doctor detail fetched: user_id={user_id}, slots={len(slot_summaries)}")
 
-    return DoctorDetailResponse(
+    doctor_detail_response = DoctorDetailResponse(
         user_id=profile["user_id"],
         full_name=profile["full_name"],
         specialization=profile.get("specialization"),
@@ -93,3 +93,4 @@ async def get_doctor_detail(
         profile_photo_url=profile.get("profile_photo_url"),
         available_slots=slot_summaries,
     )
+    return doctor_detail_response

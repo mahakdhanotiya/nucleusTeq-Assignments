@@ -75,11 +75,12 @@ async def register_user(request: RegisterRequest) -> RegisterResponse:
         f"New user registered: {new_user.email} "
         f"(role={new_user.role.value}, approval={new_user.approval_status.value})"
     )
-    return RegisterResponse(
+    register_response = RegisterResponse(
         user_id=str(new_user.id),
         email=new_user.email,
         role=new_user.role,
     )
+    return register_response
 
 
 async def login_user(request: LoginRequest) -> TokenResponse:
@@ -108,7 +109,7 @@ async def login_user(request: LoginRequest) -> TokenResponse:
 
     logger.info(f"User logged in: {user.email} (role={user.role.value})")
 
-    return TokenResponse(
+    token_response = TokenResponse(
         access_token=token,
         expires_in=expires_in,
         user=UserSummaryResponse(
@@ -118,3 +119,4 @@ async def login_user(request: LoginRequest) -> TokenResponse:
             role=user.role,
         ),
     )
+    return token_response

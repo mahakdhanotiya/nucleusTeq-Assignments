@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 def _to_payment_response(payment) -> PaymentResponse:
     """Builds a payment response."""
-    return PaymentResponse(
+    payment_response = PaymentResponse(
         id=str(payment.id),
         appointment_id=str(payment.appointment_id),
         patient_id=str(payment.patient_id),
@@ -33,6 +33,7 @@ def _to_payment_response(payment) -> PaymentResponse:
         created_at=payment.created_at,
         updated_at=payment.updated_at,
     )
+    return payment_response
 
 
 async def process_payment(

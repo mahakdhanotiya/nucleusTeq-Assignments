@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 def _to_base_response(user: User) -> UserProfileResponse:
-    return UserProfileResponse(
+    user_profile_response = UserProfileResponse(
         id=str(user.id),
         full_name=user.full_name,
         email=user.email,
@@ -27,6 +27,7 @@ def _to_base_response(user: User) -> UserProfileResponse:
         created_at=user.created_at,
         updated_at=user.updated_at,
     )
+    return user_profile_response
 
 
 async def get_my_profile(user: User) -> DoctorProfileResponse | UserProfileResponse:
@@ -35,7 +36,7 @@ async def get_my_profile(user: User) -> DoctorProfileResponse | UserProfileRespo
     """
     if user.role == UserRole.DOCTOR:
         profile = await get_doctor_profile_by_user_id(user.id)
-        return DoctorProfileResponse(
+        doctor_profile_response = DoctorProfileResponse(
             id=str(user.id),
             full_name=user.full_name,
             email=user.email,
@@ -53,6 +54,7 @@ async def get_my_profile(user: User) -> DoctorProfileResponse | UserProfileRespo
             clinic_address=profile.clinic_address if profile else None,
             profile_photo_url=profile.profile_photo_url if profile else None,
         )
+        return doctor_profile_response
 
     return _to_base_response(user)
 
@@ -109,7 +111,8 @@ async def change_password(user: User, request: ChangePasswordRequest) -> Message
     await update_user(user)
 
     logger.info(f"User changed password: {user.email}")
-    return MessageResponse(message=PASSWORD_CHANGED_SUCCESS)
+    message_response = MessageResponse(message=PASSWORD_CHANGED_SUCCESS)
+    return message_response
 
 
 from beanie import PydanticObjectId

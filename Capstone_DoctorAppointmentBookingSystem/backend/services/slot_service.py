@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
  
 def _to_slot_response(slot: Slot) -> SlotResponse:
     """Builds a slot response."""
-    return SlotResponse(
+    slot_response = SlotResponse(
         id=str(slot.id),
         doctor_id=str(slot.doctor_id),
         date=slot.date,
@@ -42,6 +42,7 @@ def _to_slot_response(slot: Slot) -> SlotResponse:
         created_at=slot.created_at,
         updated_at=slot.updated_at,
     )
+    return slot_response
  
  
 def _validate_slot_date(slot_date: date) -> None:
@@ -199,4 +200,5 @@ async def delete_slot_for_doctor(
  
     await delete_slot(slot)
     logger.info(f"Slot deleted: slot_id={slot_id}, doctor={current_user.email}")
-    return MessageResponse(message=SLOT_DELETED_SUCCESS)
+    message_response = MessageResponse(message=SLOT_DELETED_SUCCESS)
+    return message_response

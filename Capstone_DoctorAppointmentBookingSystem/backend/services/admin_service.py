@@ -17,7 +17,7 @@ def _build_admin_doctor_response(user, profile) -> AdminDoctorResponse:
     """
     Builds an admin doctor response.
     """
-    return AdminDoctorResponse(
+    admin_doctor_response = AdminDoctorResponse(
         user_id=str(user.id),
         full_name=user.full_name,
         email=user.email,
@@ -31,6 +31,7 @@ def _build_admin_doctor_response(user, profile) -> AdminDoctorResponse:
         consultation_fee=profile.consultation_fee if profile else None,
         clinic_address=profile.clinic_address if profile else None,
     )
+    return admin_doctor_response
 
 
 async def list_all_doctors() -> list[AdminDoctorResponse]:
@@ -59,7 +60,8 @@ async def set_doctor_active_status(user_id: str, is_active: bool) -> MessageResp
 
     action = "activated" if is_active else "deactivated"
     logger.info(f"Admin {action} doctor account: {user.email}")
-    return MessageResponse(message=DOCTOR_ACCOUNT_STATUS_SUCCESS_TEMPLATE.format(action))
+    message_response = MessageResponse(message=DOCTOR_ACCOUNT_STATUS_SUCCESS_TEMPLATE.format(action))
+    return message_response
 
 
 async def set_doctor_approval_status(
@@ -81,10 +83,11 @@ async def set_doctor_approval_status(
 
     action = approval_status.value.lower()
     logger.info(f"Admin {action} doctor account: {user.email}")
-    return MessageResponse(message=DOCTOR_ACCOUNT_STATUS_SUCCESS_TEMPLATE.format(action))
+    message_response = MessageResponse(message=DOCTOR_ACCOUNT_STATUS_SUCCESS_TEMPLATE.format(action))
+    return message_response
 
 
 async def get_user_dashboard_stats() -> AdminDashboardUsersResponse:
     """Returns user-side counts for the Admin Dashboard."""
-    counts = await get_user_counts()
-    return AdminDashboardUsersResponse(**counts)
+    admin_dashboard_users_response = AdminDashboardUsersResponse(**counts)
+    return admin_dashboard_users_response

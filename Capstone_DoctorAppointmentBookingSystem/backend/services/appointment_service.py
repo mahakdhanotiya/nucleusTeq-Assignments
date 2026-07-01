@@ -56,7 +56,7 @@ def _to_appointment_response(
     payment: Payment | None = None,
 ) -> AppointmentResponse:
     """Builds an appointment response."""
-    return AppointmentResponse(
+    appointment_response = AppointmentResponse(
         id=str(appointment.id),
         patient_id=str(appointment.patient_id),
         doctor_id=str(appointment.doctor_id),
@@ -78,11 +78,12 @@ def _to_appointment_response(
         created_at=appointment.created_at,
         updated_at=appointment.updated_at,
     )
+    return appointment_response
 
 
 def _to_card(appointment: Appointment) -> AppointmentCardResponse:
     """Builds an appointment card response."""
-    return AppointmentCardResponse(
+    appointment_card_response = AppointmentCardResponse(
         id=str(appointment.id),
         appointment_date=appointment.appointment_date,
         start_time=appointment.start_time,
@@ -93,6 +94,7 @@ def _to_card(appointment: Appointment) -> AppointmentCardResponse:
         patient_name=appointment.patient_snapshot.full_name,
         patient_phone=appointment.patient_snapshot.phone_number,
     )
+    return appointment_card_response
 
 
 async def book_appointment(

@@ -131,10 +131,11 @@ async def get_appointment_stats(
 
     logger.info(f"Admin dashboard stats fetched by: {current_user.user_id}")
 
-    return AppointmentStatsResponse(
+    appointment_stats_response = AppointmentStatsResponse(
         total_appointments=total,
         confirmed_appointments=confirmed,
         completed_appointments=completed,
         cancelled_appointments=cancelled,
         no_show_appointments=no_show,
     )
+    return appointment_stats_response
