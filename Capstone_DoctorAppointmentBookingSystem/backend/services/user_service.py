@@ -111,7 +111,7 @@ async def change_password(user: User, request: ChangePasswordRequest) -> Message
     logger.info(f"User changed password: {user.email}")
     return MessageResponse(message=PASSWORD_CHANGED_SUCCESS)
 
-# --- Internal Monolith Functions (replaces old internal API calls) ---
+
 from beanie import PydanticObjectId
 from repositories.user_repository import search_doctors_by_name, get_user_by_id
 from exceptions.appointment_exceptions import DoctorNotFoundError

@@ -47,7 +47,7 @@ from schemas.response.appointment_response import (
 
 logger = logging.getLogger(__name__)
 
-# Allowed terminal status values a doctor can set (FR-17).
+# Allowed terminal status values a doctor can set.
 _DOCTOR_SETTABLE_STATUSES = {AppointmentStatus.COMPLETED, AppointmentStatus.NO_SHOW}
 
 

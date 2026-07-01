@@ -48,8 +48,6 @@ async def get_current_user(
 
     return user
 
-# --- Legacy Appointment Service DTO and Dependencies ---
-
 class CurrentUser:
     """Represents the authenticated user extracted from the JWT (legacy compatibility)."""
     def __init__(self, user_id: str, email: str, role: str):
