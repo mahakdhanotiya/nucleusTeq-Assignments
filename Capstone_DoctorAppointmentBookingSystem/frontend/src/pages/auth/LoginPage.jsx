@@ -19,6 +19,8 @@ export default function LoginPage() {
     formState: { errors },
   } = useForm({ mode: 'onBlur' });
 
+  const [showPassword, setShowPassword] = useState(false);
+
   const onSubmit = async (data) => {
     setSubmitting(true);
     try {
@@ -27,8 +29,10 @@ export default function LoginPage() {
       toast.success('Login successful. Welcome back!');
       login(access_token, user);
     } catch (err) {
-      const message = err.response?.data?.message || 'Login failed. Please try again.';
-      toast.error(message);
+      if (!err.toasted) {
+        const message = err.response?.data?.message || 'Login failed. Please try again.';
+        toast.error(message);
+      }
     } finally {
       setSubmitting(false);
     }
@@ -52,12 +56,21 @@ export default function LoginPage() {
 
         <div className="mb-4">
           <label className="form-label">Password</label>
-          <input
-            type="password"
-            className={`form-control ${errors.password ? 'is-invalid' : ''}`}
-            placeholder="••••••••"
-            {...register('password', { required: 'Password is required.' })}
-          />
+          <div className="input-group">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+              placeholder="••••••••"
+              {...register('password', { required: 'Password is required.' })}
+            />
+            <button
+              className="btn btn-outline-secondary"
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`} />
+            </button>
+          </div>
           <FieldError message={errors.password?.message} />
         </div>
 

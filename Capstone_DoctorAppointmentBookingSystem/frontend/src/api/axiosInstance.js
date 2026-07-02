@@ -23,14 +23,17 @@ function createInstance(baseURL) {
       if (status === 401) {
         removeToken();
         toast.error('Session expired. Please log in again.');
+        err.toasted = true;
         // Redirect without react-router (instance lives outside component tree)
         window.location.href = '/login';
       } else if (status === 403) {
         toast.error(message);
+        err.toasted = true;
       } else if (status === 422) {
         // Validation errors — let the calling component handle detail
       } else if (status >= 500) {
         toast.error('Server error. Please try again later.');
+        err.toasted = true;
       }
 
       return Promise.reject(err);

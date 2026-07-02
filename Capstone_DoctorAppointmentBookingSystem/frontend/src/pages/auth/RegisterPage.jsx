@@ -16,6 +16,7 @@ export default function RegisterPage() {
   const navigate = useNavigate();
   const toast = useToast();
   const [submitting, setSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -51,8 +52,10 @@ export default function RegisterPage() {
       );
       navigate('/login');
     } catch (err) {
-      const message = err.response?.data?.message || 'Registration failed. Please try again.';
-      toast.error(message);
+      if (!err.toasted) {
+        const message = err.response?.data?.message || 'Registration failed. Please try again.';
+        toast.error(message);
+      }
     } finally {
       setSubmitting(false);
     }
@@ -129,12 +132,21 @@ export default function RegisterPage() {
 
         <div className="mb-3">
           <label className="form-label">Password</label>
-          <input
-            type="password"
-            className={`form-control ${errors.password ? 'is-invalid' : ''}`}
-            placeholder="8-12 chars, 1 uppercase, 1 special"
-            {...register('password', RULES.password)}
-          />
+          <div className="input-group">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+              placeholder="8-12 chars, 1 uppercase, 1 special"
+              {...register('password', RULES.password)}
+            />
+            <button
+              className="btn btn-outline-secondary"
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`} />
+            </button>
+          </div>
           <FieldError message={errors.password?.message} />
         </div>
 
