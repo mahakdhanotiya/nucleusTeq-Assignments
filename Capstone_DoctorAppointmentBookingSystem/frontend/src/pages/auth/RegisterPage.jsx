@@ -16,7 +16,6 @@ export default function RegisterPage() {
   const navigate = useNavigate();
   const toast = useToast();
   const [submitting, setSubmitting] = useState(false);
-  const [role, setRole] = useState('PATIENT');
 
   const {
     register,
@@ -25,7 +24,7 @@ export default function RegisterPage() {
     formState: { errors },
   } = useForm({ mode: 'onBlur', defaultValues: { role: 'PATIENT' } });
 
-  const selectedRole = watch('role', role);
+  const selectedRole = watch('role');
 
   const onSubmit = async (data) => {
     setSubmitting(true);
@@ -73,9 +72,8 @@ export default function RegisterPage() {
               className="btn-check"
               id="role-patient"
               value="PATIENT"
-              {...register('role')}
-              onChange={() => setRole('PATIENT')}
               defaultChecked
+              {...register('role')}
             />
             <label className="btn btn-outline-primary" htmlFor="role-patient">
               <i className="bi bi-person me-1" /> Patient
@@ -87,7 +85,6 @@ export default function RegisterPage() {
               id="role-doctor"
               value="DOCTOR"
               {...register('role')}
-              onChange={() => setRole('DOCTOR')}
             />
             <label className="btn btn-outline-primary" htmlFor="role-doctor">
               <i className="bi bi-clipboard2-pulse me-1" /> Doctor
