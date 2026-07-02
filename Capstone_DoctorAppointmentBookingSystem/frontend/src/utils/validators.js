@@ -3,10 +3,11 @@
 export const RULES = {
   fullName: {
     required: 'Full name is required.',
-    minLength: { value: 2, message: 'Minimum 2 characters.' },
-    pattern: {
-      value: /^[A-Za-z\s]{2,}$/,
-      message: 'Only alphabets and spaces allowed.',
+    validate: (v) => {
+      if (!v || !v.trim()) return 'Full name is required.';
+      if (v.trim().length < 2) return 'Minimum 2 characters.';
+      if (!/^[A-Za-z\s]+$/.test(v)) return 'Only alphabets and spaces allowed.';
+      return true;
     },
   },
 
@@ -28,7 +29,7 @@ export const RULES = {
 
   password: {
     required: 'Password is required.',
-    minLength: { value: 8,  message: 'Minimum 8 characters.' },
+    minLength: { value: 8, message: 'Minimum 8 characters.' },
     maxLength: { value: 12, message: 'Maximum 12 characters.' },
     validate: (v) => {
       if (!/[A-Z]/.test(v)) return 'Must contain at least one uppercase letter.';
