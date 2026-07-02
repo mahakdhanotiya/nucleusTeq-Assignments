@@ -2,12 +2,13 @@ import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from middleware.cors_middleware import add_cors_middleware
 
 from constants.settings import settings
 from database.database import connect_to_database, close_database_connection
 from exceptions.exception_handler import register_exception_handlers
 from middleware.logging_middleware import register_logging_middleware
+from middleware.cors_middleware import add_cors_middleware
 
 # Routers
 from routers.auth_router import router as auth_router
@@ -43,6 +44,7 @@ app = FastAPI(
 
 register_exception_handlers(app)
 register_logging_middleware(app)
+add_cors_middleware(app)
 
 # Include all routers
 app.include_router(auth_router)
