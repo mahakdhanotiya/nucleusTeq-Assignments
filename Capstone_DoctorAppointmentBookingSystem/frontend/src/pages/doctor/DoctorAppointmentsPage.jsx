@@ -58,6 +58,14 @@ export default function DoctorAppointmentsPage() {
     }
   };
 
+  // Filter appointments locally by date if activeView is 'upcoming' and a date filter is selected
+  const displayedAppointments = appointments.filter((appt) => {
+    if (activeView === 'upcoming' && dateFilter) {
+      return appt.appointment_date === dateFilter;
+    }
+    return true;
+  });
+
   const handleStatusUpdate = async (appointmentId, status) => {
     setActionLoading(appointmentId);
     try {
@@ -137,7 +145,7 @@ export default function DoctorAppointmentsPage() {
               }`}
               onClick={() => {
                 setActiveView(tab.key);
-                if (tab.key !== 'all') setDateFilter('');
+                if (tab.key !== 'all' && tab.key !== 'upcoming') setDateFilter('');
               }}
             >
               <i className={`bi ${tab.icon}`} />
@@ -146,8 +154,8 @@ export default function DoctorAppointmentsPage() {
           ))}
         </div>
 
-        {/* Date filter for "All" view */}
-        {activeView === 'all' && (
+        {/* Date filter for "Upcoming" and "All" views */}
+        {(activeView === 'all' || activeView === 'upcoming') && (
           <div className="d-flex align-items-center gap-2">
             <label className="form-label mb-0 fw-600 small text-muted">Filter by date:</label>
             <input
@@ -180,7 +188,7 @@ export default function DoctorAppointmentsPage() {
       )}
 
       {/* Empty State */}
-      {!loading && appointments.length === 0 && (
+      {!loading && displayedAppointments.length === 0 && (
         <div className="card border-0 shadow-sm p-5 text-center">
           <i className="bi bi-calendar-x text-muted d-block mb-3" style={{ fontSize: '3rem', opacity: 0.4 }} />
           <h5 className="fw-bold text-dark mb-2">No Appointments Found</h5>
@@ -197,9 +205,9 @@ export default function DoctorAppointmentsPage() {
       )}
 
       {/* Appointment Cards */}
-      {!loading && appointments.length > 0 && (
+      {!loading && displayedAppointments.length > 0 && (
         <div className="row g-3">
-          {appointments.map((appt) => {
+          {displayedAppointments.map((appt) => {
             const badge = STATUS_BADGES[appt.status] || STATUS_BADGES.CONFIRMED;
             const timePassed = hasTimePassed(appt);
             const isConfirmed = appt.status === 'CONFIRMED';

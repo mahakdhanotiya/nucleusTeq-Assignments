@@ -27,6 +27,7 @@ export default function PatientAppointmentsPage() {
   const [cancelModal, setCancelModal] = useState({ open: false, id: null });
   const [cancelReason, setCancelReason] = useState('');
   const [cancelling, setCancelling] = useState(false);
+  const [dateFilter, setDateFilter] = useState('');
 
   const fetchAppointments = useCallback(async () => {
     setLoading(true);
@@ -47,10 +48,18 @@ export default function PatientAppointmentsPage() {
     fetchAppointments();
   }, [fetchAppointments]);
 
-  // Filter based on active tab
+  // Filter based on active tab and optional date
   const filtered = appointments.filter((a) => {
-    if (activeTab === 'upcoming') return a.status === 'CONFIRMED';
-    return ['COMPLETED', 'CANCELLED', 'NO_SHOW'].includes(a.status);
+    const matchesTab = activeTab === 'upcoming'
+      ? a.status === 'CONFIRMED'
+      : ['COMPLETED', 'CANCELLED', 'NO_SHOW'].includes(a.status);
+
+    if (!matchesTab) return false;
+
+    if (dateFilter) {
+      return a.appointment_date === dateFilter;
+    }
+    return true;
   });
 
   // Cancel logic
@@ -144,22 +153,47 @@ export default function PatientAppointmentsPage() {
         <p>View and manage your upcoming and past appointments.</p>
       </div>
 
-      {/* Tabs */}
-      <div className="d-flex gap-2 mb-4">
-        {TABS.map((tab) => (
-          <button
-            key={tab.key}
-            className={`btn rounded-pill px-4 py-2 fw-600 d-flex align-items-center gap-2 ${
-              activeTab === tab.key
-                ? 'btn-primary'
-                : 'btn-outline-secondary'
-            }`}
-            onClick={() => setActiveTab(tab.key)}
-          >
-            <i className={`bi ${tab.icon}`} />
-            {tab.label}
-          </button>
-        ))}
+      {/* Tabs and Date Filter */}
+      <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+        <div className="d-flex gap-2">
+          {TABS.map((tab) => (
+            <button
+              key={tab.key}
+              className={`btn rounded-pill px-4 py-2 fw-600 d-flex align-items-center gap-2 ${
+                activeTab === tab.key
+                  ? 'btn-primary'
+                  : 'btn-outline-secondary'
+              }`}
+              onClick={() => {
+                setActiveTab(tab.key);
+                setDateFilter('');
+              }}
+            >
+              <i className={`bi ${tab.icon}`} />
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Date filter input */}
+        <div className="d-flex align-items-center gap-2">
+          <label className="form-label mb-0 fw-600 small text-muted">Filter by date:</label>
+          <input
+            type="date"
+            className="form-control form-control-sm"
+            style={{ maxWidth: '200px' }}
+            value={dateFilter}
+            onChange={(e) => setDateFilter(e.target.value)}
+          />
+          {dateFilter && (
+            <button
+              className="btn btn-sm btn-outline-secondary rounded-pill"
+              onClick={() => setDateFilter('')}
+            >
+              <i className="bi bi-x-lg" />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Loading State */}
