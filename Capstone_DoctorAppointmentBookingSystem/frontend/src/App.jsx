@@ -10,7 +10,7 @@ import RegisterPage from './pages/auth/RegisterPage';
 import NotFoundPage from './pages/shared/PageNotFound';
 import UnauthorizedPage from './pages/shared/UnauthorizedPage';
 
-/* ── Patient pages ───────────────────────────────────────── */
+
 import PatientHomePage from './pages/patient/PatientHomePage';
 
 /**
