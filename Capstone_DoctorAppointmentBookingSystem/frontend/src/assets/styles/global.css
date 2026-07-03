@@ -324,5 +324,7 @@ body {
 /* ── Utility ─────────────────────────────────────────────── */
 .text-primary { color: var(--primary) !important; }
 .bg-primary-light { background-color: var(--primary-light) !important; }
+.bg-success-light { background-color: #dcfce7 !important; }
 .divider { border-top: 1px solid var(--border); margin: 1.25rem 0; }
 .fw-600 { font-weight: 600 !important; }
+.transition-all { transition: all var(--transition); }
