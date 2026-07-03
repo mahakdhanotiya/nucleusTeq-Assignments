@@ -10,6 +10,9 @@ import RegisterPage from './pages/auth/RegisterPage';
 import NotFoundPage from './pages/shared/PageNotFound';
 import UnauthorizedPage from './pages/shared/UnauthorizedPage';
 
+/* ── Patient pages ───────────────────────────────────────── */
+import PatientHomePage from './pages/patient/PatientHomePage';
+
 /**
  * Root route declarations.
  * Patient / Doctor / Admin feature pages are added here as their
@@ -27,11 +30,18 @@ export default function App() {
 
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
+      {/* ── Patient routes ─────────────────────────────── */}
+      <Route element={<ProtectedRoute allowedRoles={['PATIENT']} />}>
+        <Route element={<DashboardLayout />}>
+          <Route path="/" element={<PatientHomePage />} />
+        </Route>
+      </Route>
+
       {/* ── Authenticated routes (any role) ───────────── */}
       <Route element={<ProtectedRoute allowedRoles={['PATIENT', 'DOCTOR', 'ADMIN']} />}>
         <Route element={<DashboardLayout />}>
-          {/* Patient / Doctor / Admin / shared pages register their
-              routes here in subsequent modules. */}
+          {/* Shared pages (profile, change-password) will be
+              registered here in subsequent modules. */}
         </Route>
       </Route>
 
