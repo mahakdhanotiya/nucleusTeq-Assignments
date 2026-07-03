@@ -12,6 +12,7 @@ import UnauthorizedPage from './pages/shared/UnauthorizedPage';
 
 
 import PatientHomePage from './pages/patient/PatientHomePage';
+import DoctorDetailPage from './pages/patient/DoctorDetailPage';
 
 /**
  * Root route declarations.
@@ -34,6 +35,7 @@ export default function App() {
       <Route element={<ProtectedRoute allowedRoles={['PATIENT']} />}>
         <Route element={<DashboardLayout />}>
           <Route path="/" element={<PatientHomePage />} />
+          <Route path="/doctors/:userId" element={<DoctorDetailPage />} />
         </Route>
       </Route>
 
