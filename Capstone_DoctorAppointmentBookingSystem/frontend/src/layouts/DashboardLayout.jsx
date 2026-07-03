@@ -10,8 +10,9 @@ const NAV_ITEMS = {
     { to: '/my-appointments', label: 'My Appointments',  icon: 'bi-calendar-check' },
   ],
   DOCTOR: [
-    { to: '/doctor/dashboard', label: 'Dashboard',           icon: 'bi-grid-1x2' },
-    { to: '/doctor/slots',     label: 'Manage Availability', icon: 'bi-calendar3' },
+    { to: '/doctor/dashboard',    label: 'Dashboard',           icon: 'bi-grid-1x2' },
+    { to: '/doctor/appointments', label: 'Appointments',        icon: 'bi-calendar-check' },
+    { to: '/doctor/slots',        label: 'Manage Availability', icon: 'bi-calendar3' },
   ],
   ADMIN: [
     { to: '/admin/dashboard', label: 'Dashboard', icon: 'bi-grid-1x2' },
