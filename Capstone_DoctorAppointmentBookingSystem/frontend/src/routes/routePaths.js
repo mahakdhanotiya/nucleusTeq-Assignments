@@ -9,6 +9,7 @@ export const ROUTES = {
   HOME: '/',
   DOCTOR_DETAIL: '/doctors/:userId',
   PAYMENT: '/payment/:appointmentId',
+  PAYMENT_SUCCESS: '/payment-success/:appointmentId',
   MY_APPOINTMENTS: '/my-appointments',
 
   // Doctor
@@ -24,6 +25,7 @@ export const ROUTES = {
   CHANGE_PASSWORD: '/change-password',
 };
 
-export const doctorDetailPath  = (userId) => `/doctors/${userId}`;
-export const paymentPath       = (appointmentId) => `/payment/${appointmentId}`;
+export const doctorDetailPath     = (userId) => `/doctors/${userId}`;
+export const paymentPath          = (appointmentId) => `/payment/${appointmentId}`;
+export const paymentSuccessPath   = (appointmentId) => `/payment-success/${appointmentId}`;
 export const doctorApptDetailPath = (appointmentId) => `/doctor/appointments/${appointmentId}`;

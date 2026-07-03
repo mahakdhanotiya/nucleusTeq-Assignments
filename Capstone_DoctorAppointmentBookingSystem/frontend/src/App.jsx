@@ -13,6 +13,8 @@ import UnauthorizedPage from './pages/shared/UnauthorizedPage';
 
 import PatientHomePage from './pages/patient/PatientHomePage';
 import DoctorDetailPage from './pages/patient/DoctorDetailPage';
+import PaymentPage from './pages/patient/PaymentPage';
+import PaymentSuccessPage from './pages/patient/PaymentSuccessPage';
 
 /**
  * Root route declarations.
@@ -37,6 +39,9 @@ export default function App() {
           <Route path="/" element={<PatientHomePage />} />
           <Route path="/doctors/:userId" element={<DoctorDetailPage />} />
         </Route>
+        {/* Full-screen secure checkout views */}
+        <Route path="/payment/:appointmentId" element={<PaymentPage />} />
+        <Route path="/payment-success/:appointmentId" element={<PaymentSuccessPage />} />
       </Route>
 
       {/* ── Authenticated routes (any role) ───────────── */}
