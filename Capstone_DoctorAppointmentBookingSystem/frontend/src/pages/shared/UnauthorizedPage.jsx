@@ -3,7 +3,13 @@ import { Link } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
 
 export default function UnauthorizedPage() {
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
+
+  let homePath = '/';
+  if (user) {
+    if (user.role === 'DOCTOR') homePath = '/doctor/dashboard';
+    else if (user.role === 'ADMIN') homePath = '/admin/dashboard';
+  }
 
   return (
     <div className="d-flex flex-column align-items-center justify-content-center text-center" style={{ minHeight: '100vh' }}>
@@ -11,7 +17,7 @@ export default function UnauthorizedPage() {
       <h2 className="mt-3 mb-1">403 — Access Denied</h2>
       <p className="text-muted mb-4">You don't have permission to view this page.</p>
       <div className="d-flex gap-2">
-        <Link to="/" className="btn btn-primary">
+        <Link to={homePath} className="btn btn-primary">
           <i className="bi bi-house me-1" /> Go Home
         </Link>
         <button className="btn btn-outline-secondary" onClick={logout}>
