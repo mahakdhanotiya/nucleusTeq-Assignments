@@ -119,6 +119,23 @@ export default function DoctorDetailPage() {
     return initials.substring(0, 2);
   };
 
+  // Check if a slot's date/time is in the past
+  const isSlotPast = (slot) => {
+    const todayStr = formatDate(new Date());
+    if (slot.date < todayStr) return true;
+    if (slot.date === todayStr) {
+      try {
+        const [h, m] = slot.start_time.split(':').map(Number);
+        const slotStartTime = new Date();
+        slotStartTime.setHours(h, m, 0, 0);
+        return new Date() > slotStartTime;
+      } catch {
+        return false;
+      }
+    }
+    return false;
+  };
+
   // Format slot times for nice display
   const formatTime = (time24) => {
     try {
@@ -286,9 +303,9 @@ export default function DoctorDetailPage() {
                     </div>
                     <p className="text-muted">Loading available slots...</p>
                   </div>
-                ) : slots.length > 0 ? (
+                ) : slots.filter((s) => !isSlotPast(s)).length > 0 ? (
                   <div className="row g-3">
-                    {slots.map((slot) => {
+                    {slots.filter((s) => !isSlotPast(s)).map((slot) => {
                       const isSelected = selectedSlot?.id === slot.id;
                       return (
                         <div key={slot.id} className="col-6 col-sm-4">
