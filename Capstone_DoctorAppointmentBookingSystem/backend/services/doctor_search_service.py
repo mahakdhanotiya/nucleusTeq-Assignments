@@ -1,5 +1,5 @@
 import logging
-from datetime import date
+from datetime import datetime, date
 from typing import Optional
 
 from beanie import PydanticObjectId
@@ -19,6 +19,22 @@ from exceptions.appointment_exceptions import DoctorNotFoundError
 logger = logging.getLogger(__name__)
 
 
+def filter_future_slots(slots: list) -> list:
+    """Helper to filter out past slots based on current local system time."""
+    now = datetime.now()
+    future_slots = []
+    for s in slots:
+        try:
+            slot_time = datetime.strptime(s.start_time, "%H:%M").time()
+            slot_datetime = datetime.combine(s.date, slot_time)
+            if slot_datetime > now:
+                future_slots.append(s)
+        except Exception:
+            if s.date >= now.date():
+                future_slots.append(s)
+    return future_slots
+
+
 async def search_doctors_service(
     name: Optional[str] = None,
     specialization: Optional[str] = None,
@@ -30,6 +46,7 @@ async def search_doctors_service(
     for profile in profiles:
         doctor_id = PydanticObjectId(profile["user_id"])
         available_slots = await get_available_slots_for_doctor(doctor_id)
+        active_slots = filter_future_slots(available_slots)
 
         results.append(
             DoctorSearchResult(
@@ -41,7 +58,7 @@ async def search_doctors_service(
                 consultation_fee=profile.get("consultation_fee"),
                 clinic_address=profile.get("clinic_address"),
                 profile_photo_url=profile.get("profile_photo_url"),
-                available_slot_count=len(available_slots),
+                available_slot_count=len(active_slots),
             )
         )
 
@@ -68,6 +85,7 @@ async def get_doctor_detail(
         doctor_id=doctor_id,
         slot_date=slot_date,
     )
+    active_slots = filter_future_slots(available_slots)
 
     slot_summaries = [
         SlotSummary(
@@ -77,7 +95,7 @@ async def get_doctor_detail(
             end_time=s.end_time,
             status=s.status,
         )
-        for s in available_slots
+        for s in active_slots
     ]
 
     logger.info(f"Doctor detail fetched: user_id={user_id}, slots={len(slot_summaries)}")
