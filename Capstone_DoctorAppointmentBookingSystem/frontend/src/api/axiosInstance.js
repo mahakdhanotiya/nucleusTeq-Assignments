@@ -20,7 +20,8 @@ function createInstance(baseURL) {
       const status  = err.response?.status;
       const message = err.response?.data?.message || 'Something went wrong.';
 
-      if (status === 401) {
+      const isAuthLogin = err.config?.url?.includes('/auth/login');
+      if (status === 401 && !isAuthLogin) {
         removeToken();
         toast.error('Session expired. Please log in again.');
         err.toasted = true;
