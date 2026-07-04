@@ -26,6 +26,7 @@ from repositories.slot_repository import (
 )
 from schemas.request.slot_request import CreateSlotRequest, UpdateSlotRequest
 from schemas.response.slot_response import MessageResponse, SlotResponse
+from services.doctor_search_service import filter_future_slots
  
 logger = logging.getLogger(__name__)
  
@@ -134,7 +135,8 @@ async def get_doctor_available_slots(
         doctor_id=PydanticObjectId(doctor_id),
         slot_date=slot_date,
     )
-    return [_to_slot_response(s) for s in slots]
+    active_slots = filter_future_slots(slots)
+    return [_to_slot_response(s) for s in active_slots]
  
  
 async def update_slot_for_doctor(
