@@ -15,7 +15,8 @@ const NAV_ITEMS = {
     { to: '/doctor/slots',        label: 'Manage Availability', icon: 'bi-calendar3' },
   ],
   ADMIN: [
-    { to: '/admin/dashboard', label: 'Dashboard', icon: 'bi-grid-1x2' },
+    { to: '/admin/dashboard', label: 'Dashboard',      icon: 'bi-speedometer2' },
+    { to: '/admin/doctors',   label: 'Manage Doctors', icon: 'bi-people-fill' },
   ],
 };
 

@@ -397,3 +397,22 @@ body {
 .strength-item.invalid {
   color: var(--text-muted);
 }
+
+/* ── Admin Dashboard Refinements ─────────────────────────── */
+.table-active-row {
+  background-color: var(--primary-light) !important;
+  border-left: 4px solid var(--primary);
+}
+
+.btn-white {
+  background-color: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text) !important;
+}
+
+.bg-info-light {
+  background-color: #e0f2fe !important;
+}
+.text-info {
+  color: #0284c7 !important;
+}
