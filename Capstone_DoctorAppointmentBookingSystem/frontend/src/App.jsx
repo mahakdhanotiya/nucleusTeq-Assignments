@@ -19,6 +19,7 @@ import PaymentSuccessPage from './pages/patient/PaymentSuccessPage';
 
 import DoctorDashboardPage from './pages/doctor/DoctorDashboardPage';
 import DoctorAppointmentsPage from './pages/doctor/DoctorAppointmentsPage';
+import DoctorSlotsPage from './pages/doctor/DoctorSlotsPage';
 
 /**
  * Root route declarations.
@@ -54,6 +55,7 @@ export default function App() {
         <Route element={<DashboardLayout />}>
           <Route path="/doctor/dashboard" element={<DoctorDashboardPage />} />
           <Route path="/doctor/appointments" element={<DoctorAppointmentsPage />} />
+          <Route path="/doctor/slots" element={<DoctorSlotsPage />} />
         </Route>
       </Route>
 
