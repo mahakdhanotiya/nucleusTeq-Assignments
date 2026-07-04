@@ -12,17 +12,19 @@ export default function LoginPage() {
   const { login } = useAuth();
   const toast = useToast();
   const [submitting, setSubmitting] = useState(false);
+  const [authError, setAuthError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm({ mode: 'onBlur' });
 
-  const [showPassword, setShowPassword] = useState(false);
-
   const onSubmit = async (data) => {
     setSubmitting(true);
+    setAuthError('');
     try {
       const res = await loginApi(data);
       const { access_token, user } = res.data;
@@ -31,7 +33,7 @@ export default function LoginPage() {
     } catch (err) {
       if (!err.toasted) {
         const message = err.response?.data?.message || 'Login failed. Please try again.';
-        toast.error(message);
+        setAuthError(message);
       }
     } finally {
       setSubmitting(false);
@@ -42,26 +44,42 @@ export default function LoginPage() {
     <>
       <h4 className="mb-4 fw-600">Log In</h4>
 
+      {/* Global Form-level Error Alert */}
+      {authError && (
+        <div className="alert alert-danger d-flex align-items-center py-2 px-3 mb-3 small" role="alert">
+          <i className="bi bi-exclamation-triangle-fill me-2 fs-6"></i>
+          <div>{authError}</div>
+        </div>
+      )}
+
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
+        {/* Email */}
         <div className="mb-3">
           <label className="form-label">Email</label>
           <input
             type="email"
-            className={`form-control ${errors.email ? 'is-invalid' : ''}`}
+            className={`form-control ${errors.email || authError ? 'is-invalid' : ''}`}
             placeholder="you@example.com"
-            {...register('email', RULES.email)}
+            {...register('email', {
+              ...RULES.email,
+              onChange: () => setAuthError('') // Clear errors on input change
+            })}
           />
           <FieldError message={errors.email?.message} />
         </div>
 
+        {/* Password */}
         <div className="mb-4">
           <label className="form-label">Password</label>
           <div className="input-group">
             <input
               type={showPassword ? 'text' : 'password'}
-              className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+              className={`form-control ${errors.password || authError ? 'is-invalid' : ''}`}
               placeholder="••••••••"
-              {...register('password', { required: 'Password is required.' })}
+              {...register('password', {
+                required: 'Password is required.',
+                onChange: () => setAuthError('') // Clear errors on input change
+              })}
             />
             <button
               className="btn btn-outline-secondary"
