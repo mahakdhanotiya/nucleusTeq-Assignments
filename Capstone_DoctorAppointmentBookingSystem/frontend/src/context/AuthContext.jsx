@@ -45,6 +45,11 @@ export function AuthProvider({ children }) {
     }
   }, [navigate]);
 
+  /** Updates user data in context state. */
+  const updateUser = useCallback((userData) => {
+    setUser((prev) => (prev ? { ...prev, ...userData } : null));
+  }, []);
+
   /** Clears auth state and redirects to login. */
   const logout = useCallback(() => {
     removeToken();
@@ -54,8 +59,8 @@ export function AuthProvider({ children }) {
   }, [navigate]);
 
   const value = useMemo(
-    () => ({ user, token, ready, login, logout }),
-    [user, token, ready, login, logout]
+    () => ({ user, token, ready, login, logout, updateUser }),
+    [user, token, ready, login, logout, updateUser]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

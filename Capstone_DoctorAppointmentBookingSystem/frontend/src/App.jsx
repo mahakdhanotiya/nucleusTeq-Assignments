@@ -21,6 +21,9 @@ import DoctorDashboardPage from './pages/doctor/DoctorDashboardPage';
 import DoctorAppointmentsPage from './pages/doctor/DoctorAppointmentsPage';
 import DoctorSlotsPage from './pages/doctor/DoctorSlotsPage';
 
+import ProfilePage from './pages/shared/ProfilePage';
+import ChangePasswordPage from './pages/shared/ChangePasswordPage';
+
 /**
  * Root route declarations.
  * Patient / Doctor / Admin feature pages are added here as their
@@ -62,8 +65,8 @@ export default function App() {
       {/* ── Authenticated routes (any role) ───────────── */}
       <Route element={<ProtectedRoute allowedRoles={['PATIENT', 'DOCTOR', 'ADMIN']} />}>
         <Route element={<DashboardLayout />}>
-          {/* Shared pages (profile, change-password) will be
-              registered here in subsequent modules. */}
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/change-password" element={<ChangePasswordPage />} />
         </Route>
       </Route>
 
