@@ -24,6 +24,9 @@ import DoctorSlotsPage from './pages/doctor/DoctorSlotsPage';
 import ProfilePage from './pages/shared/ProfilePage';
 import ChangePasswordPage from './pages/shared/ChangePasswordPage';
 
+import AdminDashboardPage from './pages/admin/AdminDashboardPage';
+import AdminDoctorsPage from './pages/admin/AdminDoctorsPage';
+
 /**
  * Root route declarations.
  * Patient / Doctor / Admin feature pages are added here as their
@@ -59,6 +62,14 @@ export default function App() {
           <Route path="/doctor/dashboard" element={<DoctorDashboardPage />} />
           <Route path="/doctor/appointments" element={<DoctorAppointmentsPage />} />
           <Route path="/doctor/slots" element={<DoctorSlotsPage />} />
+        </Route>
+      </Route>
+
+      {/* ── Admin routes ────────────────────────────────── */}
+      <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
+        <Route element={<DashboardLayout />}>
+          <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+          <Route path="/admin/doctors" element={<AdminDoctorsPage />} />
         </Route>
       </Route>
 
