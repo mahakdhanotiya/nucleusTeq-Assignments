@@ -46,17 +46,20 @@ class Appointment(Document):
     cancelled_at: Optional[datetime] = None
     cancellation_reason: Optional[str] = None
 
+    active: Optional[bool] = Field(default=True)
+
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     class Settings:
         name = "appointments"
         indexes = [
-            # Prevent duplicate bookings for the same doctor and slot.
+            # Prevent duplicate bookings for active appointments.
             IndexModel(
                 [("doctor_id", ASCENDING), ("slot_id", ASCENDING)],
-                name="doctor_slot_unique",
+                name="doctor_slot_unique_v3",
                 unique=True,
+                partialFilterExpression={"active": True},
             ),
             # Optimizes patient appointment queries.
             IndexModel(

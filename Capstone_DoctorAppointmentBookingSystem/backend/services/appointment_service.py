@@ -117,6 +117,14 @@ async def book_appointment(
     if slot.status != SlotStatus.AVAILABLE:
         raise SlotAlreadyBookedError()
 
+    # Validate that the slot time has not already passed
+    slot_datetime = datetime.combine(
+        slot.date,
+        datetime.strptime(slot.start_time, "%H:%M").time(),
+    )
+    if datetime.now() >= slot_datetime:
+        raise PastAppointmentDateError()
+
     doctor_data = await internal_fetch_doctor(request.doctor_id)
     patient_data = await internal_fetch_patient(current_user.user_id)
 
@@ -191,9 +199,9 @@ async def cancel_appointment(
     appt_datetime = datetime.combine(
         appointment.appointment_date,
         datetime.strptime(appointment.start_time, "%H:%M").time(),
-    ).replace(tzinfo=timezone.utc)
+    )
 
-    if datetime.now(timezone.utc) >= appt_datetime - timedelta(hours=2):
+    if datetime.now() >= appt_datetime - timedelta(hours=2):
         raise CancellationWindowExpiredError()
 
     slot = await get_slot_by_id(appointment.slot_id)
@@ -204,6 +212,7 @@ async def cancel_appointment(
     appointment.status = AppointmentStatus.CANCELLED
     appointment.cancelled_at = datetime.now(timezone.utc)
     appointment.cancellation_reason = request.reason
+    appointment.active = None
     await update_appointment(appointment)
 
     payment = await get_payment_by_appointment_id(appointment.id)
@@ -268,9 +277,9 @@ async def update_appointment_status(
     appt_datetime = datetime.combine(
         appointment.appointment_date,
         datetime.strptime(appointment.end_time, "%H:%M").time(),
-    ).replace(tzinfo=timezone.utc)
+    )
 
-    if datetime.now(timezone.utc) < appt_datetime:
+    if datetime.now() < appt_datetime:
         raise AppointmentNotCompletedYetError()
 
     appointment.status = request.status
