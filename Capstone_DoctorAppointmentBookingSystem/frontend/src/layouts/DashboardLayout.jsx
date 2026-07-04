@@ -28,7 +28,7 @@ const ROLE_LABEL = { PATIENT: 'Patient', DOCTOR: 'Doctor', ADMIN: 'Administrator
  * Used via React Router's <Outlet /> so each role's pages reuse this layout.
  */
 export default function DashboardLayout() {
-  const { user, logout } = useAuth();
+  const { user, logout, showExpiryWarning, dismissExpiryWarning } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const navItems = NAV_ITEMS[user?.role] || [];
@@ -86,6 +86,26 @@ export default function DashboardLayout() {
 
       {/* ── Main content ────────────────────────────────── */}
       <div className="dashboard-main">
+        {showExpiryWarning && (
+          <div 
+            className="alert alert-warning alert-dismissible fade show border-0 rounded-0 m-0 py-2.5 px-4 d-flex justify-content-between align-items-center shadow-sm w-100" 
+            role="alert" 
+            style={{ zIndex: 1050, backgroundColor: '#fef3c7', color: '#b45309' }}
+          >
+            <div className="d-flex align-items-center gap-2">
+              <i className="bi bi-exclamation-triangle-fill fs-5"></i>
+              <span className="fw-600 small">Your session is about to expire in less than 2 minutes. Please save any unsaved changes to prevent losing work.</span>
+            </div>
+            <button 
+              type="button" 
+              className="btn-close py-2.5" 
+              style={{ filter: 'invert(32%) sepia(87%) saturate(464%) hue-rotate(6deg) brightness(92%) contrast(89%)' }} 
+              aria-label="Close" 
+              onClick={dismissExpiryWarning}
+            ></button>
+          </div>
+        )}
+
         <header className="dashboard-topbar">
           <button
             className="btn btn-outline-secondary btn-sm d-md-none"
