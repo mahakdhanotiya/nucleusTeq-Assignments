@@ -1,4 +1,4 @@
-from constants.message_constants import (
+from constants.auth_constants import (
     DUPLICATE_EMAIL_TEMPLATE,
     DUPLICATE_LICENSE_TEMPLATE,
     INVALID_CREDENTIALS_ERROR,

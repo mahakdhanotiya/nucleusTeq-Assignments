@@ -6,11 +6,11 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from models.user import User
 from utils.jwt_handler import decode_access_token
 from repositories.user_repository import get_user_by_id
-from exceptions.user_exceptions import InvalidTokenError as UserInvalidTokenError
-from exceptions.auth_exceptions import AccountDeactivatedError
-from exceptions.appointment_exceptions import InvalidTokenError as ApptInvalidTokenError, UnauthorizedError
+from exceptions.custom_exceptions import InvalidTokenError as UserInvalidTokenError
+from exceptions.custom_exceptions import AccountDeactivatedError
+from exceptions.custom_exceptions import InvalidTokenError as ApptInvalidTokenError, UnauthorizedError
 
-from constants.message_constants import (
+from constants.auth_constants import (
     AUTH_HEADER_MISSING_ERROR,
     TOKEN_EXPIRED_ERROR,
     INVALID_TOKEN_ERROR,

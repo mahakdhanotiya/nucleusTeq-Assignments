@@ -12,7 +12,7 @@ from utils.jwt_handler import create_access_token
 from repositories.user_repository import get_user_by_email, create_user
 from repositories.doctor_repository import get_doctor_by_license_number, create_doctor_profile
 from repositories.patient_repository import create_patient_profile
-from exceptions.auth_exceptions import (
+from exceptions.custom_exceptions import (
     DuplicateEmailError,
     DuplicateLicenseNumberError,
     InvalidCredentialsError,

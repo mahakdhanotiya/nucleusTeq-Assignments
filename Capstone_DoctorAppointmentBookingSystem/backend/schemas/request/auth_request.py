@@ -6,7 +6,7 @@ from pydantic import BaseModel, EmailStr, Field, field_validator, model_validato
 
 from enums.gender import Gender
 from enums.user_role import UserRole
-from constants.message_constants import (
+from constants.auth_constants import (
     FULL_NAME_VALIDATION_ERROR,
     PHONE_NUMBER_VALIDATION_ERROR,
     PASSWORD_UPPERCASE_ERROR,
