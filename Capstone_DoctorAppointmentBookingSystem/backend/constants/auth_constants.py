@@ -42,7 +42,3 @@ TOKEN_MISSING_CLAIMS_ERROR = "Token is missing required claims."
 USER_NOT_FOUND_FOR_TOKEN_ERROR = (
     "User associated with this token no longer exists."
 )
-
-# Password
-INCORRECT_PASSWORD_ERROR = "The current password you entered is incorrect."
-PASSWORD_CHANGED_SUCCESS = "Password changed successfully."
