@@ -11,6 +11,8 @@ from validators.auth_validators import (
     validate_date_of_birth,
     validate_role_patient,
     validate_role_doctor,
+    validate_consultation_fee,
+    validate_clinic_address,
 )
 
 
@@ -63,6 +65,8 @@ class DoctorRegisterRequest(BaseModel):
     specialization: Specialization
     experience_years: int = Field(..., ge=0)
     license_number: str
+    consultation_fee: float = Field(..., ge=0)
+    clinic_address: str = Field(..., min_length=2)
 
     @field_validator("full_name")
     @classmethod
@@ -83,6 +87,16 @@ class DoctorRegisterRequest(BaseModel):
     @classmethod
     def check_role(cls, value: UserRole) -> UserRole:
         return validate_role_doctor(value)
+
+    @field_validator("consultation_fee")
+    @classmethod
+    def check_consultation_fee(cls, value: float) -> float:
+        return validate_consultation_fee(value)
+
+    @field_validator("clinic_address")
+    @classmethod
+    def check_clinic_address(cls, value: str) -> str:
+        return validate_clinic_address(value)
 
 
 class LoginRequest(BaseModel):

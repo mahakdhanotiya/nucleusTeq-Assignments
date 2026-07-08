@@ -10,6 +10,8 @@ from constants.auth_constants import (
     PASSWORD_DIGIT_ERROR,
     DOB_MUST_BE_PAST_ERROR,
     ADMIN_REGISTRATION_FORBIDDEN_ERROR,
+    CONSULTATION_FEE_VALIDATION_ERROR,
+    CLINIC_ADDRESS_VALIDATION_ERROR,
 )
 
 
@@ -64,3 +66,17 @@ def validate_role_doctor(value: UserRole) -> UserRole:
     if value != UserRole.DOCTOR:
         raise ValueError("Role must be DOCTOR.")
     return value
+
+
+def validate_consultation_fee(value: float) -> float:
+    """Validates that the consultation fee is a non-negative number."""
+    if value < 0:
+        raise ValueError(CONSULTATION_FEE_VALIDATION_ERROR)
+    return value
+
+
+def validate_clinic_address(value: str) -> str:
+    """Validates that the clinic address is a non-empty string."""
+    if not value or not value.strip():
+        raise ValueError(CLINIC_ADDRESS_VALIDATION_ERROR)
+    return value.strip()

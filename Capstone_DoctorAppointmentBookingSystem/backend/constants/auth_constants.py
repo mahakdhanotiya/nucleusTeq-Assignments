@@ -2,6 +2,10 @@ FULL_NAME_VALIDATION_ERROR = "Full name must contain only alphabets and spaces."
 
 PHONE_NUMBER_VALIDATION_ERROR = "Phone number must be exactly 10 digits."
 
+CONSULTATION_FEE_VALIDATION_ERROR = "Consultation fee must be a non-negative number."
+
+CLINIC_ADDRESS_VALIDATION_ERROR = "Clinic address must be a non-empty string."
+
 PASSWORD_UPPERCASE_ERROR = "Password must contain at least one uppercase letter."
 
 PASSWORD_SPECIAL_CHAR_ERROR = "Password must contain at least one special character."

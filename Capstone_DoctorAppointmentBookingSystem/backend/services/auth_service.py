@@ -83,6 +83,8 @@ async def register_doctor(request: DoctorRegisterRequest) -> DoctorRegisterRespo
             specialization=request.specialization,
             experience_years=request.experience_years,
             license_number=request.license_number,
+            consultation_fee=request.consultation_fee,
+            clinic_address=request.clinic_address,
         )
     )
 
