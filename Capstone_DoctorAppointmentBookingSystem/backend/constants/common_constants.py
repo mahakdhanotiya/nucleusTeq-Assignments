@@ -1,0 +1,1 @@
+INTERNAL_SERVER_ERROR_RESPONSE = "Something went wrong. Please try again later."

@@ -8,7 +8,7 @@ from dependencies.auth_dependency import CurrentUser
 from enums.appointment_status import AppointmentStatus
 from enums.payment_status import PaymentStatus
 from enums.slot_status import SlotStatus
-from exceptions.appointment_exceptions import (
+from exceptions.custom_exceptions import (
     AppointmentNotFoundException,
     AppointmentNotOwnedError,
     AppointmentNotCompletedYetError,
