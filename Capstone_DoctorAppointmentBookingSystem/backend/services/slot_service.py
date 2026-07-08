@@ -1,12 +1,12 @@
 import logging
 from datetime import date, datetime, timezone
-from constants.message_constants import SLOT_DELETED_SUCCESS
+from constants.slot_constants import SLOT_DELETED_SUCCESS
  
 from beanie import PydanticObjectId
  
 from dependencies.auth_dependency import CurrentUser
 from enums.slot_status import SlotStatus
-from exceptions.appointment_exceptions import (
+from exceptions.custom_exceptions import (
     InvalidSlotTimeError,
     PastSlotDateError,
     SlotConflictError,

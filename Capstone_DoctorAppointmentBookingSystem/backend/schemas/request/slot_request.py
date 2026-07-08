@@ -3,7 +3,7 @@ from datetime import date as DateType
 from typing import Optional
  
 from pydantic import BaseModel, Field, field_validator, model_validator
-from constants.message_constants import INVALID_TIME_FORMAT, END_TIME_MUST_BE_AFTER_START
+from constants.slot_constants import INVALID_TIME_FORMAT, END_TIME_MUST_BE_AFTER_START
  
  # Shared helper used by both create and update request validators.
 def _is_valid_time(value: str) -> bool:
