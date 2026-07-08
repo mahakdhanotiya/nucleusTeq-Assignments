@@ -1,16 +1,14 @@
+"""Main application entry point for the Doctor Appointment Booking System."""
+
 import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
-from middleware.cors_middleware import add_cors_middleware
-
 from constants.settings import settings
 from database.database import connect_to_database, close_database_connection
 from exceptions.exception_handler import register_exception_handlers
 from middleware.logging_middleware import register_logging_middleware
 from middleware.cors_middleware import add_cors_middleware
-
-# Routers
 
 from routers.user_router import router as user_router
 
@@ -41,7 +39,6 @@ register_exception_handlers(app)
 register_logging_middleware(app)
 add_cors_middleware(app)
 
-# Include all routers
 app.include_router(user_router)
 
 

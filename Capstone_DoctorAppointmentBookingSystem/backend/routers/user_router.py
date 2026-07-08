@@ -15,15 +15,13 @@ from services.user_service import (
 router = APIRouter(prefix="/users", tags=["User Management"])
 
 
-@router.get("/me", response_model=DoctorProfileResponse, status_code=status.HTTP_200_OK)
+@router.get("/profile", response_model=DoctorProfileResponse, status_code=status.HTTP_200_OK)
 async def get_profile(current_user: User = Depends(get_current_user)) -> DoctorProfileResponse:
-    """
-    Returns the authenticated user's profile.
-    """
+    """Returns the authenticated user's profile."""
     return await get_my_profile(current_user)
 
 
-@router.put("/me", response_model=DoctorProfileResponse, status_code=status.HTTP_200_OK)
+@router.put("/profile", response_model=DoctorProfileResponse, status_code=status.HTTP_200_OK)
 async def update_profile(
     request: UpdateProfileRequest,
     current_user: User = Depends(get_current_user),
@@ -33,7 +31,7 @@ async def update_profile(
 
 
 @router.put(
-    "/me/doctor-profile",
+    "/profile/doctor-profile",
     response_model=DoctorProfileResponse,
     status_code=status.HTTP_200_OK,
 )
@@ -41,9 +39,7 @@ async def update_doctor_profile(
     request: UpdateDoctorProfileRequest,
     current_user: User = Depends(require_doctor),
 ) -> DoctorProfileResponse:
-    """
-    Updates the authenticated doctor's profile.
-    """
+    """Updates the authenticated doctor's professional profile."""
     return await update_my_doctor_profile(current_user, request)
 
 

@@ -3,12 +3,13 @@ from datetime import datetime, timezone
 
 from models.user import User
 from enums.user_role import UserRole
+from enums.specialization import Specialization
 from schemas.request.user_request import UpdateProfileRequest, ChangePasswordRequest, UpdateDoctorProfileRequest
 from schemas.response.user_response import UserProfileResponse, DoctorProfileResponse, MessageResponse
 from utils.password import hash_password, verify_password
 from repositories.user_repository import update_user
 from repositories.doctor_repository import get_doctor_profile_by_user_id, update_doctor_profile
-from exceptions.custom_exceptions import IncorrectPasswordError
+from exceptions.custom_exceptions import IncorrectPasswordError, UserNotFoundError
 
 from constants.user_constants import PASSWORD_CHANGED_SUCCESS
 
@@ -117,7 +118,7 @@ async def change_password(user: User, request: ChangePasswordRequest) -> Message
 
 from beanie import PydanticObjectId
 from repositories.user_repository import search_doctors_by_name, get_user_by_id
-from exceptions.appointment_exceptions import DoctorNotFoundError
+from exceptions.custom_exceptions import DoctorNotFoundError
 
 async def internal_fetch_doctor(user_id: str) -> dict:
     object_id = PydanticObjectId(user_id)
@@ -145,8 +146,6 @@ async def internal_fetch_patient(user_id: str) -> dict:
     user = await get_user_by_id(object_id)
 
     if user is None or user.role != UserRole.PATIENT:
-        # Note: PATIENT_NOT_FOUND_ERROR mapped to generic in appointment logic
-        from Capstone_DoctorAppointmentBookingSystem.backend.exceptions.custom_exceptions import UserNotFoundError
         raise UserNotFoundError()
 
     return {
@@ -155,7 +154,7 @@ async def internal_fetch_patient(user_id: str) -> dict:
         "phone_number": user.phone_number,
     }
 
-async def internal_search_doctors(name: str | None = None, specialization: str | None = None) -> list[dict]:
+async def internal_search_doctors(name: str | None = None, specialization: Specialization | None = None) -> list[dict]:
     from repositories.doctor_repository import search_doctor_profiles
     
     name_matched_ids = None

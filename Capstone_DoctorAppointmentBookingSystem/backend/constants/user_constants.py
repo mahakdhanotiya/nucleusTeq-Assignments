@@ -1,4 +1,4 @@
-# User Messages
+"""Constants specific to the user management module."""
 
 USER_NOT_FOUND_ERROR = "User not found."
 

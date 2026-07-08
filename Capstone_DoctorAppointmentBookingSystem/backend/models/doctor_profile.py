@@ -5,17 +5,19 @@ from beanie import Document, Indexed, PydanticObjectId
 from pydantic import Field
 from pymongo import IndexModel, ASCENDING
 
+from enums.specialization import Specialization
+
 
 class DoctorProfile(Document):
     """MongoDB document for doctor-specific professional data."""
 
     user_id: Indexed(PydanticObjectId, unique=True)
     qualification: str
-    specialization: str
+    specialization: Specialization
     experience_years: int = Field(..., ge=0)
     license_number: Indexed(str, unique=True)
     consultation_fee: float = Field(default=0.0, ge=0)
-    clinic_address: Optional[str] = None
+    clinic_address: str
     profile_photo_url: Optional[str] = None
 
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

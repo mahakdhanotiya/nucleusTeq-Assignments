@@ -1,3 +1,4 @@
+
 import logging
 
 from fastapi import FastAPI, Request, status
@@ -8,10 +9,6 @@ from exceptions.custom_exceptions import (
     IncorrectPasswordError,
     UnauthorizedError as UserUnauthorizedError,
     InvalidTokenError as UserInvalidTokenError,
-)
-
-from constants.common_constants import (
-    INTERNAL_SERVER_ERROR_RESPONSE,
 )
 
 logger = logging.getLogger(__name__)
@@ -53,4 +50,4 @@ def register_exception_handlers(app: FastAPI) -> None:
     @app.exception_handler(Exception)
     async def handle_unexpected_error(request: Request, exc: Exception):
         logger.error(f"Unhandled exception on {request.url.path}: {exc}", exc_info=True)
-        return _build_error_response("INTERNAL_SERVER_ERROR", INTERNAL_SERVER_ERROR_RESPONSE, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return _build_error_response("INTERNAL_SERVER_ERROR", "Internal Server Error", status.HTTP_500_INTERNAL_SERVER_ERROR)

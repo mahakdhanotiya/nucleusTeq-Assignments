@@ -1,3 +1,5 @@
+"""Response schemas for the user management module."""
+
 from datetime import datetime
 from typing import Optional
 
@@ -5,10 +7,12 @@ from pydantic import BaseModel
 
 from enums.user_role import UserRole
 from enums.approval_status import ApprovalStatus
+from enums.specialization import Specialization
 
 
 class UserProfileResponse(BaseModel):
     """User profile response model."""
+
     id: str
     full_name: str
     email: str
@@ -31,7 +35,7 @@ class DoctorProfileResponse(UserProfileResponse):
     """Doctor profile response model."""
 
     qualification: Optional[str] = None
-    specialization: Optional[str] = None
+    specialization: Optional[Specialization] = None
     experience_years: Optional[int] = None
     license_number: Optional[str] = None
     consultation_fee: Optional[float] = None
@@ -41,13 +45,14 @@ class DoctorProfileResponse(UserProfileResponse):
 
 class AdminDoctorResponse(BaseModel):
     """Admin doctor response model."""
+
     user_id: str
     full_name: str
     email: str
     phone_number: str
     is_active: bool
     approval_status: ApprovalStatus
-    specialization: Optional[str] = None
+    specialization: Optional[Specialization] = None
     qualification: Optional[str] = None
     experience_years: Optional[int] = None
     license_number: Optional[str] = None
@@ -69,7 +74,7 @@ class InternalDoctorResponse(BaseModel):
     user_id: str
     full_name: str
     is_active: bool
-    specialization: Optional[str] = None
+    specialization: Optional[Specialization] = None
     qualification: Optional[str] = None
     experience_years: Optional[int] = None
     consultation_fee: Optional[float] = None
