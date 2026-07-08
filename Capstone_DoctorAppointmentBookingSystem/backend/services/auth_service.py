@@ -5,8 +5,8 @@ from models.doctor_profile import DoctorProfile
 from models.patient_profile import PatientProfile
 from enums.user_role import UserRole
 from enums.approval_status import ApprovalStatus
-from schemas.request.auth_request import RegisterRequest, LoginRequest
-from schemas.response.auth_response import RegisterResponse, TokenResponse, UserSummaryResponse
+from schemas.request.auth_request import PatientRegisterRequest, DoctorRegisterRequest, LoginRequest
+from schemas.response.auth_response import PatientRegisterResponse, DoctorRegisterResponse, TokenResponse, UserSummaryResponse
 from utils.password import hash_password, verify_password
 from utils.jwt_handler import create_access_token
 from repositories.user_repository import get_user_by_email, create_user
@@ -24,63 +24,77 @@ from exceptions.custom_exceptions import (
 logger = logging.getLogger(__name__)
 
 
-async def register_user(request: RegisterRequest) -> RegisterResponse:
-    """Registers a new Patient or Doctor account and creates the matching profile."""
+async def register_patient(request: PatientRegisterRequest) -> PatientRegisterResponse:
+    """Registers a new Patient account and creates a patient profile."""
     if await get_user_by_email(request.email) is not None:
         raise DuplicateEmailError(email=request.email)
-
-    if request.role == UserRole.DOCTOR:
-        if await get_doctor_by_license_number(request.license_number) is not None:
-            raise DuplicateLicenseNumberError(license_number=request.license_number)
-        
-    
-    approval_status = (
-        ApprovalStatus.PENDING
-        if request.role == UserRole.DOCTOR
-        else ApprovalStatus.APPROVED
-    )
 
     new_user = User(
         full_name=request.full_name,
         email=request.email,
         password_hash=hash_password(request.password),
         phone_number=request.phone_number,
-        role=request.role,
-        approval_status=approval_status,
-        
+        role=UserRole.PATIENT,
+        approval_status=ApprovalStatus.APPROVED,
     )
     await create_user(new_user)
 
-    if request.role == UserRole.PATIENT:
-        await create_patient_profile(
-            PatientProfile(
-                user_id=new_user.id,
-                gender=request.gender,
-                date_of_birth=request.date_of_birth,
-            )
+    await create_patient_profile(
+        PatientProfile(
+            user_id=new_user.id,
+            gender=request.gender,
+            date_of_birth=request.date_of_birth,
         )
-
-    if request.role == UserRole.DOCTOR:
-        await create_doctor_profile(
-            DoctorProfile(
-                user_id=new_user.id,
-                qualification=request.qualification,
-                specialization=request.specialization,
-                experience_years=request.experience_years,
-                license_number=request.license_number,
-            )
-        )
+    )
 
     logger.info(
         f"New user registered: {new_user.email} "
         f"(role={new_user.role.value}, approval={new_user.approval_status.value})"
     )
-    register_response = RegisterResponse(
+    return PatientRegisterResponse(
         user_id=str(new_user.id),
         email=new_user.email,
         role=new_user.role,
     )
-    return register_response
+
+
+async def register_doctor(request: DoctorRegisterRequest) -> DoctorRegisterResponse:
+    """Registers a new Doctor account and creates a doctor profile."""
+    if await get_user_by_email(request.email) is not None:
+        raise DuplicateEmailError(email=request.email)
+
+    if await get_doctor_by_license_number(request.license_number) is not None:
+        raise DuplicateLicenseNumberError(license_number=request.license_number)
+
+    new_user = User(
+        full_name=request.full_name,
+        email=request.email,
+        password_hash=hash_password(request.password),
+        phone_number=request.phone_number,
+        role=UserRole.DOCTOR,
+        approval_status=ApprovalStatus.PENDING,
+    )
+    await create_user(new_user)
+
+    await create_doctor_profile(
+        DoctorProfile(
+            user_id=new_user.id,
+            qualification=request.qualification,
+            specialization=request.specialization,
+            experience_years=request.experience_years,
+            license_number=request.license_number,
+        )
+    )
+
+    logger.info(
+        f"New user registered: {new_user.email} "
+        f"(role={new_user.role.value}, approval={new_user.approval_status.value})"
+    )
+    return DoctorRegisterResponse(
+        user_id=str(new_user.id),
+        email=new_user.email,
+        role=new_user.role,
+    )
 
 
 async def login_user(request: LoginRequest) -> TokenResponse:

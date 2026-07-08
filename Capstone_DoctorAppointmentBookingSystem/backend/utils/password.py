@@ -1,10 +1,12 @@
+"""Utility functions for secure password hashing and verification."""
+
 from passlib.context import CryptContext
 
-# BCrypt password hashing configuration
 password_context = CryptContext(
     schemes=["bcrypt"],
     deprecated="auto"
 )
+"""CryptContext instance configuration utilizing BCrypt schema for secure hashing."""
 
 
 def hash_password(plain_password: str) -> str:

@@ -1,6 +1,7 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 from enums.user_role import UserRole
+from constants.auth_constants import REGISTRATION_SUCCESS_MESSAGE
 
 
 class UserSummaryResponse(BaseModel):
@@ -11,17 +12,29 @@ class UserSummaryResponse(BaseModel):
     email: str
     role: UserRole
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
-class RegisterResponse(BaseModel):
-    """Response body for POST /auth/register."""
+class PatientRegisterResponse(BaseModel):
+    """Response body for POST /auth/register/patient."""
 
     user_id: str
     email: str
-    role: UserRole
-    message: str = "Registration successful. Please log in."
+    role: UserRole = UserRole.PATIENT
+    message: str = REGISTRATION_SUCCESS_MESSAGE
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class DoctorRegisterResponse(BaseModel):
+    """Response body for POST /auth/register/doctor."""
+
+    user_id: str
+    email: str
+    role: UserRole = UserRole.DOCTOR
+    message: str = REGISTRATION_SUCCESS_MESSAGE
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class TokenResponse(BaseModel):
@@ -31,3 +44,5 @@ class TokenResponse(BaseModel):
     token_type: str = "bearer"
     expires_in: int
     user: UserSummaryResponse
+
+    model_config = ConfigDict(from_attributes=True)
