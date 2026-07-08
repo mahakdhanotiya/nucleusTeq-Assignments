@@ -8,7 +8,7 @@ from repositories.doctor_repository import get_doctor_profile_by_user_id
 from exceptions.user_exceptions import UserNotFoundError, UnauthorizedError
 from enums.user_role import UserRole
 from enums.approval_status import ApprovalStatus
-from constants.message_constants import DOCTOR_ACCOUNT_STATUS_SUCCESS_TEMPLATE
+from constants.admin_constants import DOCTOR_ACCOUNT_STATUS_SUCCESS_TEMPLATE
 
 logger = logging.getLogger(__name__)
 
