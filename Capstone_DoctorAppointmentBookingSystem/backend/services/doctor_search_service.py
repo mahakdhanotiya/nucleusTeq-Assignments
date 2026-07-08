@@ -14,7 +14,7 @@ from schemas.response.doctor_response import (
     DoctorSearchResult,
     SlotSummary,
 )
-from exceptions.appointment_exceptions import DoctorNotFoundError
+from exceptions.custom_exceptions import DoctorNotFoundError
 
 logger = logging.getLogger(__name__)
 
