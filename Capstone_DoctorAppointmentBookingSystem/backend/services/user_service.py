@@ -8,9 +8,9 @@ from schemas.response.user_response import UserProfileResponse, DoctorProfileRes
 from utils.password import hash_password, verify_password
 from repositories.user_repository import update_user
 from repositories.doctor_repository import get_doctor_profile_by_user_id, update_doctor_profile
-from exceptions.user_exceptions import IncorrectPasswordError
+from exceptions.custom_exceptions import IncorrectPasswordError
 
-from constants.message_constants import PASSWORD_CHANGED_SUCCESS
+from constants.user_constants import PASSWORD_CHANGED_SUCCESS
 
 logger = logging.getLogger(__name__)
 
@@ -146,7 +146,7 @@ async def internal_fetch_patient(user_id: str) -> dict:
 
     if user is None or user.role != UserRole.PATIENT:
         # Note: PATIENT_NOT_FOUND_ERROR mapped to generic in appointment logic
-        from exceptions.user_exceptions import UserNotFoundError
+        from Capstone_DoctorAppointmentBookingSystem.backend.exceptions.custom_exceptions import UserNotFoundError
         raise UserNotFoundError()
 
     return {

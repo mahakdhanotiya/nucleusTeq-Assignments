@@ -2,7 +2,7 @@ import re
 from typing import Optional
 
 from pydantic import BaseModel, Field, field_validator
-from constants.message_constants import (
+from constants.auth_constants import (
     FULL_NAME_VALIDATION_ERROR,
     PHONE_NUMBER_VALIDATION_ERROR,
     PASSWORD_UPPERCASE_ERROR,

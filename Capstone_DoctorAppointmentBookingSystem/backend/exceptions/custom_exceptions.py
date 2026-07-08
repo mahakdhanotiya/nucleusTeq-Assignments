@@ -1,10 +1,12 @@
-from constants.message_constants import (
+from constants.auth_constants import (
     INVALID_TOKEN_DEFAULT,
     UNAUTHORIZED_ROLE_TEMPLATE,
+)
+
+from constants.user_constants import (
     USER_NOT_FOUND_ERROR,
     INCORRECT_PASSWORD_ERROR,
 )
-
 
 class InvalidTokenError(Exception):
     """Raised when a JWT token is malformed, invalid, or expired."""

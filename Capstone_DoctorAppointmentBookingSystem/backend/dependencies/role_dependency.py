@@ -3,7 +3,7 @@ from fastapi import Depends
 from models.user import User
 from enums.user_role import UserRole
 from dependencies.auth_dependency import get_current_user
-from exceptions.user_exceptions import UnauthorizedError
+from exceptions.custom_exceptions import UnauthorizedError
 
 
 def require_role(allowed_role: UserRole):
