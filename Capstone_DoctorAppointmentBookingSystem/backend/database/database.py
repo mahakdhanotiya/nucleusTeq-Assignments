@@ -9,9 +9,6 @@ from constants.settings import settings
 from models.user import User
 from models.doctor_profile import DoctorProfile
 from models.patient_profile import PatientProfile
-from models.slot import Slot
-from models.appointment import Appointment
-from models.payment import Payment
 
 logger = logging.getLogger(__name__)
 
@@ -34,9 +31,6 @@ async def connect_to_database() -> None:
         User, 
         DoctorProfile, 
         PatientProfile,
-        Slot,
-        Appointment,
-        Payment
     ]
 
     await init_beanie(database=database, document_models=document_models)
