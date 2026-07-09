@@ -1,19 +1,31 @@
 from constants.auth_constants import (
+    ACCOUNT_DEACTIVATED_ERROR,
     INVALID_TOKEN_DEFAULT,
     UNAUTHORIZED_ROLE_TEMPLATE,
 )
 
-from constants.user_constants import (
-    USER_NOT_FOUND_ERROR,
-    INCORRECT_PASSWORD_ERROR,
+from constants.doctor_constants import (
+    DOCTOR_NOT_FOUND_TEMPLATE,
 )
 
+from constants.user_constants import (
+    USER_NOT_FOUND_ERROR,
+    INCORRECT_PASSWORD_ERROR
+)
+
+
+class AccountDeactivatedError(Exception):
+    """Raised when a deactivated account attempts to log in."""
+
+    def __init__(self):
+        super().__init__(ACCOUNT_DEACTIVATED_ERROR)
+        
+        
 class InvalidTokenError(Exception):
     """Raised when a JWT token is malformed, invalid, or expired."""
 
     def __init__(self, reason: str = INVALID_TOKEN_DEFAULT):
         super().__init__(reason)
-
 
 class UnauthorizedError(Exception):
     """Raised when an authenticated user lacks the required role."""
@@ -35,3 +47,10 @@ class IncorrectPasswordError(Exception):
 
     def __init__(self):
         super().__init__(INCORRECT_PASSWORD_ERROR)
+        
+class DoctorNotFoundError(Exception):
+    """Raised when a doctor is not found."""
+
+    def __init__(self, user_id: str = ""):
+        self.user_id = user_id
+        super().__init__(DOCTOR_NOT_FOUND_TEMPLATE.format(user_id))

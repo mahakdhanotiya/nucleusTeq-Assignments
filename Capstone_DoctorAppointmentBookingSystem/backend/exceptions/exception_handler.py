@@ -5,10 +5,12 @@ from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 
 from exceptions.custom_exceptions import (
+    AccountDeactivatedError,
     UserNotFoundError,
     IncorrectPasswordError,
     UnauthorizedError as UserUnauthorizedError,
     InvalidTokenError as UserInvalidTokenError,
+    DoctorNotFoundError
 )
 
 logger = logging.getLogger(__name__)
@@ -27,6 +29,11 @@ def _build_error_response(error_code: str, message: str, status_code: int) -> JS
 
 def register_exception_handlers(app: FastAPI) -> None:
     """Registers all global exception handlers for the monolithic backend."""
+    
+    @app.exception_handler(AccountDeactivatedError)
+    async def handle_deactivated_account(request: Request, exc: AccountDeactivatedError):
+        return _build_error_response("ACCOUNT_DEACTIVATED",str(exc),status.HTTP_403_FORBIDDEN)
+
 
     @app.exception_handler(UserInvalidTokenError)
     async def handle_user_invalid_token(request: Request, exc: UserInvalidTokenError):
@@ -45,6 +52,11 @@ def register_exception_handlers(app: FastAPI) -> None:
     @app.exception_handler(IncorrectPasswordError)
     async def handle_incorrect_password(request: Request, exc: IncorrectPasswordError):
         return _build_error_response("INCORRECT_PASSWORD", str(exc), status.HTTP_400_BAD_REQUEST)
+    
+    @app.exception_handler(DoctorNotFoundError)
+    async def handle_doctor_not_found(request: Request, exc: DoctorNotFoundError):
+        return _build_error_response("DOCTOR_NOT_FOUND", str(exc), status.HTTP_404_NOT_FOUND)
+
 
     # --- Generic Error ---
     @app.exception_handler(Exception)
