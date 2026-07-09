@@ -5,7 +5,7 @@ from typing import Optional
 from pydantic import BaseModel, Field, field_validator, model_validator
 from constants.slot_constants import INVALID_TIME_FORMAT, END_TIME_MUST_BE_AFTER_START
  
- # Shared helper used by both create and update request validators.
+""" Shared helper used by both create and update request validators."""
 def _is_valid_time(value: str) -> bool:
     """Returns True if the value matches HH:MM 24-hour format."""
     return bool(re.fullmatch(r"^([01]\d|2[0-3]):[0-5]\d$", value))

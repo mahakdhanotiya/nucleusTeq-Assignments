@@ -10,7 +10,6 @@ from exceptions.exception_handler import register_exception_handlers
 from middleware.logging_middleware import register_logging_middleware
 from middleware.cors_middleware import add_cors_middleware
 
-# Routers
 
 from routers.slot_router import router as slot_router
 
@@ -41,7 +40,6 @@ register_exception_handlers(app)
 register_logging_middleware(app)
 add_cors_middleware(app)
 
-# Include all routers
 app.include_router(slot_router)
 
 
