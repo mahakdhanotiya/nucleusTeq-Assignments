@@ -32,7 +32,6 @@ class Slot(Document):
         name = "slots"
        
         indexes = [
-            # Optimizes doctor slot queries.
             IndexModel(
                 [
                     ("doctor_id", ASCENDING),
@@ -41,7 +40,6 @@ class Slot(Document):
                 ],
                 name="doctor_date_status_index",
             ),
-            # Prevents duplicate slots for the same doctor.
             IndexModel(
                 [
                     ("doctor_id", ASCENDING),

@@ -24,7 +24,6 @@ async def get_slots_by_doctor(
 ) -> list[Slot]:
     """Returns slots for a doctor using the provided filters."""
     
-    # Build the query dynamically based on the filters provided by the caller.
     filters = [Slot.doctor_id == doctor_id]
 
     if slot_date is not None:
@@ -34,7 +33,6 @@ async def get_slots_by_doctor(
         filters.append(Slot.status == status)
 
     return await Slot.find(*filters).sort(
-        # Always return slots in chronological order
         [("date", 1), ("start_time", 1)]
     ).to_list()
 
@@ -80,7 +78,6 @@ async def get_overlapping_slot(
     ]
 
     if exclude_slot_id is not None:
-        # Exclude the slot being updated from the overlap check
         filters.append({"_id": {"$ne": exclude_slot_id}})
 
     return await Slot.find(*filters).first_or_none()

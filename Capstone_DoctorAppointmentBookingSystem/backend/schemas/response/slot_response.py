@@ -17,7 +17,6 @@ class SlotResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    # Enables automatic conversion from Beanie document objects to response models.
     class Config:
         from_attributes = True
 

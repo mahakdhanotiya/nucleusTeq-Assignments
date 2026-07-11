@@ -1,6 +1,7 @@
 from beanie import PydanticObjectId
 from beanie.odm.operators.find.comparison import In
 
+from enums.specialization import Specialization
 from models.doctor_profile import DoctorProfile
 
 
@@ -22,19 +23,24 @@ async def get_doctor_profile_by_user_id(user_id: PydanticObjectId) -> DoctorProf
 
 async def update_doctor_profile(profile: DoctorProfile) -> DoctorProfile:
     """Saves changes made to an existing DoctorProfile document."""
-    await profile.save()
+    await profile.replace()
     return profile
 
 
 async def search_doctor_profiles(
-    specialization: str | None = None,
+    specialization: Specialization | None = None,
     user_ids: list[PydanticObjectId] | None = None,
 ) -> list[DoctorProfile]:
-    """Searches doctor profiles using the provided filters."""
+    """
+    Searches doctor profiles using the provided filters.
+
+    Applies a case-insensitive partial match on specialization when provided.
+    Filters by a list of user IDs when provided.
+    Returns all profiles when no filters are specified.
+    """
     query_filters = []
 
     if specialization:
-        """ Case-insensitive partial match on specialization """
         query_filters.append(
             {"specialization": {"$regex": specialization, "$options": "i"}}
         )

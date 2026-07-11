@@ -46,10 +46,11 @@ def _to_slot_response(slot: Slot) -> SlotResponse:
     return slot_response
  
  
+from validators.slot_validators import validate_slot_date
+
 def _validate_slot_date(slot_date: date) -> None:
     """Validates the slot date."""
-    if slot_date < date.today():
-        raise PastSlotDateError()
+    validate_slot_date(slot_date)
  
  
 def _validate_slot_times(start_time: str, end_time: str) -> None:
@@ -196,7 +197,6 @@ async def delete_slot_for_doctor(
     if str(slot.doctor_id) != current_user.user_id:
         raise SlotNotOwnedByDoctorError()
 
-    # cannot be deleted
     if slot.status == SlotStatus.BOOKED:
         raise SlotNotAvailableError()
  

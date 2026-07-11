@@ -1,17 +1,23 @@
+"""Main application entry point for the Doctor Appointment Booking System."""
+
 import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
-from middleware.cors_middleware import add_cors_middleware
-
 from constants.settings import settings
 from database.database import connect_to_database, close_database_connection
 from exceptions.exception_handler import register_exception_handlers
 from middleware.logging_middleware import register_logging_middleware
 from middleware.cors_middleware import add_cors_middleware
 
-
+from routers.auth_router import router as auth_router
+from routers.user_router import router as user_router
+from routers.doctor_router import router as doctor_router
 from routers.slot_router import router as slot_router
+from routers.appointment_router import router as appointment_router
+from routers.payment_router import router as payment_router
+from routers.admin_router import router as admin_router
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -20,13 +26,16 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Manages startup and shutdown of the database connection."""
-    logger.info(f"Starting {settings.APP_NAME} in '{settings.APP_ENV}' mode...")
-    await connect_to_database()
+    import os
+    if not os.getenv("TESTING"):
+        logger.info(f"Starting {settings.APP_NAME} in '{settings.APP_ENV}' mode...")
+        await connect_to_database()
 
     yield
 
-    logger.info(f"Shutting down {settings.APP_NAME}...")
-    await close_database_connection()
+    if not os.getenv("TESTING"):
+        logger.info(f"Shutting down {settings.APP_NAME}...")
+        await close_database_connection()
 
 
 app = FastAPI(
@@ -37,10 +46,19 @@ app = FastAPI(
 )
 
 register_exception_handlers(app)
-register_logging_middleware(app)
+import os
+if not os.getenv("TESTING"):
+    register_logging_middleware(app)
 add_cors_middleware(app)
 
+app.include_router(auth_router)
+app.include_router(user_router)
+app.include_router(doctor_router)
 app.include_router(slot_router)
+app.include_router(appointment_router)
+app.include_router(payment_router)
+app.include_router(admin_router)
+
 
 
 @app.get("/health")

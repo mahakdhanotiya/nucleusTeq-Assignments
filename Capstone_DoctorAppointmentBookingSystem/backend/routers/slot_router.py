@@ -1,4 +1,4 @@
-# HTTP routes for doctor availability slot management
+"""HTTP routes for doctor availability slot management."""
 
 from datetime import date
 from typing import Optional
