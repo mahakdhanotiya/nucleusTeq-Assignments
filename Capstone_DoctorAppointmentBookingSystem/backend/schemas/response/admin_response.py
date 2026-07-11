@@ -8,4 +8,4 @@ class AppointmentStatsResponse(BaseModel):
     confirmed_appointments: int
     completed_appointments: int
     cancelled_appointments: int
-    no_show_appointments: int
+    absent_appointments: int
