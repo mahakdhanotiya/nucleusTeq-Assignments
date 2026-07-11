@@ -43,7 +43,7 @@ async def get_current_user(
     if user is None:
         raise UserInvalidTokenError(USER_NOT_FOUND_FOR_TOKEN_ERROR)
 
-    if not user.is_active:
+    if not user.is_active and user.role != "DOCTOR":
         raise AccountDeactivatedError()
 
     return user

@@ -108,7 +108,7 @@ async def login_user(request: LoginRequest) -> TokenResponse:
     if not verify_password(request.password, user.password_hash):
         raise InvalidCredentialsError()
 
-    if not user.is_active:
+    if not user.is_active and user.role != "DOCTOR":
         raise AccountDeactivatedError()
     
     if user.role == UserRole.DOCTOR:
