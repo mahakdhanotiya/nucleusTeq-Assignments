@@ -7,7 +7,7 @@ from enums.appointment_status import AppointmentStatus
 from enums.payment_status import PaymentStatus
 
 
-class DoctorSnapshotResponse(BaseModel):
+class DoctorDetailsResponse(BaseModel):
     user_id: str
     full_name: str
     specialization: Optional[str] = None
@@ -15,7 +15,7 @@ class DoctorSnapshotResponse(BaseModel):
     clinic_address: Optional[str] = None
 
 
-class PatientSnapshotResponse(BaseModel):
+class PatientDetailsResponse(BaseModel):
     user_id: str
     full_name: str
     phone_number: str
@@ -39,8 +39,8 @@ class AppointmentResponse(BaseModel):
     start_time: str
     end_time: str
     status: AppointmentStatus
-    doctor_snapshot: DoctorSnapshotResponse
-    patient_snapshot: PatientSnapshotResponse
+    doctor_details: DoctorDetailsResponse
+    patient_details: PatientDetailsResponse
     payment: Optional[PaymentSummary] = None
     cancelled_at: Optional[datetime] = None
     cancellation_reason: Optional[str] = None
@@ -63,3 +63,4 @@ class AppointmentCardResponse(BaseModel):
     doctor_specialization: Optional[str] = None
     patient_name: str
     patient_phone: str
+    cancellation_reason: Optional[str] = None

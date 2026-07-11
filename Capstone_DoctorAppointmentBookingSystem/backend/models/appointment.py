@@ -8,7 +8,7 @@ from pymongo import ASCENDING, IndexModel
 from enums.appointment_status import AppointmentStatus
 
 
-class DoctorSnapshot(BaseModel):
+class DoctorDetails(BaseModel):
     """Embedded doctor information for an appointment."""
     
     user_id: str
@@ -18,7 +18,7 @@ class DoctorSnapshot(BaseModel):
     clinic_address: Optional[str] = None
 
 
-class PatientSnapshot(BaseModel):
+class PatientDetails(BaseModel):
     """Embedded patient information for an appointment."""
 
     user_id: str
@@ -39,8 +39,8 @@ class Appointment(Document):
 
     status: AppointmentStatus = Field(default=AppointmentStatus.CONFIRMED)
 
-    doctor_snapshot: DoctorSnapshot
-    patient_snapshot: PatientSnapshot
+    doctor_details: DoctorDetails
+    patient_details: PatientDetails
 
     payment_id: Optional[PydanticObjectId] = None
     cancelled_at: Optional[datetime] = None
@@ -54,19 +54,16 @@ class Appointment(Document):
     class Settings:
         name = "appointments"
         indexes = [
-            # Prevent duplicate bookings for active appointments.
             IndexModel(
                 [("doctor_id", ASCENDING), ("slot_id", ASCENDING)],
                 name="doctor_slot_unique_v3",
                 unique=True,
                 partialFilterExpression={"active": True},
             ),
-            # Optimizes patient appointment queries.
             IndexModel(
                 [("patient_id", ASCENDING), ("status", ASCENDING), ("appointment_date", ASCENDING)],
                 name="patient_status_date_index",
             ),
-            # Optimizes doctor appointment queries.
             IndexModel(
                 [("doctor_id", ASCENDING), ("appointment_date", ASCENDING), ("status", ASCENDING)],
                 name="doctor_date_status_index",

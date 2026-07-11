@@ -1,5 +1,6 @@
 import logging
 from datetime import date, datetime, timezone, timedelta
+from typing import Optional
 
 from beanie import PydanticObjectId
 from pymongo.errors import DuplicateKeyError
@@ -8,9 +9,10 @@ from dependencies.auth_dependency import CurrentUser
 from enums.appointment_status import AppointmentStatus
 from enums.payment_status import PaymentStatus
 from enums.slot_status import SlotStatus
+from enums.request_status import RequestStatus
 from exceptions.custom_exceptions import (
     AppointmentNotFoundException,
-    AppointmentNotOwnedError,
+    AppointmentAccessDeniedError,
     AppointmentNotCompletedYetError,
     CancellationWindowExpiredError,
     InvalidStatusTransitionError,
@@ -18,8 +20,17 @@ from exceptions.custom_exceptions import (
     SlotAlreadyBookedError,
     SlotNotFoundException,
 )
+from models.cancellation_request import DoctorCancellationRequest
+from schemas.request.cancellation_request import DoctorCancellationRequestSchema
+from schemas.response.cancellation_response import DoctorCancellationResponseSchema
+from repositories.cancellation_repository import (
+    create_cancellation_request,
+    get_cancellation_request_by_id,
+    list_cancellation_requests,
+    update_cancellation_request,
+)
 from services.user_service import internal_fetch_doctor, internal_fetch_patient
-from models.appointment import Appointment, DoctorSnapshot, PatientSnapshot
+from models.appointment import Appointment, DoctorDetails, PatientDetails
 from models.payment import Payment
 from repositories.appointment_repository import (
     create_appointment,
@@ -40,22 +51,22 @@ from schemas.request.appointment_request import (
 from schemas.response.appointment_response import (
     AppointmentCardResponse,
     AppointmentResponse,
-    DoctorSnapshotResponse,
-    PatientSnapshotResponse,
+    DoctorDetailsResponse,
+    PatientDetailsResponse,
     PaymentSummary,
 )
 
 logger = logging.getLogger(__name__)
 
-# Allowed terminal status values a doctor can set.
-_DOCTOR_SETTABLE_STATUSES = {AppointmentStatus.COMPLETED, AppointmentStatus.NO_SHOW}
+_DOCTOR_SETTABLE_STATUSES = {AppointmentStatus.COMPLETED, AppointmentStatus.ABSENT}
 
 
 def _to_appointment_response(
     appointment: Appointment,
-    payment: Payment | None = None,
+    payment: Optional[Payment] = None,
 ) -> AppointmentResponse:
-    """Builds an appointment response."""
+    """Helper to map a DB Appointment Beanie document into the response DTO."""
+    
     appointment_response = AppointmentResponse(
         id=str(appointment.id),
         patient_id=str(appointment.patient_id),
@@ -65,8 +76,8 @@ def _to_appointment_response(
         start_time=appointment.start_time,
         end_time=appointment.end_time,
         status=appointment.status,
-        doctor_snapshot=DoctorSnapshotResponse(**appointment.doctor_snapshot.model_dump()),
-        patient_snapshot=PatientSnapshotResponse(**appointment.patient_snapshot.model_dump()),
+        doctor_details=DoctorDetailsResponse(**appointment.doctor_details.model_dump()),
+        patient_details=PatientDetailsResponse(**appointment.patient_details.model_dump()),
         payment=PaymentSummary(
             payment_id=str(payment.id),
             status=payment.status,
@@ -89,10 +100,11 @@ def _to_card(appointment: Appointment) -> AppointmentCardResponse:
         start_time=appointment.start_time,
         end_time=appointment.end_time,
         status=appointment.status,
-        doctor_name=appointment.doctor_snapshot.full_name,
-        doctor_specialization=appointment.doctor_snapshot.specialization,
-        patient_name=appointment.patient_snapshot.full_name,
-        patient_phone=appointment.patient_snapshot.phone_number,
+        doctor_name=appointment.doctor_details.full_name,
+        doctor_specialization=appointment.doctor_details.specialization,
+        patient_name=appointment.patient_details.full_name,
+        patient_phone=appointment.patient_details.phone_number,
+        cancellation_reason=appointment.cancellation_reason,
     )
     return appointment_card_response
 
@@ -117,9 +129,14 @@ async def book_appointment(
     if slot.status != SlotStatus.AVAILABLE:
         raise SlotAlreadyBookedError()
 
-    # Validate that the slot time has not already passed
+    slot_date = slot.date.date() if isinstance(slot.date, datetime) else slot.date
+    request_date = request.appointment_date.date() if isinstance(request.appointment_date, datetime) else request.appointment_date
+
+    if slot_date != request_date:
+        raise PastAppointmentDateError()
+
     slot_datetime = datetime.combine(
-        slot.date,
+        slot_date,
         datetime.strptime(slot.start_time, "%H:%M").time(),
     )
     if datetime.now() >= slot_datetime:
@@ -128,14 +145,14 @@ async def book_appointment(
     doctor_data = await internal_fetch_doctor(request.doctor_id)
     patient_data = await internal_fetch_patient(current_user.user_id)
 
-    doctor_snapshot = DoctorSnapshot(
+    doctor_details = DoctorDetails(
         user_id=doctor_data["user_id"],
         full_name=doctor_data["full_name"],
         specialization=doctor_data.get("specialization"),
         consultation_fee=doctor_data.get("consultation_fee"),
         clinic_address=doctor_data.get("clinic_address"),
     )
-    patient_snapshot = PatientSnapshot(
+    patient_details = PatientDetails(
         user_id=patient_data["user_id"],
         full_name=patient_data["full_name"],
         phone_number=patient_data["phone_number"],
@@ -151,14 +168,13 @@ async def book_appointment(
         appointment_date=request.appointment_date,
         start_time=slot.start_time,
         end_time=slot.end_time,
-        doctor_snapshot=doctor_snapshot,
-        patient_snapshot=patient_snapshot,
+        doctor_details=doctor_details,
+        patient_details=patient_details,
     )
 
     try:
         await create_appointment(appointment)
     except DuplicateKeyError:
-        # Concurrent request booked the same slot — restore slot status
         slot.status = SlotStatus.AVAILABLE
         await update_slot(slot)
         raise SlotAlreadyBookedError()
@@ -191,7 +207,7 @@ async def cancel_appointment(
         raise AppointmentNotFoundException(appointment_id)
 
     if str(appointment.patient_id) != str(current_user.user_id):
-        raise AppointmentNotOwnedError()
+        raise AppointmentAccessDeniedError()
 
     if appointment.status != AppointmentStatus.CONFIRMED:
         raise InvalidStatusTransitionError(appointment.status.value, "CANCELLED")
@@ -268,12 +284,11 @@ async def update_appointment_status(
         raise AppointmentNotFoundException(appointment_id)
 
     if str(appointment.doctor_id) != str(current_user.user_id):
-        raise AppointmentNotOwnedError()
+        raise AppointmentAccessDeniedError()
 
     if appointment.status != AppointmentStatus.CONFIRMED:
         raise InvalidStatusTransitionError(appointment.status.value, request.status.value)
 
-    # Appointment time must have passed
     appt_datetime = datetime.combine(
         appointment.appointment_date,
         datetime.strptime(appointment.end_time, "%H:%M").time(),
@@ -307,7 +322,129 @@ async def get_appointment_detail(
     is_doctor = str(appointment.doctor_id) == str(current_user.id)
 
     if not is_patient and not is_doctor:
-        raise AppointmentNotOwnedError()
+        raise AppointmentAccessDeniedError()
 
     payment = await get_payment_by_appointment_id(appointment.id)
     return _to_appointment_response(appointment, payment)
+
+
+async def _to_cancellation_response(
+    req: DoctorCancellationRequest,
+) -> DoctorCancellationResponseSchema:
+    from repositories.user_repository import get_user_by_id
+    user = await get_user_by_id(req.doctor_id)
+    start = req.start_time if req.start_time else getattr(req, "cut_off_time", None) or "00:00"
+    end = req.end_time if req.end_time else "23:59"
+    return DoctorCancellationResponseSchema(
+        id=str(req.id),
+        doctor_id=str(req.doctor_id),
+        doctor_name=user.full_name if user else "Unknown Doctor",
+        doctor_email=user.email if user else "N/A",
+        date=req.date,
+        start_time=start,
+        end_time=end,
+        reason=req.reason,
+        status=req.status,
+        created_at=req.created_at,
+        updated_at=req.updated_at,
+    )
+
+
+async def submit_bulk_cancellation_request(
+    request_dto: DoctorCancellationRequestSchema,
+    current_user: CurrentUser,
+) -> DoctorCancellationResponseSchema:
+    """Submits a bulk cancellation request by a doctor."""
+    doctor_id = PydanticObjectId(current_user.user_id)
+
+    existing = await DoctorCancellationRequest.find_one(
+        DoctorCancellationRequest.doctor_id == doctor_id,
+        DoctorCancellationRequest.date == request_dto.date,
+        DoctorCancellationRequest.start_time == request_dto.start_time,
+        DoctorCancellationRequest.end_time == request_dto.end_time,
+        DoctorCancellationRequest.status == RequestStatus.PENDING,
+    )
+    if existing:
+        raise ValueError("A pending cancellation request for this date and time range already exists.")
+
+    new_request = DoctorCancellationRequest(
+        doctor_id=doctor_id,
+        date=request_dto.date,
+        start_time=request_dto.start_time,
+        end_time=request_dto.end_time,
+        reason=request_dto.reason,
+        status=RequestStatus.PENDING,
+    )
+    await create_cancellation_request(new_request)
+    logger.info(f"Doctor {current_user.user_id} submitted cancellation request for {request_dto.date} between {request_dto.start_time} and {request_dto.end_time}")
+    return await _to_cancellation_response(new_request)
+
+
+async def get_bulk_cancellation_requests(
+    status: RequestStatus | None = None,
+) -> list[DoctorCancellationResponseSchema]:
+    """Lists all bulk cancellation requests (admin view)."""
+    requests = await list_cancellation_requests(status)
+    return [await _to_cancellation_response(r) for r in requests]
+
+
+async def approve_bulk_cancellation_request(
+    request_id: str,
+) -> DoctorCancellationResponseSchema:
+    """Approves a bulk cancellation request and cancels all affected appointments/slots."""
+    req_obj_id = PydanticObjectId(request_id)
+    req = await get_cancellation_request_by_id(req_obj_id)
+    if req is None:
+        raise ValueError("Cancellation request not found.")
+    if req.status != RequestStatus.PENDING:
+        raise ValueError(f"Request is already {req.status.value}.")
+
+    from repositories.slot_repository import get_slots_by_doctor, delete_slot
+    slots = await get_slots_by_doctor(req.doctor_id, req.date)
+
+    start = req.start_time if req.start_time else getattr(req, "cut_off_time", None) or "00:00"
+    end = req.end_time if req.end_time else "23:59"
+    affected_slots = [
+        s for s in slots if start <= s.start_time <= end
+    ]
+
+    for slot in affected_slots:
+        if slot.status == SlotStatus.BOOKED:
+            appointment = await Appointment.find_one(
+                Appointment.slot_id == slot.id,
+                Appointment.status == AppointmentStatus.CONFIRMED,
+            )
+            if appointment:
+                appointment.status = AppointmentStatus.CANCELLED
+                appointment.cancelled_at = datetime.now(timezone.utc)
+                appointment.cancellation_reason = f"Cancelled due to doctor leave request: {req.reason}"
+                appointment.active = None
+                await update_appointment(appointment)
+
+        await delete_slot(slot)
+
+    req.status = RequestStatus.APPROVED
+    req.updated_at = datetime.now(timezone.utc)
+    await update_cancellation_request(req)
+
+    logger.info(f"Admin approved leave request {request_id}. Cancelled {len(affected_slots)} slots.")
+    return await _to_cancellation_response(req)
+
+
+async def reject_bulk_cancellation_request(
+    request_id: str,
+) -> DoctorCancellationResponseSchema:
+    """Rejects a bulk cancellation request."""
+    req_obj_id = PydanticObjectId(request_id)
+    req = await get_cancellation_request_by_id(req_obj_id)
+    if req is None:
+        raise ValueError("Cancellation request not found.")
+    if req.status != RequestStatus.PENDING:
+        raise ValueError(f"Request is already {req.status.value}.")
+
+    req.status = RequestStatus.REJECTED
+    req.updated_at = datetime.now(timezone.utc)
+    await update_cancellation_request(req)
+
+    logger.info(f"Admin rejected bulk cancellation request {request_id}.")
+    return await _to_cancellation_response(req)

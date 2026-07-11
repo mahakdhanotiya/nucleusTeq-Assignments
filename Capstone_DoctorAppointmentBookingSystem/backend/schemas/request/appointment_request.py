@@ -19,7 +19,7 @@ class UpdateAppointmentStatusRequest(BaseModel):
 
     status: AppointmentStatus = Field(
         ...,
-        description="New status. Doctor can set COMPLETED or NO_SHOW only.",
+        description="New status. Doctor can set COMPLETED or ABSENT only.",
     )
 
 
