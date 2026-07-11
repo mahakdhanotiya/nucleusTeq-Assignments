@@ -1,15 +1,12 @@
-# Mock payment processing.
-# No real payment gateway — simulates a successful payment state transition.
-
 import logging
 
 from beanie import PydanticObjectId
 
 from dependencies.auth_dependency import CurrentUser
 from enums.payment_status import PaymentStatus
-from exceptions.appointment_exceptions import (
+from exceptions.custom_exceptions import (
     AppointmentNotFoundException,
-    AppointmentNotOwnedError,
+    AppointmentAccessDeniedError,
 )
 from repositories.appointment_repository import get_appointment_by_id
 from repositories.payment_repository import (
@@ -41,16 +38,23 @@ async def process_payment(
     current_user: CurrentUser,
 ) -> PaymentResponse:
     """Processes the payment for an appointment."""
+    from enums.appointment_status import AppointmentStatus
     appointment = await get_appointment_by_id(PydanticObjectId(appointment_id))
     if appointment is None:
         raise AppointmentNotFoundException(appointment_id)
 
     if str(appointment.patient_id) != str(current_user.user_id):
-        raise AppointmentNotOwnedError()
+        raise AppointmentAccessDeniedError()
+
+    if appointment.status == AppointmentStatus.CANCELLED:
+        raise ValueError("Cannot process payment for a cancelled appointment.")
 
     payment = await get_payment_by_appointment_id(appointment.id)
     if payment is None:
         raise AppointmentNotFoundException(appointment_id)
+
+    if payment.status == PaymentStatus.SUCCESS:
+        raise ValueError("Payment has already been processed for this appointment.")
 
     payment.status = PaymentStatus.SUCCESS
     updated = await update_payment(payment)
@@ -74,7 +78,7 @@ async def get_payment_for_appointment(
     is_patient = str(appointment.patient_id) == str(current_user.id)
     is_doctor = str(appointment.doctor_id) == str(current_user.id)
     if not is_patient and not is_doctor:
-        raise AppointmentNotOwnedError()
+        raise AppointmentAccessDeniedError()
 
     payment = await get_payment_by_appointment_id(appointment.id)
     if payment is None:
