@@ -23,7 +23,7 @@ async def get_doctor_profile_by_user_id(user_id: PydanticObjectId) -> DoctorProf
 
 async def update_doctor_profile(profile: DoctorProfile) -> DoctorProfile:
     """Saves changes made to an existing DoctorProfile document."""
-    await profile.save()
+    await profile.replace()
     return profile
 
 

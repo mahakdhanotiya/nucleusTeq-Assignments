@@ -35,7 +35,7 @@ class DoctorProfileResponse(UserProfileResponse):
     """Doctor profile response model."""
 
     qualification: Optional[str] = None
-    specialization: Optional[Specialization] = None
+    specialization: Optional[str] = None
     experience_years: Optional[int] = None
     license_number: Optional[str] = None
     consultation_fee: Optional[float] = None
@@ -52,7 +52,7 @@ class AdminDoctorResponse(BaseModel):
     phone_number: str
     is_active: bool
     approval_status: ApprovalStatus
-    specialization: Optional[Specialization] = None
+    specialization: Optional[str] = None
     qualification: Optional[str] = None
     experience_years: Optional[int] = None
     license_number: Optional[str] = None
@@ -74,7 +74,7 @@ class InternalDoctorResponse(BaseModel):
     user_id: str
     full_name: str
     is_active: bool
-    specialization: Optional[Specialization] = None
+    specialization: Optional[str] = None
     qualification: Optional[str] = None
     experience_years: Optional[int] = None
     consultation_fee: Optional[float] = None

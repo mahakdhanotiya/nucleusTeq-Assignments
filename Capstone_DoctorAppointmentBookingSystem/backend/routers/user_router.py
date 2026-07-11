@@ -10,6 +10,7 @@ from services.user_service import (
     update_my_profile,
     update_my_doctor_profile,
     change_password,
+    set_doctor_self_active_status,
 )
 
 router = APIRouter(prefix="/users", tags=["User Management"])
@@ -50,3 +51,12 @@ async def update_password(
 ) -> MessageResponse:
     """Changes the current user's password after validating the old one."""
     return await change_password(current_user, request)
+
+
+@router.patch("/profile/active-status", response_model=MessageResponse, status_code=status.HTTP_200_OK)
+async def toggle_active_status(
+    is_active: bool,
+    current_user: User = Depends(require_doctor),
+) -> MessageResponse:
+    """Allows a doctor to activate or deactivate their own profile status."""
+    return await set_doctor_self_active_status(current_user, is_active)
