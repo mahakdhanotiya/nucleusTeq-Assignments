@@ -8,7 +8,11 @@ from constants.settings import settings
 
 from models.user import User
 from models.doctor_profile import DoctorProfile
+from models.patient_profile import PatientProfile
 from models.slot import Slot
+from models.appointment import Appointment
+from models.payment import Payment
+from models.cancellation_request import DoctorCancellationRequest
 
 logger = logging.getLogger(__name__)
 
@@ -17,6 +21,7 @@ mongo_client: AsyncIOMotorClient | None = None
 async def connect_to_database() -> None:
     """Connects to MongoDB Atlas and initializes Beanie with all document models."""
     global mongo_client
+    import os
 
     logger.info("Connecting to MongoDB...")
 
@@ -25,12 +30,17 @@ async def connect_to_database() -> None:
         tls=True,
         tlsCAFile=certifi.where()
     )
-    database = mongo_client[settings.DATABASE_NAME]
+    db_name = os.getenv("TEST_DB_NAME", "doctor_appointment_test_db") if os.getenv("TESTING") == "True" else settings.DATABASE_NAME
+    database = mongo_client[db_name]
 
     document_models: list = [
         User, 
         DoctorProfile, 
-        Slot  
+        PatientProfile,
+        Slot,
+        Appointment,
+        Payment,
+        DoctorCancellationRequest
     ]
 
     await init_beanie(database=database, document_models=document_models)
