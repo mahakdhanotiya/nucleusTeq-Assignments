@@ -4,7 +4,7 @@ import { getToken, removeToken } from '../utils/tokenHelpers';
 
 /** Creates an Axios instance pointing at the given base URL. */
 function createInstance(baseURL) {
-  const instance = axios.create({ baseURL, timeout: 10000 });
+  const instance = axios.create({ baseURL, timeout: 30000 });
 
   // Attach JWT on every request
   instance.interceptors.request.use((config) => {

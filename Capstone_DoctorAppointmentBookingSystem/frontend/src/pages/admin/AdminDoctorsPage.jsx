@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { 
   getAllDoctors, 
   approveDoctor, 
@@ -17,20 +17,32 @@ export default function AdminDoctorsPage() {
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [expandedId, setExpandedId] = useState(null);
   const [actionId, setActionId] = useState(null); // Tracks row action loading states
+  const isMounted = useRef(true);
 
   useEffect(() => {
+    isMounted.current = true;
     fetchDoctors();
+    return () => {
+      isMounted.current = false;
+    };
   }, []);
 
   const fetchDoctors = async () => {
     try {
       setLoading(true);
       const res = await getAllDoctors();
-      setDoctors(res.data);
+      if (isMounted.current) {
+        setDoctors(res.data);
+      }
     } catch (err) {
-      toast.error('Failed to load registered doctors.');
+      console.error('fetchDoctors error details:', err);
+      if (isMounted.current) {
+        toast.error('Failed to load registered doctors.');
+      }
     } finally {
-      setLoading(false);
+      if (isMounted.current) {
+        setLoading(false);
+      }
     }
   };
 
