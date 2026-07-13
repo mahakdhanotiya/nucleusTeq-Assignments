@@ -29,7 +29,12 @@ import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import AdminDoctorsPage from './pages/admin/AdminDoctorsPage';
 import AdminLeaveRequestsPage from './pages/admin/AdminLeaveRequestsPage';
 
-/* Root route declarations.*/
+/**
+ * Root route declarations.
+ * Patient / Doctor / Admin feature pages are added here as their
+ * respective modules are implemented — DashboardLayout is already
+ * wired to support all three roles via role-based sidebar nav.
+ */
 export default function App() {
   return (
     <Routes>
