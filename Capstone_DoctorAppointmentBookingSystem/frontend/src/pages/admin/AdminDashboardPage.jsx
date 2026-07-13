@@ -38,7 +38,7 @@ export default function AdminDashboardPage() {
     // Fetch Doctors List
     try {
       const doctorsRes = await getAllDoctors();
-      setRecentDoctors((doctorsRes.data || []).slice(0, 5));
+      setRecentDoctors([...(doctorsRes.data || [])].reverse().slice(0, 5));
     } catch (err) {
       console.error('Failed to fetch doctors list:', err);
     }
