@@ -16,6 +16,7 @@ import DoctorDetailPage from './pages/patient/DoctorDetailPage';
 import PatientAppointmentsPage from './pages/patient/PatientAppointmentsPage';
 import PaymentPage from './pages/patient/PaymentPage';
 import PaymentSuccessPage from './pages/patient/PaymentSuccessPage';
+import ErrorBoundary from './components/common/ErrorBoundary';
 
 import DoctorDashboardPage from './pages/doctor/DoctorDashboardPage';
 import DoctorAppointmentsPage from './pages/doctor/DoctorAppointmentsPage';
@@ -49,9 +50,9 @@ export default function App() {
       {/* ── Patient routes ─────────────────────────────── */}
       <Route element={<ProtectedRoute allowedRoles={['PATIENT']} />}>
         <Route element={<DashboardLayout />}>
-          <Route path="/" element={<PatientHomePage />} />
-          <Route path="/doctors/:userId" element={<DoctorDetailPage />} />
-          <Route path="/my-appointments" element={<PatientAppointmentsPage />} />
+          <Route path="/" element={<ErrorBoundary><PatientHomePage /></ErrorBoundary>} />
+          <Route path="/doctors/:userId" element={<ErrorBoundary><DoctorDetailPage /></ErrorBoundary>} />
+          <Route path="/my-appointments" element={<ErrorBoundary><PatientAppointmentsPage /></ErrorBoundary>} />
         </Route>
         {/* Full-screen secure checkout views */}
         <Route path="/payment/:appointmentId" element={<PaymentPage />} />
