@@ -1,0 +1,1 @@
+DOCTOR_ACCOUNT_STATUS_SUCCESS_TEMPLATE = "Doctor account {} successfully."
