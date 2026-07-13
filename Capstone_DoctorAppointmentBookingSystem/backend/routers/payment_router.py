@@ -1,7 +1,4 @@
-# Payment endpoints for mock payment processing.
-
 from fastapi import APIRouter, Depends, status
-
 from dependencies.auth_dependency import CurrentUser, get_current_user, require_patient
 from schemas.request.payment_request import ProcessPaymentRequest
 from schemas.response.payment_response import PaymentResponse
