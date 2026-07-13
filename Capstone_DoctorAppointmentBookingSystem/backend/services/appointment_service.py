@@ -76,7 +76,13 @@ def _to_appointment_response(
         start_time=appointment.start_time,
         end_time=appointment.end_time,
         status=appointment.status,
-        doctor_details=DoctorDetailsResponse(**appointment.doctor_details.model_dump()),
+        doctor_details=DoctorDetailsResponse(
+            user_id=appointment.doctor_details.user_id,
+            full_name=appointment.doctor_details.full_name,
+            specialization=appointment.doctor_details.specialization or "N/A",
+            consultation_fee=appointment.doctor_details.consultation_fee,
+            clinic_address=appointment.doctor_details.clinic_address,
+        ),
         patient_details=PatientDetailsResponse(**appointment.patient_details.model_dump()),
         payment=PaymentSummary(
             payment_id=str(payment.id),

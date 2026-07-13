@@ -10,7 +10,7 @@ from enums.payment_status import PaymentStatus
 class DoctorDetailsResponse(BaseModel):
     user_id: str
     full_name: str
-    specialization: Optional[str] = None
+    specialization: str
     consultation_fee: Optional[float] = None
     clinic_address: Optional[str] = None
 
