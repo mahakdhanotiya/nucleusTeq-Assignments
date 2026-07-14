@@ -5,7 +5,7 @@ from beanie import PydanticObjectId
 from schemas.response.user_response import AdminDoctorResponse, AdminDashboardUsersResponse, MessageResponse
 from repositories.user_repository import get_user_by_id, get_all_doctors, get_user_counts
 from repositories.doctor_repository import get_doctor_profile_by_user_id
-from exceptions.user_exceptions import UserNotFoundError, UnauthorizedError
+from exceptions.custom_exceptions import UserNotFoundError, UnauthorizedError
 from enums.user_role import UserRole
 from enums.approval_status import ApprovalStatus
 from constants.admin_constants import DOCTOR_ACCOUNT_STATUS_SUCCESS_TEMPLATE

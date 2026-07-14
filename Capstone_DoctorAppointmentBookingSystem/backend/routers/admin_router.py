@@ -126,7 +126,7 @@ async def get_appointment_stats(
         Appointment.status == AppointmentStatus.CANCELLED
     ).count()
     no_show = await Appointment.find(
-        Appointment.status == AppointmentStatus.NO_SHOW
+        Appointment.status == AppointmentStatus.ABSENT
     ).count()
 
     logger.info(f"Admin dashboard stats fetched by: {current_user.user_id}")
@@ -136,6 +136,6 @@ async def get_appointment_stats(
         confirmed_appointments=confirmed,
         completed_appointments=completed,
         cancelled_appointments=cancelled,
-        no_show_appointments=no_show,
+        absent_appointments=no_show,
     )
     return appointment_stats_response

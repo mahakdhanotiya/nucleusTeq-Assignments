@@ -56,7 +56,7 @@ async def test_admin_doctor_approval_and_rejection_flow(client: AsyncClient, adm
     # 2. Admin approves doctor
     approve_res = await client.patch(f"/admin/doctors/{doctor_user_id}/approve", headers=admin_headers)
     assert approve_res.status_code == 200
-    assert approve_res.json()["message"] == "Doctor account successfully approved."
+    assert approve_res.json()["message"] == "Doctor account approved successfully."
 
     # Verify updated in DB
     user = await User.find_one(User.id == PydanticObjectId(doctor_user_id))
@@ -88,7 +88,7 @@ async def test_admin_doctor_rejection(client: AsyncClient, admin_headers: dict):
     # Admin rejects
     reject_res = await client.patch(f"/admin/doctors/{doctor_user_id}/reject", headers=admin_headers)
     assert reject_res.status_code == 200
-    assert reject_res.json()["message"] == "Doctor account successfully rejected."
+    assert reject_res.json()["message"] == "Doctor account rejected successfully."
 
     user = await User.find_one(User.id == PydanticObjectId(doctor_user_id))
     assert user.approval_status == ApprovalStatus.REJECTED
